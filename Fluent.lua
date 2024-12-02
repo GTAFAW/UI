@@ -5949,7 +5949,7 @@ local ClosureBindings = {
 		return Themes
 	end,
 	[48] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(48)return {
-		Name = "紫晶",
+		Name = "Amethyst",
 		Accent = Color3.fromRGB(97, 62, 167),
 
 		AcrylicMain = Color3.fromRGB(20, 20, 20),
@@ -5997,7 +5997,7 @@ local ClosureBindings = {
 		}
 	end,
 	[49] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(49)return {
-		Name = "翠绿",
+		Name = "Aqua",
 		Accent = Color3.fromRGB(60, 165, 165),
 
 		AcrylicMain = Color3.fromRGB(20, 20, 20),
@@ -6045,7 +6045,7 @@ local ClosureBindings = {
 		}
 	end,
 	[50] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(50)return {
-		Name = "黑暗",
+		Name = "Dark",
 		Accent = Color3.fromRGB(96, 205, 255),
 
 		AcrylicMain = Color3.fromRGB(60, 60, 60),
@@ -6093,7 +6093,7 @@ local ClosureBindings = {
 		}
 	end,
 	[51] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(51)return {
-		Name = "较暗",
+		Name = "Darker",
 		Accent = Color3.fromRGB(72, 138, 182),
 
 		AcrylicMain = Color3.fromRGB(30, 30, 30),
@@ -6124,7 +6124,7 @@ local ClosureBindings = {
 		}
 	end,
 	[52] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(52)return {
-		Name = "",
+		Name = "Light",
 		Accent = Color3.fromRGB(0, 103, 192),
 
 		AcrylicMain = Color3.fromRGB(200, 200, 200),
@@ -6172,7 +6172,7 @@ local ClosureBindings = {
 		}
 	end,
 	[53] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(53)return {
-		Name = "玫瑰",
+		Name = "Rose",
 		Accent = Color3.fromRGB(180, 55, 90),
 
 		AcrylicMain = Color3.fromRGB(40, 40, 40),
@@ -6220,7 +6220,7 @@ local ClosureBindings = {
 		}
 	end,
 	[54] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(54)return {
-		Name = "正常主题",
+		Name = "Normal Theme",
 		Accent = Color3.fromRGB(255, 34, 97),
 
 		AcrylicMain = Color3.fromRGB(20, 20, 20),
