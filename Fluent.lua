@@ -1,3 +1,84 @@
+local player = game.Players.LocalPlayer
+local L1 = Instance.new("ScreenGui")
+local L2 = Instance.new("ImageButton")
+local L3 = Instance.new("UICorner")
+local sound = Instance.new("Sound")
+
+-- 设置UICorner
+L3.Name = "UICorner"
+L3.Parent = L2
+
+-- 设置ImageButton
+L2.Name = "CustomButton"
+L2.Parent = L1
+L2.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+L2.BackgroundTransparency = 1.0
+L2.BorderSizePixel = 0
+L2.Position = UDim2.new(0.1208, 0, 0.0953, 0)
+L2.Size = UDim2.new(0, 50, 0, 50)
+L2.Image = "rbxassetid://120611289434746" -- 你的图片ID
+L2.ScaleType = Enum.ScaleType.Slice -- 根据需要调整图片的缩放类型
+L2.Draggable = true -- 允许拖动
+
+-- 设置声音
+sound.Parent = L2
+sound.SoundId = "rbxassetid://3398620867"
+
+-- 设置点击事件
+L2.MouseButton1Click:Connect(function()
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
+    sound:Play()
+end)
+
+-- 设置拖动事件
+local function updateButtonPosition()
+    local userInputService = game:GetService("UserInputService")
+    local dragObject = nil
+    local dragStart = nil
+
+    L2.MouseEnter:Connect(function()
+        dragObject = L2
+    end)
+
+    L2.MouseLeave:Connect(function()
+        dragObject = nil
+    end)
+
+    userInputService.InputBegan:Connect(function(input, gameProcessed)
+        if dragObject and input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragStart = input.Position
+            gameProcessed = true
+        end
+    end)
+
+    userInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragStart = nil
+        end
+    end)
+
+    userInputService.InputChanged:Connect(function(input, gameProcessed)
+        if dragStart and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            dragStart = input.Position
+            dragObject.Position = UDim2.new(dragObject.Position.X.Scale, dragObject.Position.X.Offset + delta.X, 
+                                            dragObject.Position.Y.Scale, dragObject.Position.Y.Offset + delta.Y)
+            gameProcessed = true
+        end
+    end)
+end
+
+updateButtonPosition()
+
+-- 设置ScreenGui
+L1.Name = "MainGui"
+L1.Parent = player:WaitForChild("PlayerGui")
+L1.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- 打印信息
+print("stop tween")
+
+-- Fluent库的代码，你需要确保Fluent库的代码是可用的
 local ImportGlobals
 local ObjectTree = {
 	{
@@ -394,8 +475,8 @@ local ObjectTree = {
 	}
 }
 
-if game:GetService("CoreGui"):FindFirstChild('Normal Hub') then
-	game:GetService("CoreGui"):FindFirstChild('Normal Hub'):Destroy()
+if game:GetService("CoreGui"):FindFirstChild('XGO Hub') then
+	game:GetService("CoreGui"):FindFirstChild('XGO Hub'):Destroy()
 end
 
 -- Holds direct closure data
@@ -420,7 +501,7 @@ local ClosureBindings = {
 		local ProtectGui = protectgui or (syn and syn.protect_gui) or function() end
 		local GUI = New("ScreenGui", {
 			Parent = RunService:IsStudio() and LocalPlayer.PlayerGui or game:GetService("CoreGui"),
-			Name = "Normal Hub"
+			Name = "XGO Hub"
 		})
 
 
@@ -461,16 +542,16 @@ local ClosureBindings = {
 
 				if not i then
 					return Library:Notify({
-						Title = "Interface",
-						Content = "Callback error",
+						Title = "介面",
+						Content = "回调错误",
 						SubContent = Event,
 						Duration = 5,
 					})
 				end
 
 				return Library:Notify({
-					Title = "Interface",
-					Content = "Callback error",
+					Title = "介面",
+					Content = "回调错误",
 					SubContent = Event:sub(i + 1),
 					Duration = 5,
 				})
@@ -2027,17 +2108,17 @@ local ClosureBindings = {
 
 			TitleBar.CloseButton = BarButton(Assets.Close, UDim2.new(1, -4, 0, 4), TitleBar.Frame, function()
 				Library.Window:Dialog({
-					Title = "Close",
-					Content = "Are you sure you want to unload the interface?",
+					Title = "关闭",
+					Content = "你确定要关闭ui界面吗?",
 					Buttons = {
 						{
-							Title = "Yes",
+							Title = "是",
 							Callback = function()
 								Library:Destroy()
 							end,
 						},
 						{
-							Title = "No",
+							Title = "不",
 						},
 					},
 				})
@@ -2361,8 +2442,8 @@ local ClosureBindings = {
 					MinimizeNotif = true
 					local Key = Library.MinimizeKeybind and Library.MinimizeKeybind.Value or Library.MinimizeKey.Name
 					Library:Notify({
-						Title = "Interface",
-						Content = "Press " .. Key .. " to toggle the inteface.",
+						Title = "界面",
+						Content = "按 " .. Key .. " 键来切换界面.",
 						Duration = 6
 					})
 				end
