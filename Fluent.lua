@@ -1,84 +1,3 @@
-local player = game.Players.LocalPlayer
-local L1 = Instance.new("ScreenGui")
-local L2 = Instance.new("ImageButton")
-local L3 = Instance.new("UICorner")
-local sound = Instance.new("Sound")
-
--- 设置UICorner
-L3.Name = "UICorner"
-L3.Parent = L2
-
--- 设置ImageButton
-L2.Name = "CustomButton"
-L2.Parent = L1
-L2.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-L2.BackgroundTransparency = 1.0
-L2.BorderSizePixel = 0
-L2.Position = UDim2.new(0.1208, 0, 0.0953, 0)
-L2.Size = UDim2.new(0, 50, 0, 50)
-L2.Image = "rbxassetid://120611289434746" -- 你的图片ID
-L2.ScaleType = Enum.ScaleType.Slice -- 根据需要调整图片的缩放类型
-L2.Draggable = true -- 允许拖动
-
--- 设置声音
-sound.Parent = L2
-sound.SoundId = "rbxassetid://3398620867"
-
--- 设置点击事件
-L2.MouseButton1Click:Connect(function()
-    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
-    sound:Play()
-end)
-
--- 设置拖动事件
-local function updateButtonPosition()
-    local userInputService = game:GetService("UserInputService")
-    local dragObject = nil
-    local dragStart = nil
-
-    L2.MouseEnter:Connect(function()
-        dragObject = L2
-    end)
-
-    L2.MouseLeave:Connect(function()
-        dragObject = nil
-    end)
-
-    userInputService.InputBegan:Connect(function(input, gameProcessed)
-        if dragObject and input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragStart = input.Position
-            gameProcessed = true
-        end
-    end)
-
-    userInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragStart = nil
-        end
-    end)
-
-    userInputService.InputChanged:Connect(function(input, gameProcessed)
-        if dragStart and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            dragStart = input.Position
-            dragObject.Position = UDim2.new(dragObject.Position.X.Scale, dragObject.Position.X.Offset + delta.X, 
-                                            dragObject.Position.Y.Scale, dragObject.Position.Y.Offset + delta.Y)
-            gameProcessed = true
-        end
-    end)
-end
-
-updateButtonPosition()
-
--- 设置ScreenGui
-L1.Name = "MainGui"
-L1.Parent = player:WaitForChild("PlayerGui")
-L1.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
--- 打印信息
-print("stop tween")
-
--- Fluent库的代码，你需要确保Fluent库的代码是可用的
 local ImportGlobals
 local ObjectTree = {
 	{
@@ -6030,7 +5949,7 @@ local ClosureBindings = {
 		return Themes
 	end,
 	[48] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(48)return {
-		Name = "Amethyst",
+		Name = "紫晶",
 		Accent = Color3.fromRGB(97, 62, 167),
 
 		AcrylicMain = Color3.fromRGB(20, 20, 20),
@@ -6078,7 +5997,7 @@ local ClosureBindings = {
 		}
 	end,
 	[49] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(49)return {
-		Name = "Aqua",
+		Name = "翠绿",
 		Accent = Color3.fromRGB(60, 165, 165),
 
 		AcrylicMain = Color3.fromRGB(20, 20, 20),
@@ -6126,7 +6045,7 @@ local ClosureBindings = {
 		}
 	end,
 	[50] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(50)return {
-		Name = "Dark",
+		Name = "黑暗",
 		Accent = Color3.fromRGB(96, 205, 255),
 
 		AcrylicMain = Color3.fromRGB(60, 60, 60),
@@ -6174,7 +6093,7 @@ local ClosureBindings = {
 		}
 	end,
 	[51] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(51)return {
-		Name = "Darker",
+		Name = "较暗",
 		Accent = Color3.fromRGB(72, 138, 182),
 
 		AcrylicMain = Color3.fromRGB(30, 30, 30),
@@ -6205,7 +6124,7 @@ local ClosureBindings = {
 		}
 	end,
 	[52] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(52)return {
-		Name = "Light",
+		Name = "",
 		Accent = Color3.fromRGB(0, 103, 192),
 
 		AcrylicMain = Color3.fromRGB(200, 200, 200),
@@ -6253,7 +6172,7 @@ local ClosureBindings = {
 		}
 	end,
 	[53] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(53)return {
-		Name = "Rose",
+		Name = "玫瑰",
 		Accent = Color3.fromRGB(180, 55, 90),
 
 		AcrylicMain = Color3.fromRGB(40, 40, 40),
@@ -6301,7 +6220,7 @@ local ClosureBindings = {
 		}
 	end,
 	[54] = function()local maui,script,require,getfenv,setfenv=ImportGlobals(54)return {
-		Name = "Normal Theme",
+		Name = "正常主题",
 		Accent = Color3.fromRGB(255, 34, 97),
 
 		AcrylicMain = Color3.fromRGB(20, 20, 20),
