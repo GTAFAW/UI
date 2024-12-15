@@ -1,4 +1,4 @@
-do
+do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do
 local a=Instance.new("UIStroke");
 local a=Instance.new("UICorner");
 local a=game.Players.LocalPlayer;
