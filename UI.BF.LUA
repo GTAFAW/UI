@@ -1,5 +1,4 @@
------------BF.UI--------jm------- [[
-do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do do
+-----------BF.UI--------jm------- [[ do -- ]] --UI--
 local a=Instance.new("UIStroke");
 local a=Instance.new("UICorner");
 local a=game.Players.LocalPlayer;
