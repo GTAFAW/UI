@@ -1,4 +1,4 @@
------------BF.UI--------jm-----------------[[ .BF.BG.BF.BF.BF.BF.BF.BF.BF.BF.]]
+-----------BF.UI--------jm-----------------[[ .BF.BF.BF.BF.BF.BF.BF.BF.BF.BF.]]
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 local _rn2mb1f68 = function() do
