@@ -1,41 +1,7 @@
 -----------BF.UI--------jm-------[[
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
-local _rn2mb1f68 = function()
-    do
-local a=Instance.new((function()
-        local a={1142,986,1116,1545,1519,1480,1428,1350};
-        local b='';
-        for i=1,#a do 
-            b=b..string.char((a[i]-37)/13);
-        end;
-        return b;
-    end)());
-local a=Instance.new((function()
-        local a={1142,986,908,1480,1519,1467,1350,1519};
-        local b='';
-        for i=1,#a do 
-            b=b..string.char((a[i]-37)/13);
-        end;
-        return b;
-    end)());
-local a=game.Players.LocalPlayer;
-local b=game:GetService((function()
-        local a={1142,1532,1350,1519,986,1467,1493,1558,1545,1116,1350,1519,1571,1402,1324,1350};
-        local b='';
-        for i=1,#a do 
-            b=b..string.char((a[i]-37)/13);
-        end;
-        return b;
-    end)());
-local c=game:GetService((function()
-        local a={1129,1584,1350,1350,1467,1116,1350,1519,1571,1402,1324,1350};
-        local b='';
-        for i=1,#a do 
-            b=b..string.char((a[i]-37)/13);
-        end;
-        return b;
-    end)());
+local _rn2mb1f68 = function() do
 local a=Instance.new("UIStroke");
 local a=Instance.new("UICorner");
 local a=game.Players.LocalPlayer;
