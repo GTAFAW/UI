@@ -1,9 +1,41 @@
------------BF.UI--------jm------- [[ do -- ]] --UI--
-local a=Instance.new("UIStroke");
-local a=Instance.new("UICorner");
+-----------BF.UI--------jm-------[[
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local _rn2mb1f68 = function()
+    do
+local a=Instance.new((function()
+        local a={1142,986,1116,1545,1519,1480,1428,1350};
+        local b='';
+        for i=1,#a do 
+            b=b..string.char((a[i]-37)/13);
+        end;
+        return b;
+    end)());
+local a=Instance.new((function()
+        local a={1142,986,908,1480,1519,1467,1350,1519};
+        local b='';
+        for i=1,#a do 
+            b=b..string.char((a[i]-37)/13);
+        end;
+        return b;
+    end)());
 local a=game.Players.LocalPlayer;
-local b=game:GetService("UserInputService");
-local c=game:GetService("TweenService");
+local b=game:GetService((function()
+        local a={1142,1532,1350,1519,986,1467,1493,1558,1545,1116,1350,1519,1571,1402,1324,1350};
+        local b='';
+        for i=1,#a do 
+            b=b..string.char((a[i]-37)/13);
+        end;
+        return b;
+    end)());
+local c=game:GetService((function()
+        local a={1129,1584,1350,1350,1467,1116,1350,1519,1571,1402,1324,1350};
+        local b='';
+        for i=1,#a do 
+            b=b..string.char((a[i]-37)/13);
+        end;
+        return b;
+    end)());
 local function d(a,d) 
 local e=nil;
 local f=nil;
@@ -198,4 +230,4 @@ local g=Instance.new("UIGradient");
 local h=Instance.new("UIGradient");b.Name="Seperator";b.Parent=f;b.BackgroundColor3=_G.Primary;b.BackgroundTransparency=1;b.Size=UDim2.new(0,379,0,30);c.Name="Sep1";c.Parent=b;c.BackgroundColor3=_G.Primary;c.BackgroundTransparency=0.1;c.BorderSizePixel=0;c.Position=UDim2.new(0,10,0,13);c.Size=UDim2.new(0,60,0,2);d.Name="Sep2";d.Parent=b;d.BackgroundColor3=Color3.fromRGB(255,255,255);d.BackgroundTransparency=1;d.Position=UDim2.new(0,0,0,0);d.Size=UDim2.new(0,379,0,30);d.Font=Enum.Font.GothamSemibold;d.Text="<             "   .. a   .. "             >" ;d.TextColor3=Color3.fromRGB(255,0,0);d.TextSize=14;e.Name="Sep3";e.Parent=b;e.BackgroundColor3=_G.Primary;e.BackgroundTransparency=0.1;e.BorderSizePixel=0;e.Position=UDim2.new(0,309,0,13);e.Size=UDim2.new(0,60,0,2);g.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,_G.Dark),ColorSequenceKeypoint.new(0.5,_G.Primary),ColorSequenceKeypoint.new(1,_G.Dark)});g.Parent=c;h.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,_G.Dark),ColorSequenceKeypoint.new(0.5,_G.Primary),ColorSequenceKeypoint.new(1,_G.Dark)});h.Parent=e;end;a.Line=function(self) 
 local a=Instance.new("Frame");
 local b=Instance.new("Frame");
-local c=Instance.new("UIGradient");a.Name="Linee";a.Parent=f;a.BackgroundColor3=Color3.fromRGB(255,255,255);a.BackgroundTransparency=1;a.Position=UDim2.new(0,0,0.119999997,0);a.Size=UDim2.new(0,310,0,20);b.Name="Line";b.Parent=a;b.BackgroundColor3=Color3.new(125,125,125);b.BorderSizePixel=0;b.Position=UDim2.new(0,0,0,10);b.Size=UDim2.new(0,379,0,1);c.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,_G.Dark),ColorSequenceKeypoint.new(0.4,_G.Primary),ColorSequenceKeypoint.new(0.5,_G.Primary),ColorSequenceKeypoint.new(0.6,_G.Primary),ColorSequenceKeypoint.new(1,_G.Dark)});c.Parent=b;end;return a;end;return d;end;return a; end
+local c=Instance.new("UIGradient");a.Name="Linee";a.Parent=f;a.BackgroundColor3=Color3.fromRGB(255,255,255);a.BackgroundTransparency=1;a.Position=UDim2.new(0,0,0.119999997,0);a.Size=UDim2.new(0,310,0,20);b.Name="Line";b.Parent=a;b.BackgroundColor3=Color3.new(125,125,125);b.BorderSizePixel=0;b.Position=UDim2.new(0,0,0,10);b.Size=UDim2.new(0,379,0,1);c.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,_G.Dark),ColorSequenceKeypoint.new(0.4,_G.Primary),ColorSequenceKeypoint.new(0.5,_G.Primary),ColorSequenceKeypoint.new(0.6,_G.Primary),ColorSequenceKeypoint.new(1,_G.Dark)});c.Parent=b;end;return a;end;return d;end;return a; end end; _rn2mb1f68();
