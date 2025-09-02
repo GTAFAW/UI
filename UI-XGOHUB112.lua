@@ -5,29 +5,63 @@
 
 -- 此源码永不加密 | 也尽量保持更新 |
 -- 新增：重复执行UI检测与旧UI删除机制
--- 全局变量标记已存在的UI实例，确保单例
-if _G.XGOHUB_ExistingUI then
-    pcall(function()
-        -- 销毁旧UI的主界面容器（ScreenGui）
-        if _G.XGOHUB_ExistingUI.ScreenGui and _G.XGOHUB_ExistingUI.ScreenGui.Parent then
-            _G.XGOHUB_ExistingUI.ScreenGui:Destroy()
+-- 1. 脚本最顶部：检测是否为第2次执行，是则摧毁旧UI
+if _G.XGOHUB_ExecutionCount and _G.XGOHUB_ExecutionCount >= 1 then
+    -- 彻底摧毁所有旧UI（主窗口、模糊、通知等）
+    local function destroyAllOldUI()
+        -- 清理全局标记的旧UI实例
+        if _G.XGOHUB_ExistingUI then
+            pcall(function()
+                if _G.XGOHUB_ExistingUI.ScreenGui and _G.XGOHUB_ExistingUI.ScreenGui.Parent then
+                    _G.XGOHUB_ExistingUI.ScreenGui:Destroy()
+                end
+                if _G.XGOHUB_ExistingUI.BlurEle and type(_G.XGOHUB_ExistingUI.BlurEle.Destroy) == "function" then
+                    _G.XGOHUB_ExistingUI.BlurEle.Destroy()
+                end
+                _G.XGOHUB_ExistingUI = nil
+            end)
         end
-        -- 销毁旧UI的亚克力模糊效果（若存在）
-        if _G.XGOHUB_ExistingUI.BlurEle and type(_G.XGOHUB_ExistingUI.BlurEle.Destroy) == "function" then
-            _G.XGOHUB_ExistingUI.BlurEle.Destroy()
-        end
-        print("[XGO HUB] 检测到旧UI，已自动清理")
-    end)
-end
--- 初始化新UI存储容器，用于后续存储当前UI实例
-_G.XGOHUB_ExistingUI = {}
 
--- （原脚本中找到 Windowxgo 函数，在其内部末尾添加以下代码，用于记录当前UI实例）
--- 需插入到 WindowLibrary:Destroy() 函数定义后、return WindowLibrary 前
--- 查找原代码中 "function Library:Windowxgo(setup)" 函数，在其末尾添加：
--- 记录当前UI的ScreenGui和模糊效果到全局变量
-_G.XGOHUB_ExistingUI.ScreenGui = ScreenGui
-_G.XGOHUB_ExistingUI.BlurEle = BlurEle
+        -- 兜底清理CoreGui/PlayerGui残留
+        local CoreGui = game:GetService("CoreGui")
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        local PlayerGui = LocalPlayer and LocalPlayer.PlayerGui or nil
+
+        for _, child in ipairs(CoreGui:GetChildren()) do
+            if child.Name:find("XGO") or child.Name:find("MainFrame") or child.Name:find("NotificationBar") then
+                pcall(child.Destroy, child)
+            end
+        end
+        if PlayerGui then
+            for _, child in ipairs(PlayerGui:GetChildren()) do
+                if child.Name:find("XGO") or child.Name:find("IndependentModernNotification") then
+                    pcall(child.Destroy, child)
+                end
+            end
+        end
+
+        -- 清理Lighting模糊效果
+        local Lighting = game:GetService("Lighting")
+        for _, child in ipairs(Lighting:GetChildren()) do
+            if child:IsA("BlurEffect") and child.Name:find("XGO") then
+                pcall(child.Destroy, child)
+            end
+        end
+
+        print("[XGO HUB] 检测到重复执行，已摧毁旧UI")
+    end
+    destroyAllOldUI()
+end
+
+-- 更新执行次数（首次执行设为1，重复执行累加）
+_G.XGOHUB_ExecutionCount = (_G.XGOHUB_ExecutionCount or 0) + 1
+
+-- 2. 原脚本中找到 `function Library:Windowxgo(setup)` 函数，在其末尾（return WindowLibrary 前）添加：
+-- 记录当前新UI实例到全局变量，供下次重复执行时检测
+_G.XGOHUB_ExistingUI = {
+    ScreenGui = ScreenGui,  -- 原脚本创建的主UI容器
+    BlurEle = BlurEle       -- 原脚本创建的亚克力模糊效果
+}
     
 local Library = {
 	Version = '\88\71\79\72\85\66\32\45\32\98\121\46\120\103\111',
