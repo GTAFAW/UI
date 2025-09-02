@@ -9,39 +9,35 @@
 
 
 
--- 1. 脚本最顶部：检测是否存在上一次的旧UI，有则关闭
--- （首次执行时无旧UI，不触发；第2/3/...次执行时，自动关闭上一次的UI）
-if _G.XGOHUB_LastActiveUI then
-    local function closePrevUIAndKeepNew()
-        -- 取出上一次旧UI的核心实例（和原脚本关闭逻辑完全对应）
-        local prevMainFrame = _G.XGOHUB_LastActiveUI.MainFrame
-        local prevWindowLib = _G.XGOHUB_LastActiveUI.WindowLibrary
+-- 1. 脚本最顶部：检测是否存在上一个相同UI，有则触发关闭
+if _G.XGOHUB_PrevSameUI then
+    local function closePrevKeepNew()
+        -- 取出上一个相同UI的核心实例（与原UI结构完全一致）
+        local prevMainFrame = _G.XGOHUB_PrevSameUI.MainFrame
+        local prevWindowLib = _G.XGOHUB_PrevSameUI.WindowLibrary
 
-        -- 优先用原脚本的关闭动画：先缩放到0，再彻底销毁（避免突兀）
+        -- 沿用原脚本关闭逻辑：先执行缩放动画，再关闭旧UI（不删除额外元素）
         if prevMainFrame and prevMainFrame.Parent then
             Library:Tween(prevMainFrame, Library.TweenLibrary.SmallEffect, {
-                Size = UDim2.fromScale(0, 0),  -- 原脚本关闭时的缩放参数
-                Position = UDim2.fromScale(0.5, 0.5)  -- 原脚本关闭时的居中定位
+                Size = UDim2.fromScale(0, 0),  -- 原UI关闭时的缩放参数
+                Position = UDim2.fromScale(0.5, 0.5)  -- 原UI关闭时的居中定位
             }).Completed:Connect(function()
                 task.wait()
-                prevWindowLib:Destroy()  -- 调用原脚本的Destroy方法彻底删除旧UI
-                print("[XGO HUB] 已关闭上一次的旧UI，保留当前新UI")
+                prevWindowLib:Destroy()  -- 调用原UI的关闭方法，停用旧UI
+                print("[XGO HUB] 已关闭上一个相同UI，保留下一个相同UI")
             end)
-        else
-            -- 兜底：若旧UI窗口异常，直接销毁残留（防止内存泄漏）
-            prevWindowLib:Destroy()
         end
     end
-    closePrevUIAndKeepNew()
+    closePrevKeepNew()
 end
 
--- 2. 原脚本中找到「function Library:Windowxgo(setup)」函数，在其末尾（return WindowLibrary 前）添加：
--- 用当前新UI的实例，覆盖全局变量中“上一次UI”的标记
--- （确保下次执行时，能精准找到“上一次”的UI并关闭）
-_G.XGOHUB_LastActiveUI = {
-    MainFrame = MainFrame,          -- 当前新UI的核心窗口（原脚本创建的MainFrame）
-    WindowLibrary = WindowLibrary   -- 当前新UI的管理对象（原脚本的WindowLibrary，含Destroy方法）
+-- 2. 原脚本「function Library:Windowxgo(setup)」函数末尾（return WindowLibrary 前）添加：
+-- 记录当前新UI实例，覆盖上一个相同UI标记（确保下次执行时精准关闭）
+_G.XGOHUB_PrevSameUI = {
+    MainFrame = MainFrame,          -- 当前新UI的核心窗口（与旧UI结构一致）
+    WindowLibrary = WindowLibrary   -- 当前新UI的管理对象（含原关闭方法）
 }
+
 
 
 
