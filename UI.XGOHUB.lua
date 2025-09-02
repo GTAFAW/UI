@@ -9,35 +9,55 @@
 
 
 
--- 1. 脚本最顶部：检测是否存在上一个相同UI，有则触发关闭
-if _G.XGOHUB_PrevSameUI then
-    local function closePrevKeepNew()
-        -- 取出上一个相同UI的核心实例（与原UI结构完全一致）
-        local prevMainFrame = _G.XGOHUB_PrevSameUI.MainFrame
-        local prevWindowLib = _G.XGOHUB_PrevSameUI.WindowLibrary
+-- 关键修复1：脚本最顶部添加（确保全局变量能跨执行读取，且优先关闭旧UI）
+-- 先检测是否存在上一个UI的全局标记，有则强制关闭
+if _G.XGOHUB_LastUI and _G.XGOHUB_LastUI.WindowLibrary then
+    -- 强制触发旧UI关闭（即使动画异常，也会兜底销毁）
+    local function forceClosePrevUI()
+        local prevMainFrame = _G.XGOHUB_LastUI.MainFrame
+        local prevWindowLib = _G.XGOHUB_LastUI.WindowLibrary
 
-        -- 沿用原脚本关闭逻辑：先执行缩放动画，再关闭旧UI（不删除额外元素）
+        -- 1. 优先执行原脚本关闭动画（保持风格一致）
         if prevMainFrame and prevMainFrame.Parent then
-            Library:Tween(prevMainFrame, Library.TweenLibrary.SmallEffect, {
-                Size = UDim2.fromScale(0, 0),  -- 原UI关闭时的缩放参数
-                Position = UDim2.fromScale(0.5, 0.5)  -- 原UI关闭时的居中定位
-            }).Completed:Connect(function()
-                task.wait()
-                prevWindowLib:Destroy()  -- 调用原UI的关闭方法，停用旧UI
-                print("[XGO HUB] 已关闭上一个相同UI，保留下一个相同UI")
+            -- 直接调用原脚本的Tween参数，避免动画参数不匹配
+            local closeTween = Library:Tween(prevMainFrame, Library.TweenLibrary.SmallEffect, {
+                Size = UDim2.fromScale(0, 0),
+                Position = UDim2.fromScale(0.5, 0.5)
+            })
+            -- 动画完成或失败，都销毁旧UI
+            closeTween.Completed:Connect(function()
+                task.wait(0.1)
+                prevWindowLib:Destroy()
             end)
+            -- 兜底：动画1秒内未完成，直接销毁
+            task.delay(1, function()
+                if prevMainFrame.Parent then
+                    prevWindowLib:Destroy()
+                end
+            end)
+        else
+            -- 2. 旧UI窗口已异常，直接调用原销毁方法
+            prevWindowLib:Destroy()
         end
+        print("[修复] 已关闭上一个UI")
     end
-    closePrevKeepNew()
+    -- 立即执行关闭（不等待新UI创建，避免相撞）
+    forceClosePrevUI()
 end
 
--- 2. 原脚本「function Library:Windowxgo(setup)」函数末尾（return WindowLibrary 前）添加：
--- 记录当前新UI实例，覆盖上一个相同UI标记（确保下次执行时精准关闭）
-_G.XGOHUB_PrevSameUI = {
-    MainFrame = MainFrame,          -- 当前新UI的核心窗口（与旧UI结构一致）
-    WindowLibrary = WindowLibrary   -- 当前新UI的管理对象（含原关闭方法）
-}
-
+-- 关键修复2：原脚本「function Library:Windowxgo(setup)」函数末尾（return WindowLibrary 前）添加
+-- 确保新UI实例100%被记录，且覆盖旧标记（必须放在WindowLibrary:Destroy()定义之后）
+-- （重点：确认ScreenGui、MainFrame、WindowLibrary都是原脚本创建的真实实例）
+if ScreenGui and MainFrame and WindowLibrary then
+    _G.XGOHUB_LastUI = {
+        ScreenGui = ScreenGui,          -- 原UI的顶层容器（防止残留）
+        MainFrame = MainFrame,          -- 原UI的核心窗口（用于关闭动画）
+        WindowLibrary = WindowLibrary   -- 原UI的销毁方法载体（关键）
+    }
+    print("[修复] 已记录当前新UI，供下次关闭使用")
+else
+    warn("[修复警告] 新UI实例未找到，可能导致下次无法关闭")
+end
 
 
 
