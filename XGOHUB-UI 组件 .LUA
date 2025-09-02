@@ -12,7 +12,7 @@ local Window = AcrylicLibrary:Windowxgo({
         Title = "-<- 卡密验证 ->-",
         OnGetKey = function()
             setclipboard("259461151") 
-              return "https://example.com/getkey?hwid="
+              return "https://qun.qq.com/universal-share/share?ac=1&authKey=p2MORmDbzYQ"
         end,
         OnLogin = function(key)
             -- 这里应该是验证卡密的逻辑
