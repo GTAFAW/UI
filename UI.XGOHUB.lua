@@ -9,38 +9,39 @@
 
 
 
--- 1. 脚本最顶部：检测是否存在旧UI（即之前执行过），有则删除旧UI
-if _G.XGOHUB_LastUI then
-    -- 复用原脚本关闭动画，先关闭旧UI再创建新UI
-    local function deleteOldUIPreserveNew()
-        local lastMainFrame = _G.XGOHUB_LastUI.MainFrame  -- 上一个旧UI的核心窗口
-        local lastWindowLib = _G.XGOHUB_LastUI.WindowLib  -- 上一个旧UI的管理对象
+-- 1. 脚本最顶部：检测是否存在上一次的旧UI，有则关闭
+-- （首次执行时无旧UI，不触发；第2/3/...次执行时，自动关闭上一次的UI）
+if _G.XGOHUB_LastActiveUI then
+    local function closePrevUIAndKeepNew()
+        -- 取出上一次旧UI的核心实例（和原脚本关闭逻辑完全对应）
+        local prevMainFrame = _G.XGOHUB_LastActiveUI.MainFrame
+        local prevWindowLib = _G.XGOHUB_LastActiveUI.WindowLibrary
 
-        -- 执行原脚本风格的关闭动画（缩放到0）
-        if lastMainFrame and lastMainFrame.Parent then
-            Library:Tween(lastMainFrame, Library.TweenLibrary.SmallEffect, {
-                Size = UDim2.fromScale(0, 0),
-                Position = UDim2.fromScale(0.5, 0.5)
+        -- 优先用原脚本的关闭动画：先缩放到0，再彻底销毁（避免突兀）
+        if prevMainFrame and prevMainFrame.Parent then
+            Library:Tween(prevMainFrame, Library.TweenLibrary.SmallEffect, {
+                Size = UDim2.fromScale(0, 0),  -- 原脚本关闭时的缩放参数
+                Position = UDim2.fromScale(0.5, 0.5)  -- 原脚本关闭时的居中定位
             }).Completed:Connect(function()
                 task.wait()
-                lastWindowLib:Destroy()  -- 彻底删除旧UI
-                print("[XGO HUB] 已删除上一个旧UI，保留最新UI")
+                prevWindowLib:Destroy()  -- 调用原脚本的Destroy方法彻底删除旧UI
+                print("[XGO HUB] 已关闭上一次的旧UI，保留当前新UI")
             end)
         else
-            -- 兜底：旧UI窗口异常时直接销毁
-            lastWindowLib:Destroy()
+            -- 兜底：若旧UI窗口异常，直接销毁残留（防止内存泄漏）
+            prevWindowLib:Destroy()
         end
     end
-    deleteOldUIPreserveNew()
+    closePrevUIAndKeepNew()
 end
 
--- 2. 原脚本中找到 `function Library:Windowxgo(setup)` 函数，在其末尾（return WindowLibrary 前）添加：
--- 记录当前最新UI的实例到全局变量（覆盖上一个旧UI的标记）
-_G.XGOHUB_LastUI = {
-    MainFrame = MainFrame,          -- 当前新UI的核心窗口
-    WindowLib = WindowLibrary       -- 当前新UI的管理对象（含Destroy方法）
+-- 2. 原脚本中找到「function Library:Windowxgo(setup)」函数，在其末尾（return WindowLibrary 前）添加：
+-- 用当前新UI的实例，覆盖全局变量中“上一次UI”的标记
+-- （确保下次执行时，能精准找到“上一次”的UI并关闭）
+_G.XGOHUB_LastActiveUI = {
+    MainFrame = MainFrame,          -- 当前新UI的核心窗口（原脚本创建的MainFrame）
+    WindowLibrary = WindowLibrary   -- 当前新UI的管理对象（原脚本的WindowLibrary，含Destroy方法）
 }
-
 
 
 
