@@ -9,41 +9,37 @@
 
 
 
--- 1. 脚本最顶部：检测是否已存在UI，存在则触发旧UI关闭（首次执行不触发，后续均触发）
-if _G.XGOHUB_CurrentUI then
-    -- 复用原脚本关闭逻辑：先动画缩放到0，再彻底销毁
-    local function closeOldUI()
-        local oldMainFrame = _G.XGOHUB_CurrentUI.MainFrame
-        local oldWindowLib = _G.XGOHUB_CurrentUI.WindowLibrary
+-- 1. 脚本最顶部：检测是否存在旧UI（即之前执行过），有则删除旧UI
+if _G.XGOHUB_LastUI then
+    -- 复用原脚本关闭动画，先关闭旧UI再创建新UI
+    local function deleteOldUIPreserveNew()
+        local lastMainFrame = _G.XGOHUB_LastUI.MainFrame  -- 上一个旧UI的核心窗口
+        local lastWindowLib = _G.XGOHUB_LastUI.WindowLib  -- 上一个旧UI的管理对象
 
-        -- 执行原风格关闭动画
-        if oldMainFrame and oldMainFrame.Parent then
-            Library:Tween(oldMainFrame, Library.TweenLibrary.SmallEffect, {
+        -- 执行原脚本风格的关闭动画（缩放到0）
+        if lastMainFrame and lastMainFrame.Parent then
+            Library:Tween(lastMainFrame, Library.TweenLibrary.SmallEffect, {
                 Size = UDim2.fromScale(0, 0),
                 Position = UDim2.fromScale(0.5, 0.5)
             }).Completed:Connect(function()
                 task.wait()
-                oldWindowLib:Destroy() -- 调用原脚本销毁方法
-                print("[XGO HUB] 后续执行已关闭旧UI")
+                lastWindowLib:Destroy()  -- 彻底删除旧UI
+                print("[XGO HUB] 已删除上一个旧UI，保留最新UI")
             end)
         else
-            -- 兜底：直接销毁残留
-            oldWindowLib:Destroy()
+            -- 兜底：旧UI窗口异常时直接销毁
+            lastWindowLib:Destroy()
         end
-
-        -- 清空旧UI标记，避免重复触发
-        _G.XGOHUB_CurrentUI = nil
     end
-    closeOldUI()
+    deleteOldUIPreserveNew()
 end
 
 -- 2. 原脚本中找到 `function Library:Windowxgo(setup)` 函数，在其末尾（return WindowLibrary 前）添加：
--- 记录当前UI实例到全局变量（首次执行记录，后续执行检测到此标记则关闭旧UI）
-_G.XGOHUB_CurrentUI = {
-    MainFrame = MainFrame,          -- 原脚本核心窗口
-    WindowLibrary = WindowLibrary   -- 原脚本窗口管理对象（含Destroy方法）
+-- 记录当前最新UI的实例到全局变量（覆盖上一个旧UI的标记）
+_G.XGOHUB_LastUI = {
+    MainFrame = MainFrame,          -- 当前新UI的核心窗口
+    WindowLib = WindowLibrary       -- 当前新UI的管理对象（含Destroy方法）
 }
-
 
 
 
