@@ -1,0 +1,184 @@
+local Nofitication = {}
+local GUI = game:GetService("CoreGui"):FindFirstChild("STX_Nofitication")
+
+function Nofitication:Notify(nofdebug, middledebug, all)
+    local SelectedType = string.lower(tostring(middledebug.Type))
+
+    ---------- 基础实例 ----------
+    local ambientShadow = Instance.new("ImageLabel")
+    local Window        = Instance.new("Frame")
+    local Glass         = Instance.new("Frame")      -- 玻璃层
+    local Outline_A     = Instance.new("Frame")
+    local WindowTitle   = Instance.new("TextLabel")
+    local WindowDescription = Instance.new("TextLabel")
+
+    ---------- ambientShadow ----------
+    ambientShadow.Name               = "ambientShadow"
+    ambientShadow.Parent             = GUI
+    ambientShadow.AnchorPoint        = Vector2.new(0.5, 0.5)
+    ambientShadow.BackgroundTransparency = 1
+    ambientShadow.BorderSizePixel    = 0
+    ambientShadow.Position           = UDim2.new(0.915, 0, 0.937, 0)
+    ambientShadow.Size               = UDim2.new(0, 0, 0, 0)
+    ambientShadow.Image              = "rbxassetid://1316045217"
+    ambientShadow.ImageColor3        = Color3.fromRGB(0, 0, 0)
+    ambientShadow.ImageTransparency  = 0.6          -- 更淡阴影
+    ambientShadow.ScaleType          = Enum.ScaleType.Slice
+    ambientShadow.SliceCenter        = Rect.new(10, 10, 118, 118)
+
+    ---------- Window ----------
+    Window.Name               = "Window"
+    Window.Parent             = ambientShadow
+    Window.BackgroundColor3   = Color3.fromRGB(255, 255, 255)
+    Window.BackgroundTransparency = 0.75
+    Window.BorderSizePixel    = 0
+    Window.Position           = UDim2.new(0, 5, 0, 5)
+    Window.Size               = UDim2.new(0, 230, 0, 80)
+    Window.ZIndex             = 2
+
+    ---------- Glass ----------
+    Glass.Name               = "Glass"
+    Glass.Parent             = Window
+    Glass.Size               = UDim2.new(1, 0, 1, 0)
+    Glass.BackgroundColor3   = Color3.fromRGB(255, 255, 255)
+    Glass.BackgroundTransparency = 0.85
+    Glass.BorderSizePixel    = 0
+    Glass.ZIndex             = 1
+
+    ---------- Outline ----------
+    Outline_A.Name           = "Outline_A"
+    Outline_A.Parent         = Window
+    Outline_A.BackgroundColor3 = middledebug.OutlineColor or Color3.fromRGB(255, 255, 255)
+    Outline_A.BackgroundTransparency = 0.5
+    Outline_A.BorderSizePixel = 0
+    Outline_A.Position       = UDim2.new(0, 0, 0, 25)
+    Outline_A.Size           = UDim2.new(0, 230, 0, 2)
+    Outline_A.ZIndex         = 5
+
+    ---------- Title ----------
+    WindowTitle.Name           = "WindowTitle"
+    WindowTitle.Parent         = Window
+    WindowTitle.BackgroundTransparency = 1
+    WindowTitle.BorderSizePixel = 0
+    WindowTitle.Position       = UDim2.new(0, 8, 0, 2)
+    WindowTitle.Size           = UDim2.new(0, 222, 0, 22)
+    WindowTitle.ZIndex         = 4
+    WindowTitle.Font           = Enum.Font.GothamSemibold
+    WindowTitle.Text           = nofdebug.Title
+    WindowTitle.TextColor3     = Color3.fromRGB(255, 255, 255)
+    WindowTitle.TextSize       = 12
+    WindowTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    ---------- Description ----------
+    WindowDescription.Name           = "WindowDescription"
+    WindowDescription.Parent         = Window
+    WindowDescription.BackgroundTransparency = 1
+    WindowDescription.BorderSizePixel = 0
+    WindowDescription.Position       = UDim2.new(0, 8, 0, 34)
+    WindowDescription.Size           = UDim2.new(0, 216, 0, 40)
+    WindowDescription.ZIndex         = 4
+    WindowDescription.Font           = Enum.Font.GothamSemibold
+    WindowDescription.Text           = nofdebug.Description
+    WindowDescription.TextColor3     = Color3.fromRGB(220, 220, 220)
+    WindowDescription.TextSize       = 12
+    WindowDescription.TextWrapped    = true
+    WindowDescription.TextXAlignment = Enum.TextXAlignment.Left
+    WindowDescription.TextYAlignment = Enum.TextYAlignment.Top
+
+    ------------------------------------------------------------------
+    -- 动画逻辑与原接口保持一致，未改动
+    ------------------------------------------------------------------
+    if SelectedType == "default" then
+        local function script()
+            ambientShadow:TweenSize(UDim2.new(0, 240, 0, 90), "Out", "Linear", 0.2)
+            Outline_A:TweenSize(UDim2.new(0, 0, 0, 2), "Out", "Linear", middledebug.Time)
+            wait(middledebug.Time)
+            ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+            wait(0.2)
+            ambientShadow:Destroy()
+        end
+        coroutine.wrap(script)()
+
+    elseif SelectedType == "image" then
+        ambientShadow:TweenSize(UDim2.new(0, 240, 0, 90), "Out", "Linear", 0.2)
+        WindowTitle.Position = UDim2.new(0, 24, 0, 2)
+        local ImageButton = Instance.new("ImageButton")
+        ImageButton.Parent = Window
+        ImageButton.BackgroundTransparency = 1
+        ImageButton.BorderSizePixel = 0
+        ImageButton.Position = UDim2.new(0, 4, 0, 4)
+        ImageButton.Size = UDim2.new(0, 18, 0, 18)
+        ImageButton.ZIndex = 5
+        ImageButton.AutoButtonColor = false
+        ImageButton.Image = all.Image
+        ImageButton.ImageColor3 = all.ImageColor
+
+        local function script()
+            Outline_A:TweenSize(UDim2.new(0, 0, 0, 2), "Out", "Linear", middledebug.Time)
+            wait(middledebug.Time)
+            ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+            wait(0.2)
+            ambientShadow:Destroy()
+        end
+        coroutine.wrap(script)()
+
+    elseif SelectedType == "option" then
+        ambientShadow:TweenSize(UDim2.new(0, 240, 0, 110), "Out", "Linear", 0.2)
+        Window.Size = UDim2.new(0, 230, 0, 100)
+
+        local Uncheck = Instance.new("ImageButton")
+        local Check   = Instance.new("ImageButton")
+        Uncheck.Name = "Uncheck"
+        Uncheck.Parent = Window
+        Uncheck.BackgroundTransparency = 1
+        Uncheck.BorderSizePixel = 0
+        Uncheck.Position = UDim2.new(0, 7, 0, 76)
+        Uncheck.Size = UDim2.new(0, 18, 0, 18)
+        Uncheck.ZIndex = 5
+        Uncheck.AutoButtonColor = false
+        Uncheck.Image = "rbxassetid://6031094678"
+        Uncheck.ImageColor3 = Color3.fromRGB(255, 84, 84)
+
+        Check.Name = "Check"
+        Check.Parent = Window
+        Check.BackgroundTransparency = 1
+        Check.BorderSizePixel = 0
+        Check.Position = UDim2.new(0, 28, 0, 76)
+        Check.Size = UDim2.new(0, 18, 0, 18)
+        Check.ZIndex = 5
+        Check.AutoButtonColor = false
+        Check.Image = "rbxassetid://6031094667"
+        Check.ImageColor3 = Color3.fromRGB(83, 230, 50)
+
+        local function script()
+            local Stilthere = true
+            local function Unchecked()
+                pcall(function() all.Callback(false) end)
+                ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+                wait(0.2)
+                ambientShadow:Destroy()
+                Stilthere = false
+            end
+            local function Checked()
+                pcall(function() all.Callback(true) end)
+                ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+                wait(0.2)
+                ambientShadow:Destroy()
+                Stilthere = false
+            end
+            Uncheck.MouseButton1Click:Connect(Unchecked)
+            Check.MouseButton1Click:Connect(Checked)
+
+            Outline_A:TweenSize(UDim2.new(0, 0, 0, 2), "Out", "Linear", middledebug.Time)
+            wait(middledebug.Time)
+            if Stilthere then
+                ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+                wait(0.2)
+                ambientShadow:Destroy()
+            end
+        end
+        coroutine.wrap(script)()
+    end
+end
+
+return Nofitication
