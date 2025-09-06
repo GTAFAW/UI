@@ -36,267 +36,36 @@ local function playSound(audioId)
     sound:Play()
 end
 
--- 检查执行次数并给出反馈（新增UI库保留选项）
-if executionCount == 1 then
-    -- 第一次执行：不发送通知，直接执行脚本
+-- 检查执行次数并给出反馈-这里=如果是没有其他的情况下可以写一个，但有的话
+if executionCount == 1 then--讲解一下return是终止脚本,不让脚本再次执行.也就是所谓的返回值
+    -- 第一次执行，不发送通知，直接执行脚本
 elseif executionCount == 2 then
-    -- 第二次执行：提醒无需重复
+    -- 第二次执行，提醒用户脚本已执行无需重复
     sendNotification("脚本已执行，无需再重复执行.")
     playSound(3398620867)
-    return  
+    return  -- 终止脚本执行
 elseif executionCount == 3 then
-    -- 第三次执行：提醒再点两次重启
+    -- 第三次执行，提醒用户再点击两次将重启脚本
     sendNotification("再点击两次将重启脚本.")
     playSound(3398620867)
-    return  
+    return  -- 终止脚本执行
 elseif executionCount == 4 then
-    sendNotification("再点击一次，重新启动/关闭脚本.")
+    sendNotification("再点击一次，重新启动脚本.")
     playSound(3398620867)
-    return  
+    return  -- 终止脚本执行
 elseif executionCount == 5 then
-    -- 第五次执行：新增弹窗，让玩家选择“重启脚本”或“关闭UI库”
-    sendNotification("即将执行操作，请选择模式.")
+    -- 第五次执行，提醒用户脚本将重新启动，并继续执行脚本
+    sendNotification("脚本已重新启动，请稍后.")
     playSound(3398620867)
-
-    -- 弹窗：选择“重启脚本”或“关闭UI库”
-    local choiceMade = false
-    WindowLibrary:Dialog({
-        Title = "-- 操作选择 --",
-        Content = "第五次点击：选择保留UI库或关闭",
-        Buttons = {
-            -- 选项1：保留UI库，仅重启脚本（原逻辑）
-            {
-                Title = "保留UI库，重启脚本",
-                Hightlight = true,
-                Callback = function()
-                    sendNotification("脚本已重新启动，请稍后.")
-                    executionCountDataStore.Value = 1 -- 重置计数为1（下次视为第二次执行）
-                    choiceMade = true
-                    -- 保留UI库，继续执行原有脚本逻辑（无需销毁）
-                end,
-            },
-            -- 选项2：关闭UI库（玩家主动选择删除）
-            {
-                Title = "关闭UI库（停止所有功能）",
-                Callback = function()
-                    sendNotification("UI库已关闭，需重新执行脚本恢复.")
-                    -- 销毁UI库及关联资源
-                    local uiLibRoot = game.Players.LocalPlayer.PlayerGui:FindFirstChild("xgo Hub 作者XGO")
-                    if uiLibRoot then uiLibRoot:Destroy() end -- 删除顶部彩虹UI
-                    executionCountDataStore.Value = 0 -- 重置计数
-                    WindowLibrary:Destroy() -- 销毁主UI窗口及模糊效果
-                    choiceMade = true
-                    return -- 终止脚本，不继续执行
-                end,
-            }
-        }
-    })
-
-    -- 等待玩家选择，避免脚本继续执行
-    while not choiceMade do task.wait(0.1) end
+    -- 重置计数器
+    executionCountDataStore.Value = 1  -- 将计数器重置为1，使得下一次执行被视为第二次执行
+    -- 这里可以继续执行脚本的其他部分
 else
-    -- 第六次及以后：同第二次逻辑（提醒无需重复）
+    -- 第六次及以后执行，执行第二次执行时的逻辑
     sendNotification("脚本已执行，无需再重复执行.")
     playSound(3398620867)
-    return  
+    return  -- 终止脚本执行
 end
---这里是执行后删除重复的显示代码让他重新启动
-local existingGui = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("xgo Hub 作者XGO")
-if existingGui then
-    -- 如果存在，则删除
-    existingGui:Destroy()
-end
-
---原创 xgohub 作者XGO
-
-local a = Instance.new("ScreenGui")
-a.Name = "xgo Hub 作者XGO"
-a.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
--- 创建文本标签
-local b = Instance.new("TextLabel")
-b.Parent = a
-b.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-b.BackgroundTransparency = 1
-b.BorderSizePixel = 0
-b.Size = UDim2.new(0, 1100, 0, 40)
-b.Font = Enum.Font.GothamBlack
-b.TextColor3 = Color3.fromRGB(255, 255, 255)
-b.TextSize = 11.5
-b.TextStrokeTransparency = 0.8
-b.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-b.TextWrapped = true
-b.TextXAlignment = Enum.TextXAlignment.Center
-b.Text = "xgo Hub TIME\n如果卡在这个页面,请重新启动."
-
--- 旋转螺旋彩虹动态效果
-local c = Instance.new("UIGradient")
-c.Parent = b
-local gradientAngle = 45
-local rainbowColors = {
-    Color3.fromRGB(255, 0, 0),    -- 红
-    Color3.fromRGB(255, 165, 0),  -- 橙
-    Color3.fromRGB(255, 255, 0),  -- 黄
-    Color3.fromRGB(0, 255, 0),    -- 绿
-    Color3.fromRGB(0, 0, 255),    -- 蓝
-    Color3.fromRGB(128, 0, 128)   -- 紫
-}
-local function updateRainbowGradient()
-    gradientAngle = (gradientAngle + 1) % 360
-    c.Rotation = gradientAngle
-    local colorPoints = {}
-    local colorCount = #rainbowColors
-    for i = 1, colorCount do
-        local offsetTime = ((i - 1) / colorCount + (gradientAngle / 360)) % 1
-        table.insert(colorPoints, ColorSequenceKeypoint.new(offsetTime, rainbowColors[i]))
-    end
-    table.insert(colorPoints, ColorSequenceKeypoint.new(1, rainbowColors[1]))
-    c.Color = ColorSequence.new(colorPoints)
-end
-game:GetService("RunService").RenderStepped:Connect(updateRainbowGradient)
-
--- 圆角效果（可选保留）
-local d = Instance.new("UICorner")
-d.Parent = b
-d.CornerRadius = UDim.new(0, 8)
-
--- 获取当前游戏名称
-local NG = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
-
--- 屏幕尺寸自适应（紧贴顶部留2像素间距）
-local function updateUIPosition()
-    local screenWidth = game:GetService("GuiService"):GetScreenResolution().X
-    local uiYPos = 2
-    local uiXPos = (screenWidth / 2) - (b.AbsoluteSize.X / 2)
-    b.Position = UDim2.new(0, uiXPos, 0, uiYPos)
-end
-updateUIPosition()
-game:GetService("RunService").Heartbeat:Connect(updateUIPosition)
-
--- 帧率计数器（修复重复等待问题）
-local currentFps = 0
-spawn(function()
-    while task.wait(1) do 
-        local start = tick()
-        game:GetService("RunService").RenderStepped:Wait()
-        currentFps = math.floor(1 / (tick() - start))
-    end
-end)
-
--- 季节判断函数
-local function getSeason(month, day)
-    if (month == 3 and day >= 21) or (month == 4) or (month == 5) or (month == 6 and day < 22) then
-        return "【春季】"
-    elseif (month == 6 and day >= 22) or (month == 7) or (month == 8) or (month == 9 and day < 23) then
-        return "【夏季】"
-    elseif (month == 9 and day >= 23) or (month == 10) or (month == 11) or (month == 12 and day < 22) then
-        return "【秋季】"
-    else
-        return "【冬季】"
-    end
-end
-
--- 节日判断函数
-local function getFestival(month, day)
-    local festivals = {
-        {1, 1, "元旦"},
-        {1, 22, "春节"},
-        {2, 2, "龙抬头"},
-        {2, 14, "情人节"},
-        {3, 8, "妇女节"},
-        {3, 12, "植树节"},
-        {4, 5, "清明节"},
-        {4, 1, "愚人节"},
-        {5, 1, "劳动节"},
-        {5, 4, "青年节"},
-        {5, 20, "端午节"},
-        {6, 1, "儿童节"},
-        {7, 1, "建党节"},
-        {7, 7, "七夕节"},
-        {8, 1, "建军节"},
-        {8, 15, "中秋节"},
-        {9, 10, "教师节"},
-        {9, 9, "重阳节"},
-        {10, 1, "国庆节"},
-        {11, 21, "今天祝我生日"},
-        {12, 8, "腊八节"},
-        {12, 23, "小年"},
-        {12, 24, "小年"},
-        {12, 22, "冬至"},
-        {12, 25, "圣诞节"}
-    }
-    for _, fest in ipairs(festivals) do
-        if fest[1] == month and fest[2] == day then
-            return "【节】:" .. fest[3] .. "快乐 "
-        end
-    end
-    return ""
-end
-
--- ===================== 修复：星期几显示逻辑 =====================
-spawn(function()
-    local startTime = tick()
-    while task.wait(0.5) do 
-        pcall(function()
-            -- 1. 脚本时长
-            local elapsedTime = tick() - startTime
-            local hours = math.floor(elapsedTime / 3600)
-            local minutes = math.floor((elapsedTime % 3600) / 60)
-            local seconds = math.floor(elapsedTime % 60)
-            local scriptTime = string.format("%02d:%02d:%02d", hours, minutes, seconds)
-
-            -- 2. 系统时间（简化星期获取：直接用os.date("%w")映射，避免数组索引问题）
-            local year = os.date("%Y") -- 获取4位年份
-            local month = os.date("%m") -- 2位月份
-            local day = os.date("%d") -- 2位日期
-            local weekNum = os.date("%w") -- 0=周日，1=周一...6=周六
-            -- 直接映射星期，避免数组+1可能导致的索引错误
-            local weekStr
-            if weekNum == "0" then weekStr = "日】"
-            elseif weekNum == "1" then weekStr = "一】"
-            elseif weekNum == "2" then weekStr = "二】"
-            elseif weekNum == "3" then weekStr = "三】"
-            elseif weekNum == "4" then weekStr = "四】"
-            elseif weekNum == "5" then weekStr = "五】"
-            else weekStr = "六" end
-            
-            local dateStr = year .. "年" .. month .. "月" .. day .. "日 【周" .. weekStr
-            local timeStr = os.date("%H:%M:%S") 
-
-            -- 3. 季节和节日
-            local season = getSeason(tonumber(month), tonumber(day))
-            local festival = getFestival(tonumber(month), tonumber(day))
-
-            -- 4. 时间段提示
-            local hour = tonumber(os.date("%H"))
-            local timeOfDay
-            if hour >= 0 and hour < 5 then
-                timeOfDay = "已经<凌晨>了,还不睡"
-            elseif hour >= 5 and hour < 12 then
-                timeOfDay = "哎呀已经<早上>了"
-            elseif hour == 12 then
-                timeOfDay = "<中午>吃饭的时间到喽"
-            elseif hour > 12 and hour < 18 then
-                timeOfDay = "<下午>时间没事做˂⁽ˈ₍ ⁾˲₎₌"
-            else
-                timeOfDay = "已经<晚上>了呀,早点睡"
-            end
-
-            -- 5. PING值（增加判空，避免报错）
-            local ping = "未知"
-            local stats = game:GetService("Stats")
-            if stats and stats.Network and stats.Network.ServerStatsItem["Data Ping"] then
-                ping = stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
-            end
-
-            -- 6. 最终更新文本（分行清晰，避免拥挤）
-            b.Text = "脚本时长: " .. scriptTime .. " | 帧率: " .. currentFps .. " | PING: " .. ping ..
-                "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
-                "正在玩: " .. NG .. " | " .. timeOfDay
-        end)
-    end
-end)
 
 local Library = {
 	Version = '\88\71\79\72\85\66\32\45\32\98\121\46\120\103\111',
@@ -7452,3 +7221,201 @@ return ColorPickerSettings
 end;
 
 return Library;
+
+--这里是执行后删除重复的显示代码让他重新启动
+local existingGui = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("xgo Hub 作者XGO")
+if existingGui then
+    -- 如果存在，则删除
+    existingGui:Destroy()
+end
+
+--原创 xgohub 作者XGO
+
+local a = Instance.new("ScreenGui")
+a.Name = "xgo Hub 作者XGO"
+a.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- 创建文本标签
+local b = Instance.new("TextLabel")
+b.Parent = a
+b.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+b.BackgroundTransparency = 1
+b.BorderSizePixel = 0
+b.Size = UDim2.new(0, 1100, 0, 40)
+b.Font = Enum.Font.GothamBlack
+b.TextColor3 = Color3.fromRGB(255, 255, 255)
+b.TextSize = 11.5
+b.TextStrokeTransparency = 0.8
+b.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+b.TextWrapped = true
+b.TextXAlignment = Enum.TextXAlignment.Center
+b.Text = "xgo Hub TIME\n如果卡在这个页面,请重新启动."
+
+-- 旋转螺旋彩虹动态效果
+local c = Instance.new("UIGradient")
+c.Parent = b
+local gradientAngle = 45
+local rainbowColors = {
+    Color3.fromRGB(255, 0, 0),    -- 红
+    Color3.fromRGB(255, 165, 0),  -- 橙
+    Color3.fromRGB(255, 255, 0),  -- 黄
+    Color3.fromRGB(0, 255, 0),    -- 绿
+    Color3.fromRGB(0, 0, 255),    -- 蓝
+    Color3.fromRGB(128, 0, 128)   -- 紫
+}
+local function updateRainbowGradient()
+    gradientAngle = (gradientAngle + 1) % 360
+    c.Rotation = gradientAngle
+    local colorPoints = {}
+    local colorCount = #rainbowColors
+    for i = 1, colorCount do
+        local offsetTime = ((i - 1) / colorCount + (gradientAngle / 360)) % 1
+        table.insert(colorPoints, ColorSequenceKeypoint.new(offsetTime, rainbowColors[i]))
+    end
+    table.insert(colorPoints, ColorSequenceKeypoint.new(1, rainbowColors[1]))
+    c.Color = ColorSequence.new(colorPoints)
+end
+game:GetService("RunService").RenderStepped:Connect(updateRainbowGradient)
+
+-- 圆角效果（可选保留）
+local d = Instance.new("UICorner")
+d.Parent = b
+d.CornerRadius = UDim.new(0, 8)
+
+-- 获取当前游戏名称
+local NG = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+
+-- 屏幕尺寸自适应（紧贴顶部留2像素间距）
+local function updateUIPosition()
+    local screenWidth = game:GetService("GuiService"):GetScreenResolution().X
+    local uiYPos = 2
+    local uiXPos = (screenWidth / 2) - (b.AbsoluteSize.X / 2)
+    b.Position = UDim2.new(0, uiXPos, 0, uiYPos)
+end
+updateUIPosition()
+game:GetService("RunService").Heartbeat:Connect(updateUIPosition)
+
+-- 帧率计数器（修复重复等待问题）
+local currentFps = 0
+spawn(function()
+    while task.wait(1) do 
+        local start = tick()
+        game:GetService("RunService").RenderStepped:Wait()
+        currentFps = math.floor(1 / (tick() - start))
+    end
+end)
+
+-- 季节判断函数
+local function getSeason(month, day)
+    if (month == 3 and day >= 21) or (month == 4) or (month == 5) or (month == 6 and day < 22) then
+        return "【春季】"
+    elseif (month == 6 and day >= 22) or (month == 7) or (month == 8) or (month == 9 and day < 23) then
+        return "【夏季】"
+    elseif (month == 9 and day >= 23) or (month == 10) or (month == 11) or (month == 12 and day < 22) then
+        return "【秋季】"
+    else
+        return "【冬季】"
+    end
+end
+
+-- 节日判断函数
+local function getFestival(month, day)
+    local festivals = {
+        {1, 1, "元旦"},
+        {1, 22, "春节"},
+        {2, 2, "龙抬头"},
+        {2, 14, "情人节"},
+        {3, 8, "妇女节"},
+        {3, 12, "植树节"},
+        {4, 5, "清明节"},
+        {4, 1, "愚人节"},
+        {5, 1, "劳动节"},
+        {5, 4, "青年节"},
+        {5, 20, "端午节"},
+        {6, 1, "儿童节"},
+        {7, 1, "建党节"},
+        {7, 7, "七夕节"},
+        {8, 1, "建军节"},
+        {8, 15, "中秋节"},
+        {9, 10, "教师节"},
+        {9, 9, "重阳节"},
+        {10, 1, "国庆节"},
+        {11, 21, "今天祝我生日"},
+        {12, 8, "腊八节"},
+        {12, 23, "小年"},
+        {12, 24, "小年"},
+        {12, 22, "冬至"},
+        {12, 25, "圣诞节"}
+    }
+    for _, fest in ipairs(festivals) do
+        if fest[1] == month and fest[2] == day then
+            return "【节】:" .. fest[3] .. "快乐 "
+        end
+    end
+    return ""
+end
+
+-- ===================== 修复：星期几显示逻辑 =====================
+spawn(function()
+    local startTime = tick()
+    while task.wait(0.5) do 
+        pcall(function()
+            -- 1. 脚本时长
+            local elapsedTime = tick() - startTime
+            local hours = math.floor(elapsedTime / 3600)
+            local minutes = math.floor((elapsedTime % 3600) / 60)
+            local seconds = math.floor(elapsedTime % 60)
+            local scriptTime = string.format("%02d:%02d:%02d", hours, minutes, seconds)
+
+            -- 2. 系统时间（简化星期获取：直接用os.date("%w")映射，避免数组索引问题）
+            local year = os.date("%Y") -- 获取4位年份
+            local month = os.date("%m") -- 2位月份
+            local day = os.date("%d") -- 2位日期
+            local weekNum = os.date("%w") -- 0=周日，1=周一...6=周六
+            -- 直接映射星期，避免数组+1可能导致的索引错误
+            local weekStr
+            if weekNum == "0" then weekStr = "日】"
+            elseif weekNum == "1" then weekStr = "一】"
+            elseif weekNum == "2" then weekStr = "二】"
+            elseif weekNum == "3" then weekStr = "三】"
+            elseif weekNum == "4" then weekStr = "四】"
+            elseif weekNum == "5" then weekStr = "五】"
+            else weekStr = "六" end
+            
+            local dateStr = year .. "年" .. month .. "月" .. day .. "日 【周" .. weekStr
+            local timeStr = os.date("%H:%M:%S") 
+
+            -- 3. 季节和节日
+            local season = getSeason(tonumber(month), tonumber(day))
+            local festival = getFestival(tonumber(month), tonumber(day))
+
+            -- 4. 时间段提示
+            local hour = tonumber(os.date("%H"))
+            local timeOfDay
+            if hour >= 0 and hour < 5 then
+                timeOfDay = "已经<凌晨>了,还不睡"
+            elseif hour >= 5 and hour < 12 then
+                timeOfDay = "哎呀已经<早上>了"
+            elseif hour == 12 then
+                timeOfDay = "<中午>吃饭的时间到喽"
+            elseif hour > 12 and hour < 18 then
+                timeOfDay = "<下午>时间没事做˂⁽ˈ₍ ⁾˲₎₌"
+            else
+                timeOfDay = "已经<晚上>了呀,早点睡"
+            end
+
+            -- 5. PING值（增加判空，避免报错）
+            local ping = "未知"
+            local stats = game:GetService("Stats")
+            if stats and stats.Network and stats.Network.ServerStatsItem["Data Ping"] then
+                ping = stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
+            end
+
+            -- 6. 最终更新文本（分行清晰，避免拥挤）
+            b.Text = "脚本时长: " .. scriptTime .. " | 帧率: " .. currentFps .. " | PING: " .. ping ..
+                "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
+                "正在玩: " .. NG .. " | " .. timeOfDay
+        end)
+    end
+end)
