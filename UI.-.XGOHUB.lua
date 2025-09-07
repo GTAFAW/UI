@@ -1572,18 +1572,7 @@ Library.TweenService = game:GetService('TweenService');
 Library.LocalPlayer = game:GetService('Players').LocalPlayer;
 Library.CoreGui = (game:FindFirstChild('CoreGui') and Library.Cloneref(game:GetService('CoreGui'))) or Library.LocalPlayer.PlayerGui;
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
-Library.SizeLibrary = {
-    -- 原修改后460,308 → 再次缩小80%：368,246
-    Default = UDim2.fromOffset(368, 246),  
-    -- 原修改后200,100 → 再次缩小80%：160,80
-    Auth = UDim2.new(0.05, 160, 0.05, 80), 
-    Max = UDim2.fromScale(1, 1), 
-    -- 原70,70 → 再次缩小80%：56,56
-    Loading = UDim2.new(0, 56, 0, 56),     
-    -- 原25,25 → 再次缩小80%：20,20
-    Close = UDim2.new(0.01, 20, 0.01, 20)  
 };
---[[
 Library.SizeLibrary = {
     -- 原Default：580,385 → 改小为 460,308（缩小80%）
     Default = UDim2.fromOffset(460, 308),  
@@ -1593,7 +1582,7 @@ Library.SizeLibrary = {
     Loading = UDim2.new(0, 70, 0, 70),     
     Close = UDim2.new(0.01, 25, 0.01, 25)  
 };
---]]
+
 Library.Theme = {}
 
 Library.Colors = { 
