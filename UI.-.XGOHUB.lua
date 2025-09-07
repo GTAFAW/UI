@@ -4199,7 +4199,6 @@ local function SaveConfiguration()
     end
     local JsonData = HttpService:JSONEncode(Data)
 
-    -- 编辑器环境显示配置 / 本地文件保存（适配原UI逻辑）
     if useStudio then
         local parent = script.Parent or game.CoreGui
         if parent:FindFirstChild('configuration') then parent.configuration:Destroy() end
@@ -4224,28 +4223,26 @@ local function SaveConfiguration()
     end
 end
 
--- 按钮触发式颜色选择器（点击按钮展开框架）
+-- 修复版：按钮触发式颜色选择器（确保颜色可选择）
 function Root:ColorPickerButton(setup)
     setup = setup or {}
-    -- 基础配置（默认值+用户自定义）
     local cfg = {
-        ButtonText = setup.ButtonText or "选择颜色",  -- 按钮显示文本
-        DefaultColor = setup.DefaultColor or Color3.fromRGB(255,255,255),  -- 默认颜色
-        Callback = setup.Callback or function() end,  -- 选择完成回调
-        Flag = setup.Flag or nil,  -- 配置标识
-        FrameSize = setup.FrameSize or UDim2.new(0, 300, 0, 220)  -- 展开框架尺寸
+        ButtonText = setup.ButtonText or "选择颜色",
+        DefaultColor = setup.DefaultColor or Color3.fromRGB(255,255,255),
+        Callback = setup.Callback or function() end,
+        Flag = setup.Flag or nil,
+        FrameSize = setup.FrameSize or UDim2.new(0, 300, 0, 220)
     }
 
-    -- ===================== 1. 创建「颜色选择按钮」（玩家点击触发） =====================
+    -- ===================== 1. 颜色选择按钮（基础组件） =====================
     local ColorBtn = Instance.new("Frame")
     ColorBtn.Name = "ColorPickerButton"
-    ColorBtn.Parent = ScrollingFrame  -- 挂载到原UI的滚动容器
+    ColorBtn.Parent = ScrollingFrame
     ColorBtn.BackgroundColor3 = Library.Colors.Default
     ColorBtn.BackgroundTransparency = 0.25
-    ColorBtn.Size = UDim2.new(0.99, 0, 0, Library.ItemHeight)  -- 对齐原UI按钮高度
+    ColorBtn.Size = UDim2.new(0.99, 0, 0, Library.ItemHeight)
     ColorBtn.ZIndex = 10
 
-    -- 按钮阴影（复用原UI样式）
     local BtnShadow = Instance.new("ImageLabel")
     BtnShadow.Name = "DropShadow"
     BtnShadow.Parent = ColorBtn
@@ -4260,13 +4257,11 @@ function Root:ColorPickerButton(setup)
     BtnShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     BtnShadow.SliceScale = 0.05
 
-    -- 按钮边框（高亮色适配主题）
     local BtnStroke = Instance.new("UIStroke")
     BtnStroke.Parent = ColorBtn
     BtnStroke.Transparency = 0.85
     BtnStroke.Color = Library.Colors.Hightlight
 
-    -- 按钮文本（显示“选择颜色”）
     local BtnText = Instance.new("TextLabel")
     BtnText.Parent = ColorBtn
     BtnText.AnchorPoint = Vector2.new(0, 0.5)
@@ -4281,7 +4276,6 @@ function Root:ColorPickerButton(setup)
     BtnText.TextStrokeColor3 = Library.Colors.TextColor
     BtnText.TextStrokeTransparency = 0.95
 
-    -- 按钮点击区域（透明触发）
     local BtnClick = Instance.new("TextButton")
     BtnClick.Parent = ColorBtn
     BtnClick.Size = UDim2.new(1, 0, 1, 0)
@@ -4289,19 +4283,20 @@ function Root:ColorPickerButton(setup)
     BtnClick.TextTransparency = 1
     BtnClick.ZIndex = 15
 
-    -- ===================== 2. 创建「颜色选择框架」（点击按钮后显示） =====================
+    -- ===================== 2. 颜色选择框架（修复交互核心） =====================
     local ColorFrame = Instance.new("Frame")
     ColorFrame.Name = "ColorPickerFrame"
     ColorFrame.Parent = ScrollingFrame
     ColorFrame.BackgroundColor3 = Library.Colors.Default
     ColorFrame.BackgroundTransparency = 0.25
     ColorFrame.Size = cfg.FrameSize
-    ColorFrame.Position = UDim2.new(0, 0, 0, ColorBtn.AbsoluteSize.Y + 10)  -- 位于按钮下方
+    ColorFrame.Position = UDim2.new(0, 0, 0, ColorBtn.AbsoluteSize.Y + 10)
     ColorFrame.ZIndex = 15
-    ColorFrame.Visible = false  -- 默认隐藏
+    ColorFrame.Visible = false
     ColorFrame.ClipsDescendants = true
+    -- 关键修复：确保框架可交互
+    ColorFrame.Active = true
 
-    -- 框架阴影
     local FrameShadow = Instance.new("ImageLabel")
     FrameShadow.Name = "DropShadow"
     FrameShadow.Parent = ColorFrame
@@ -4316,13 +4311,11 @@ function Root:ColorPickerButton(setup)
     FrameShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     FrameShadow.SliceScale = 0.05
 
-    -- 框架边框
     local FrameStroke = Instance.new("UIStroke")
     FrameStroke.Parent = ColorFrame
     FrameStroke.Transparency = 0.85
     FrameStroke.Color = Library.Colors.Hightlight
 
-    -- 框架标题（如“选择主题色”）
     local FrameTitle = Instance.new("TextLabel")
     FrameTitle.Parent = ColorFrame
     FrameTitle.BackgroundTransparency = 1
@@ -4335,28 +4328,39 @@ function Root:ColorPickerButton(setup)
     FrameTitle.TextStrokeColor3 = Library.Colors.TextColor
     FrameTitle.TextStrokeTransparency = 0.95
 
-    -- ===================== 3. 颜色选择核心组件（放在框架内） =====================
+    -- ===================== 3. 颜色选择核心（修复拖动和坐标） =====================
     local TweenService = game:GetService("TweenService")
     local UserInputService = game:GetService("UserInputService")
     local RunService = game:GetService("RunService")
-    local mouse = game.Players.LocalPlayer:GetMouse()
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local mouse = LocalPlayer:GetMouse()
 
-    -- 3.1 颜色预览区（显示当前选择的颜色）
+    -- 3.1 颜色预览区
     local Preview = Instance.new("Frame")
     Preview.Parent = ColorFrame
     Preview.Position = UDim2.new(0.02, 0, 0, 40)
     Preview.Size = UDim2.new(0.96, 0, 0, 30)
     Preview.BackgroundColor3 = cfg.DefaultColor
     Preview.BorderSizePixel = 0
+    -- 增加预览区边框，让颜色更明显
+    local PreviewStroke = Instance.new("UIStroke")
+    PreviewStroke.Parent = Preview
+    PreviewStroke.Color = Color3.fromRGB(255,255,255)
+    PreviewStroke.Transparency = 0.5
+    PreviewStroke.Thickness = 1
 
-    -- 3.2 色相选择滑块
+    -- 3.2 色相滑块（修复拖动检测）
     local HueSlider = Instance.new("Frame")
+    HueSlider.Name = "HueSlider"
     HueSlider.Parent = ColorFrame
     HueSlider.Position = UDim2.new(0.02, 0, 0, 80)
     HueSlider.Size = UDim2.new(0.96, 0, 0, 8)
-    HueSlider.BackgroundTransparency = 1
+    HueSlider.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    HueSlider.BackgroundTransparency = 0.1
+    -- 关键修复：滑块可交互
+    HueSlider.Active = true
 
-    -- 滑块渐变色（全色相）
     local HueGradient = Instance.new("UIGradient")
     HueGradient.Parent = HueSlider
     HueGradient.Color = ColorSequence.new({
@@ -4369,47 +4373,63 @@ function Root:ColorPickerButton(setup)
         ColorSequenceKeypoint.new(1, Color3.fromRGB(255,0,0))
     })
 
-    -- 滑块选择点
     local HuePoint = Instance.new("ImageLabel")
+    HuePoint.Name = "HuePoint"
     HuePoint.Parent = HueSlider
     HuePoint.Size = UDim2.new(0, 16, 0, 16)
     HuePoint.AnchorPoint = Vector2.new(0.5, 0.5)
+    HuePoint.Position = UDim2.new(0, 0, 0.5, 0) -- 初始位置
     HuePoint.BackgroundTransparency = 1
-    HuePoint.Image = "rbxassetid://7733710700"  -- 原UI勾选图标（白色）
+    HuePoint.Image = "rbxassetid://7733710700"
     HuePoint.ImageColor3 = Color3.fromRGB(255,255,255)
+    HuePoint.ZIndex = 20
 
-    -- 3.3 饱和度/明度选择面板
+    -- 3.3 饱和度/明度面板（修复坐标计算）
     local SvPanel = Instance.new("Frame")
+    SvPanel.Name = "SvPanel"
     SvPanel.Parent = ColorFrame
     SvPanel.Position = UDim2.new(0.02, 0, 0, 100)
     SvPanel.Size = UDim2.new(0.6, 0, 0, 80)
-    SvPanel.BackgroundTransparency = 1
+    SvPanel.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    SvPanel.BackgroundTransparency = 0.1
+    -- 关键修复：面板可交互
+    SvPanel.Active = true
 
-    -- 面板背景图（饱和度-明度映射）
-    local SvImage = Instance.new("ImageLabel")
-    SvImage.Parent = SvPanel
-    SvImage.Size = UDim2.new(1, 0, 1, 0)
-    SvImage.BackgroundTransparency = 1
-    SvImage.Image = "rbxassetid://11415645739"  -- 标准SV图
-    SvImage.ImageTransparency = 0.2
+    -- 修复SV面板背景（增加饱和度-明度渐变，确保颜色显示正常）
+    local SvSatGradient = Instance.new("UIGradient")
+    SvSatGradient.Parent = SvPanel
+    SvSatGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,0))
+    })
+    SvSatGradient.Rotation = 0
 
-    -- 面板选择点
+    local SvValGradient = Instance.new("UIGradient")
+    SvValGradient.Parent = SvPanel
+    SvValGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255,255,255))
+    })
+    SvValGradient.Rotation = 90
+
     local SvPoint = Instance.new("ImageLabel")
+    SvPoint.Name = "SvPoint"
     SvPoint.Parent = SvPanel
     SvPoint.Size = UDim2.new(0, 14, 0, 14)
     SvPoint.AnchorPoint = Vector2.new(0.5, 0.5)
+    SvPoint.Position = UDim2.new(1, 0, 0, 0) -- 初始位置（100%饱和度，100%明度）
     SvPoint.BackgroundTransparency = 1
     SvPoint.Image = "rbxassetid://7733710700"
     SvPoint.ImageColor3 = Color3.fromRGB(255,255,255)
+    SvPoint.ZIndex = 20
 
-    -- 3.4 RGB输入区（数值调节）
+    -- 3.4 RGB输入区（修复数值同步）
     local RgbContainer = Instance.new("Frame")
     RgbContainer.Parent = ColorFrame
     RgbContainer.Position = UDim2.new(0.65, 0, 0, 100)
     RgbContainer.Size = UDim2.new(0.33, 0, 0, 80)
     RgbContainer.BackgroundTransparency = 1
 
-    -- RGB输入框（R/G/B三个）
     local RgbInputs = {}
     local RgbLabels = {"R", "G", "B"}
     for i, label in ipairs(RgbLabels) do
@@ -4421,13 +4441,11 @@ function Root:ColorPickerButton(setup)
         InputFrame.BackgroundTransparency = 0.5
         InputFrame.BorderSizePixel = 0
 
-        -- 输入框边框
         local InputStroke = Instance.new("UIStroke")
         InputStroke.Parent = InputFrame
         InputStroke.Color = Library.Colors.Hightlight
         InputStroke.Transparency = 0.85
 
-        -- 输入框标签（R/G/B）
         local InputLabel = Instance.new("TextLabel")
         InputLabel.Parent = InputFrame
         InputLabel.Position = UDim2.new(0, 5, 0, 0)
@@ -4438,7 +4456,6 @@ function Root:ColorPickerButton(setup)
         InputLabel.TextColor3 = Library.Colors.TextColor
         InputLabel.TextSize = 14
 
-        -- 输入框（数值）
         local InputBox = Instance.new("TextBox")
         InputBox.Name = "InputBox"
         InputBox.Parent = InputFrame
@@ -4450,11 +4467,16 @@ function Root:ColorPickerButton(setup)
         InputBox.TextColor3 = Library.Colors.TextColor
         InputBox.TextSize = 12
         InputBox.TextXAlignment = Enum.TextXAlignment.Center
+        -- 修复：只允许输入数字
+        InputBox:GetPropertyChangedSignal("Text"):Connect(function()
+            InputBox.Text = InputBox.Text:gsub("[^0-9]", "")
+            if #InputBox.Text > 3 then InputBox.Text = InputBox.Text:sub(1, 3) end
+        end)
 
         table.insert(RgbInputs, InputBox)
     end
 
-    -- 3.5 确认按钮（选择完成）
+    -- 3.5 确认按钮
     local ConfirmBtn = Instance.new("Frame")
     ConfirmBtn.Parent = ColorFrame
     ConfirmBtn.Position = UDim2.new(0.02, 0, 0, 190)
@@ -4463,7 +4485,6 @@ function Root:ColorPickerButton(setup)
     ConfirmBtn.BackgroundTransparency = 0.3
     ConfirmBtn.BorderSizePixel = 0
 
-    -- 确认按钮文本
     local ConfirmText = Instance.new("TextLabel")
     ConfirmText.Parent = ConfirmBtn
     ConfirmText.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -4476,7 +4497,6 @@ function Root:ColorPickerButton(setup)
     ConfirmText.TextScaled = true
     ConfirmText.TextSize = 14
 
-    -- 确认按钮点击区
     local ConfirmClick = Instance.new("TextButton")
     ConfirmClick.Parent = ConfirmBtn
     ConfirmClick.Size = UDim2.new(1, 0, 1, 0)
@@ -4484,99 +4504,126 @@ function Root:ColorPickerButton(setup)
     ConfirmClick.TextTransparency = 1
     ConfirmClick.ZIndex = 20
 
-    -- ===================== 4. 交互逻辑（点击按钮展开/收起，颜色选择） =====================
-    local isFrameOpen = false  -- 框架是否展开
-    local h, s, v = cfg.DefaultColor:ToHSV()  -- 色相/饱和度/明度
+    -- ===================== 4. 修复颜色选择逻辑 =====================
+    local isFrameOpen = false
+    local h, s, v = cfg.DefaultColor:ToHSV()
     local currentColor = cfg.DefaultColor
 
-    -- 初始化显示（设置默认颜色对应的UI状态）
-    local function initColorUI()
-        -- 更新预览区颜色
+    -- 修复：初始化UI（确保坐标和数值正确）
+    local function updateColorUI()
+        -- 1. 更新预览色
         Preview.BackgroundColor3 = currentColor
-        -- 更新滑块位置（色相）
-        HuePoint.Position = UDim2.new(h, 0, 0.5, 0)
-        -- 更新SV面板选择点位置（饱和度x，明度y）
-        SvPoint.Position = UDim2.new(s, 0, 1 - v, 0)
-        -- 更新RGB输入框数值
+        -- 2. 更新色相滑块（关键：用绝对坐标计算，避免相对坐标错误）
+        local huePointX = math.clamp(h * HueSlider.AbsoluteSize.X, 0, HueSlider.AbsoluteSize.X)
+        HuePoint.Position = UDim2.new(0, huePointX, 0.5, 0)
+        -- 3. 更新SV面板（关键：修复饱和度/明度对应的坐标）
+        local svPointX = math.clamp(s * SvPanel.AbsoluteSize.X, 0, SvPanel.AbsoluteSize.X)
+        local svPointY = math.clamp((1 - v) * SvPanel.AbsoluteSize.Y, 0, SvPanel.AbsoluteSize.Y)
+        SvPoint.Position = UDim2.new(0, svPointX, 0, svPointY)
+        -- 4. 更新RGB输入框
         local r = math.floor(currentColor.R * 255)
         local g = math.floor(currentColor.G * 255)
         local b = math.floor(currentColor.B * 255)
-        RgbInputs[1].Text = tostring(r)
-        RgbInputs[2].Text = tostring(g)
-        RgbInputs[3].Text = tostring(b)
+        -- 避免输入框频繁刷新导致闪烁
+        if RgbInputs[1].Text ~= tostring(r) then RgbInputs[1].Text = tostring(r) end
+        if RgbInputs[2].Text ~= tostring(g) then RgbInputs[2].Text = tostring(g) end
+        if RgbInputs[3].Text ~= tostring(b) then RgbInputs[3].Text = tostring(b) end
+        -- 5. 更新SV面板的色相叠加（让面板显示当前色相的饱和度-明度变化）
+        SvSatGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromHSV(h, 0, 1)),
+            ColorSequenceKeypoint.new(1, Color3.fromHSV(h, 1, 1))
+        })
     end
-    initColorUI()
+    -- 初始执行一次，确保UI正确
+    updateColorUI()
 
-    -- 按钮点击：展开/收起框架
+    -- 修复：按钮点击展开/收起
     BtnClick.MouseButton1Click:Connect(function()
         isFrameOpen = not isFrameOpen
-        -- 展开：显示框架+动画
         if isFrameOpen then
             ColorFrame.Visible = true
+            -- 确保框架在按钮下方（用绝对位置避免滚动后错位）
+            local btnBottomY = ColorBtn.AbsolutePosition.Y + ColorBtn.AbsoluteSize.Y
+            ColorFrame.Position = UDim2.new(0, ColorBtn.AbsolutePosition.X, 0, btnBottomY + 10)
             TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
-                BackgroundTransparency = 0.25,
-                Position = UDim2.new(0, 0, 0, ColorBtn.AbsoluteSize.Y + 10)
+                BackgroundTransparency = 0.25
             }):Play()
-            -- 按钮高亮提示
-            TweenService:Create(BtnStroke, Library.TweenLibrary.SmallEffect, {
-                Transparency = 0.5
-            }):Play()
-        -- 收起：隐藏框架+动画
+            BtnStroke.Transparency = 0.5
         else
             TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 0, 0, ColorBtn.AbsoluteSize.Y)
+                BackgroundTransparency = 1
             }):Play()
             task.wait(0.3)
             ColorFrame.Visible = false
-            -- 按钮恢复默认样式
-            TweenService:Create(BtnStroke, Library.TweenLibrary.SmallEffect, {
-                Transparency = 0.85
-            }):Play()
+            BtnStroke.Transparency = 0.85
         end
     end)
 
-    -- 色相滑块拖动
+    -- 修复：色相滑块拖动（增加InputBegan/InputEnded直接绑定到滑块）
     local isHueDragging = false
-    HueSlider.MouseButton1Down:Connect(function() isHueDragging = true end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            isHueDragging = false
+    -- 用InputBegan替代MouseButton1Down，兼容触摸和鼠标
+    HueSlider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isHueDragging = true
+            -- 拖动时立即更新一次，避免延迟
+            local sliderX = math.clamp(input.Position.X - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
+            h = sliderX / HueSlider.AbsoluteSize.X
+            currentColor = Color3.fromHSV(h, s, v)
+            updateColorUI()
         end
     end)
 
-    -- SV面板拖动
+    -- 修复：SV面板拖动
     local isSvDragging = false
-    SvPanel.MouseButton1Down:Connect(function() isSvDragging = true end)
+    SvPanel.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isSvDragging = true
+            -- 拖动时立即更新
+            local panelX = math.clamp(input.Position.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
+            local panelY = math.clamp(input.Position.Y - SvPanel.AbsolutePosition.Y, 0, SvPanel.AbsoluteSize.Y)
+            s = panelX / SvPanel.AbsoluteSize.X
+            v = 1 - (panelY / SvPanel.AbsoluteSize.Y)
+            currentColor = Color3.fromHSV(h, s, v)
+            updateColorUI()
+        end
+    end)
+
+    -- 修复：输入结束后取消拖动状态
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isHueDragging = false
             isSvDragging = false
         end
     end)
 
-    -- 实时更新拖动选择的颜色
+    -- 修复：实时拖动更新（用RenderStepped确保流畅）
     RunService.RenderStepped:Connect(function()
-        -- 色相滑块拖动更新
-        if isHueDragging and isFrameOpen then
-            local sliderX = math.clamp(mouse.X - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
+        if not isFrameOpen then return end -- 框架关闭时不执行
+
+        -- 1. 色相拖动更新
+        if isHueDragging then
+            -- 用鼠标绝对位置计算，避免InputChanged延迟
+            local mouseX = UserInputService:GetMouseLocation().X
+            local sliderX = math.clamp(mouseX - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
             h = sliderX / HueSlider.AbsoluteSize.X
             currentColor = Color3.fromHSV(h, s, v)
-            initColorUI()
+            updateColorUI()
         end
 
-        -- SV面板拖动更新
-        if isSvDragging and isFrameOpen then
-            local panelX = math.clamp(mouse.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
-            local panelY = math.clamp(mouse.Y - SvPanel.AbsolutePosition.Y, 0, SvPanel.AbsoluteSize.Y)
+        -- 2. SV拖动更新
+        if isSvDragging then
+            local mousePos = UserInputService:GetMouseLocation()
+            local panelX = math.clamp(mousePos.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
+            local panelY = math.clamp(mousePos.Y - SvPanel.AbsolutePosition.Y, 0, SvPanel.AbsoluteSize.Y)
             s = panelX / SvPanel.AbsoluteSize.X
             v = 1 - (panelY / SvPanel.AbsoluteSize.Y)
             currentColor = Color3.fromHSV(h, s, v)
-            initColorUI()
+            updateColorUI()
         end
     end)
 
-    -- RGB输入框修改颜色
-    local function updateColorByRGB()
+    -- 修复：RGB输入框更新颜色
+    local function updateColorFromRGB()
         local r = tonumber(RgbInputs[1].Text) or 255
         local g = tonumber(RgbInputs[2].Text) or 255
         local b = tonumber(RgbInputs[3].Text) or 255
@@ -4584,43 +4631,48 @@ function Root:ColorPickerButton(setup)
         g = math.clamp(g, 0, 255)
         b = math.clamp(b, 0, 255)
         currentColor = Color3.fromRGB(r, g, b)
+        -- 同步色相/饱和度/明度，确保滑块和面板同步
         h, s, v = currentColor:ToHSV()
-        initColorUI()
+        updateColorUI()
     end
+    -- 给每个输入框绑定失去焦点事件
     for _, box in ipairs(RgbInputs) do
-        box.FocusLost:Connect(updateColorByRGB)
+        box.FocusLost:Connect(updateColorFromRGB)
+        -- 增加回车确认（优化体验）
+        box.Focused:Connect(function()
+            box.Changed:Connect(function(property)
+                if property == "Text" then
+                    -- 输入时实时更新（可选，优化体验）
+                    updateColorFromRGB()
+                end
+            end)
+        end)
     end
 
-    -- 确认按钮：触发回调+收起框架
+    -- 确认按钮逻辑
     ConfirmClick.MouseButton1Click:Connect(function()
-        cfg.Callback(currentColor)  -- 执行用户自定义回调（如应用颜色）
-        SaveConfiguration()         -- 保存选择的颜色配置
+        cfg.Callback(currentColor)
+        SaveConfiguration()
         -- 收起框架
         isFrameOpen = false
         TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 0, 0, ColorBtn.AbsoluteSize.Y)
+            BackgroundTransparency = 1
         }):Play()
         task.wait(0.3)
         ColorFrame.Visible = false
-        TweenService:Create(BtnStroke, Library.TweenLibrary.SmallEffect, {
-            Transparency = 0.85
-        }):Play()
+        BtnStroke.Transparency = 0.85
     end)
 
-    -- ===================== 5. 外部控制接口（方便用户后续操作） =====================
+    -- ===================== 5. 外部接口 =====================
     local api = {}
-    -- 外部设置颜色
     function api:SetColor(color)
         currentColor = color
         h, s, v = color:ToHSV()
-        initColorUI()
+        updateColorUI()
     end
-    -- 外部获取当前颜色
     function api:GetColor()
         return currentColor
     end
-    -- 显示/隐藏按钮
     function api:Visible(isVisible)
         ColorBtn.Visible = isVisible
         if not isVisible then
