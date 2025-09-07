@@ -1572,7 +1572,7 @@ Library.TweenService = game:GetService('TweenService');
 Library.LocalPlayer = game:GetService('Players').LocalPlayer;
 Library.CoreGui = (game:FindFirstChild('CoreGui') and Library.Cloneref(game:GetService('CoreGui'))) or Library.LocalPlayer.PlayerGui;
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
-};
+
 Library.SizeLibrary = {
     -- 原Default：580,385 → 改小为 460,308（缩小80%）
     Default = UDim2.fromOffset(460, 308),  
