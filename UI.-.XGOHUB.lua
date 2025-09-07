@@ -6,8 +6,6 @@
 -- 此源码永不加密 | 也尽量保持更新 |
 -- 
 -- 
-local NotificationHolder = loadstring(game:HttpGet('https://github.com/GTAFAW/UI/raw/main/%E9%80%9A%E7%9F%A5n1.lua'))()
-local Notification = loadstring(game:HttpGet('https://github.com/GTAFAW/UI/raw/main/%E9%80%9A%E7%9F%A5n2.lua'))()
 local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
 executionCountDataStore.Name = "ExecutionCount"
 executionCountDataStore.Parent = game.ReplicatedStorage
@@ -1575,6 +1573,18 @@ Library.LocalPlayer = game:GetService('Players').LocalPlayer;
 Library.CoreGui = (game:FindFirstChild('CoreGui') and Library.Cloneref(game:GetService('CoreGui'))) or Library.LocalPlayer.PlayerGui;
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 Library.SizeLibrary = {
+    -- 原修改后460,308 → 再次缩小80%：368,246
+    Default = UDim2.fromOffset(368, 246),  
+    -- 原修改后200,100 → 再次缩小80%：160,80
+    Auth = UDim2.new(0.05, 160, 0.05, 80), 
+    Max = UDim2.fromScale(1, 1), 
+    -- 原70,70 → 再次缩小80%：56,56
+    Loading = UDim2.new(0, 56, 0, 56),     
+    -- 原25,25 → 再次缩小80%：20,20
+    Close = UDim2.new(0.01, 20, 0.01, 20)  
+};
+--[[
+Library.SizeLibrary = {
     -- 原Default：580,385 → 改小为 460,308（缩小80%）
     Default = UDim2.fromOffset(460, 308),  
     -- 原Auth：250,125 → 改小为 200,100
@@ -1583,7 +1593,7 @@ Library.SizeLibrary = {
     Loading = UDim2.new(0, 70, 0, 70),     
     Close = UDim2.new(0.01, 25, 0.01, 25)  
 };
-
+--]]
 Library.Theme = {}
 
 Library.Colors = { 
@@ -1665,12 +1675,17 @@ Library.Colors = {
 	}
                   end;
     function Library.Theme:HightGreen()
-	Library.Colors = { 
+    -- 定义库（Library）的颜色配置表（Colors），用于"HightGreen"（高亮绿色）主题
+    Library.Colors = { 
+        -- 高亮色：用于突出显示的元素（如选中状态、按钮 hover 效果等），RGB值对应亮绿色
         Hightlight = Color3.fromRGB(0, 255, 140),
-		Default = Color3.fromRGB(8, 13, 12),
-		Disable = Color3.fromRGB(163, 188, 165),
-		TextColor = Color3.fromRGB(255, 255, 255),
-	}
+        -- 默认色：界面基础背景色或普通元素底色，RGB值对应深暗色（接近黑色）
+        Default = Color3.fromRGB(8, 13, 12),
+        -- 禁用色：用于不可交互状态的元素（如禁用按钮、失效选项等），RGB值对应浅灰绿色
+        Disable = Color3.fromRGB(163, 188, 165),
+        -- 文本色：界面中文字的颜色，RGB值对应纯白色，确保在深色背景上清晰可见
+        TextColor = Color3.fromRGB(255, 255, 255),
+    }
                   end;
     function Library.Theme:Halloween()
 	Library.Colors = { 
