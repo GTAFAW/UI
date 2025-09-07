@@ -4178,12 +4178,18 @@ function Library:Windowxgo(setup)
 
 			return RootSkid;
 		end;
---[[---- // 颜色选择器   ----------------------------------------------------------------------------------------
+------ // 颜色选择器   ----------------------------------------------------------------------------------------
+        -- 补充颜色打包工具函数（适配SaveConfiguration）
+local function PackColor(color)
+    return {R = color.R * 255, G = color.G * 255, B = color.B * 255}
+end
+
+-- 配置保存函数（适配原UI的Library库）
 local function SaveConfiguration()
     if not CEnabled then return end
 
     local Data = {}
-    for i, v in pairs(RayfieldLibrary.Flags) do
+    for i, v in pairs(RayfieldLibrary and RayfieldLibrary.Flags or {}) do
         if v.Type == "ColorPicker" then
             Data[i] = PackColor(v.Color)
         else
@@ -4195,17 +4201,19 @@ local function SaveConfiguration()
         end
     end
 
-    -- 将数据转换为 JSON 字符串
+    -- 依赖原UI的HttpService（确保全局可访问）
+    local HttpService = game:GetService("HttpService")
     local JsonData = HttpService:JSONEncode(Data)
 
     if useStudio then
-        -- 在 Roblox 编辑器中创建一个 ScreenGui 来显示配置数据
-        if script.Parent:FindFirstChild('configuration') then
-            script.Parent.configuration:Destroy()
+        -- 在Roblox编辑器中显示配置（适配原UI的ScreenGui父级逻辑）
+        local parent = script.Parent or game.CoreGui
+        if parent:FindFirstChild('configuration') then
+            parent.configuration:Destroy()
         end
         
         local ScreenGui = Instance.new("ScreenGui")
-        ScreenGui.Parent = script.Parent
+        ScreenGui.Parent = parent
         ScreenGui.Name = 'configuration'
 
         local TextBox = Instance.new("TextBox")
@@ -4223,256 +4231,471 @@ local function SaveConfiguration()
         TextBox.TextXAlignment = Enum.TextXAlignment.Left
         TextBox.TextWrapped = true
     else
-        -- 将配置数据写入到文件中
+        -- 写入文件（适配原UI的文件路径规范）
         if writefile then
+            local ConfigurationFolder = "XGO_HUB_Config"
+            local CFileName = "ColorConfig"
+            local ConfigurationExtension = ".json"
             writefile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension, tostring(JsonData))
         end
     end
 end
 
-function Root:ColorPicker(setup) -- by Throit
-    ColorPickerSettings.Type = "ColorPicker"
-    local ColorPicker = Elements.Template.ColorPicker:Clone()
-    local Background = ColorPicker.CPBackground
-    local Display = Background.Display
-    local Main = Background.MainCP
-    local Slider = ColorPicker.ColorSlider
-    ColorPicker.ClipsDescendants = true
-    ColorPicker.Name = ColorPickerSettings.Name
-    ColorPicker.Title.Text = ColorPickerSettings.Name
-    ColorPicker.Visible = true
-    ColorPicker.Parent = TabPage
-    ColorPicker.Size = UDim2.new(1, -10, 0, 45)
-    Background.Size = UDim2.new(0, 39, 0, 22)
-    Display.BackgroundTransparency = 0
-    Main.MainPoint.ImageTransparency = 1
-    ColorPicker.Interact.Size = UDim2.new(1, 0, 1, 0)
-    ColorPicker.Interact.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ColorPicker.RGB.Position = UDim2.new(0, 17, 0, 70)
-    ColorPicker.HexInput.Position = UDim2.new(0, 17, 0, 90)
-    Main.ImageTransparency = 1
-    Background.BackgroundTransparency = 1
+-- 颜色选择器组件（融入原UI的Root对象）
+function Root:ColorPicker(setup)
+    setup = setup or {}
+    -- 初始化颜色选择器配置（对齐原UI参数规范）
+    local ColorPickerSettings = {
+        Type = "ColorPicker",
+        Name = setup.Name or "ColorPicker",
+        Color = setup.Default or Color3.fromRGB(255, 255, 255),
+        Callback = setup.Callback or function() end,
+        Flag = setup.Flag or nil
+    }
 
-    for _, rgbinput in ipairs(ColorPicker.RGB:GetChildren()) do
-        if rgbinput:IsA("Frame") then
-            rgbinput.BackgroundColor3 = Library.Colors.Default
-            rgbinput.UIStroke.Color = Library.Colors.Hightlight
-        end
+    -- 1. 创建基础容器（适配原UI的Frame样式）
+    local ColorPicker = Instance.new("Frame")
+    ColorPicker.Name = ColorPickerSettings.Name
+    ColorPicker.Parent = TabFrames -- 原UI的标签容器
+    ColorPicker.ClipsDescendants = true
+    ColorPicker.Visible = true
+    ColorPicker.Size = UDim2.new(1, -10, 0, 45)
+    ColorPicker.BackgroundColor3 = Library.Colors.Default
+    ColorPicker.BackgroundTransparency = 0.25
+    ColorPicker.BorderSizePixel = 0
+
+    -- 2. 添加阴影和边框（复用原UI的DropShadow逻辑）
+    local DropShadow = Instance.new("ImageLabel")
+    DropShadow.Name = "DropShadow"
+    DropShadow.Parent = ColorPicker
+    DropShadow.BackgroundTransparency = 1
+    DropShadow.Position = UDim2.new(0, -5, 0, -5)
+    DropShadow.Size = UDim2.new(1, 10, 1, 10)
+    DropShadow.ZIndex = -1
+    DropShadow.Image = "rbxassetid://297694300"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.5
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+    DropShadow.SliceScale = 0.05
+
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Parent = ColorPicker
+    UIStroke.Transparency = 0.85
+    UIStroke.Color = Library.Colors.Hightlight
+
+    -- 3. 创建标题（对齐原UI的TextLabel样式）
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.Parent = ColorPicker
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 10, 0, 5)
+    Title.Size = UDim2.new(0.5, 0, 0, 14)
+    Title.Font = Enum.Font.Gotham
+    Title.Text = ColorPickerSettings.Name
+    Title.TextColor3 = Library.Colors.TextColor
+    Title.TextSize = 14
+    Title.TextStrokeColor3 = Library.Colors.TextColor
+    Title.TextStrokeTransparency = 0.95
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- 4. 颜色显示区
+    local Background = Instance.new("Frame")
+    Background.Name = "CPBackground"
+    Background.Parent = ColorPicker
+    Background.Position = UDim2.new(1, -45, 0, 5)
+    Background.Size = UDim2.new(0, 39, 0, 22)
+    Background.BackgroundColor3 = Library.Colors.Default
+    Background.BackgroundTransparency = 1
+    Background.BorderSizePixel = 0
+
+    local Display = Instance.new("Frame")
+    Display.Name = "Display"
+    Display.Parent = Background
+    Display.Size = UDim2.new(1, 0, 1, 0)
+    Display.BackgroundColor3 = ColorPickerSettings.Color
+    Display.BackgroundTransparency = 0
+    Display.BorderSizePixel = 0
+
+    -- 5. 颜色选择面板（展开/收起逻辑）
+    local Main = Instance.new("Frame")
+    Main.Name = "MainCP"
+    Main.Parent = Background
+    Main.Position = UDim2.new(0, -180, 0, 30)
+    Main.Size = UDim2.new(0, 173, 0, 86)
+    Main.BackgroundTransparency = 1
+    Main.BorderSizePixel = 0
+
+    local MainImage = Instance.new("ImageLabel")
+    MainImage.Parent = Main
+    MainImage.Size = UDim2.new(1, 0, 1, 0)
+    MainImage.BackgroundTransparency = 1
+    MainImage.Image = "rbxassetid://11415645739" -- 颜色选择器背景图
+    MainImage.ImageTransparency = Library.Colors ~= Library.Theme.Default and 0.25 or 0.1
+
+    local MainPoint = Instance.new("ImageLabel")
+    MainPoint.Name = "MainPoint"
+    MainPoint.Parent = Main
+    MainPoint.Size = UDim2.new(0, 15, 0, 15)
+    MainPoint.BackgroundTransparency = 1
+    MainPoint.Image = "rbxassetid://7733710700" -- 原UI的勾选图标
+    MainPoint.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    MainPoint.ImageTransparency = 1
+    MainPoint.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    -- 6. 色相滑块
+    local Slider = Instance.new("Frame")
+    Slider.Name = "ColorSlider"
+    Slider.Parent = Background
+    Slider.Position = UDim2.new(1, 10, 0, 0)
+    Slider.Size = UDim2.new(0, 10, 0, 86)
+    Slider.BackgroundTransparency = 1
+
+    local SliderImage = Instance.new("UIGradient")
+    SliderImage.Parent = Slider
+    SliderImage.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+        ColorSequenceKeypoint.new(0.16, Color3.fromRGB(255, 255, 0)),
+        ColorSequenceKeypoint.new(0.32, Color3.fromRGB(0, 255, 0)),
+        ColorSequenceKeypoint.new(0.48, Color3.fromRGB(0, 255, 255)),
+        ColorSequenceKeypoint.new(0.64, Color3.fromRGB(0, 0, 255)),
+        ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 0, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+    })
+    SliderImage.Rotation = 270
+
+    local SliderPoint = Instance.new("ImageLabel")
+    SliderPoint.Name = "SliderPoint"
+    SliderPoint.Parent = Slider
+    SliderPoint.Size = UDim2.new(0, 20, 0, 8)
+    SliderPoint.BackgroundTransparency = 1
+    SliderPoint.Image = "rbxassetid://7733710700"
+    SliderPoint.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    SliderPoint.AnchorPoint = Vector2.new(0.5, 0.5)
+
+    -- 7. RGB输入区（适配原UI的输入框样式）
+    local RGBContainer = Instance.new("Frame")
+    RGBContainer.Name = "RGB"
+    RGBContainer.Parent = Background
+    RGBContainer.Position = UDim2.new(0, -180, 0, 120)
+    RGBContainer.Size = UDim2.new(0, 173, 0, 30)
+    RGBContainer.BackgroundTransparency = 1
+
+    local RGBLabels = {"R", "G", "B"}
+    local RGBInputs = {}
+    for i, label in ipairs(RGBLabels) do
+        local InputFrame = Instance.new("Frame")
+        InputFrame.Name = label .. "Input"
+        InputFrame.Parent = RGBContainer
+        InputFrame.Position = UDim2.new(0, (i-1)*55, 0, 0)
+        InputFrame.Size = UDim2.new(0, 50, 0, 30)
+        InputFrame.BackgroundColor3 = Library.Colors.Default
+        InputFrame.BackgroundTransparency = 0.5
+        InputFrame.BorderSizePixel = 0
+
+        local InputStroke = Instance.new("UIStroke")
+        InputStroke.Parent = InputFrame
+        InputStroke.Color = Library.Colors.Hightlight
+        InputStroke.Transparency = 0.85
+
+        local InputLabel = Instance.new("TextLabel")
+        InputLabel.Parent = InputFrame
+        InputLabel.Position = UDim2.new(0, 5, 0, 0)
+        InputLabel.Size = UDim2.new(0, 15, 0, 30)
+        InputLabel.BackgroundTransparency = 1
+        InputLabel.Font = Enum.Font.Gotham
+        InputLabel.Text = label
+        InputLabel.TextColor3 = Library.Colors.TextColor
+        InputLabel.TextSize = 14
+
+        local InputBox = Instance.new("TextBox")
+        InputBox.Name = "InputBox"
+        InputBox.Parent = InputFrame
+        InputBox.Position = UDim2.new(0, 20, 0, 0)
+        InputBox.Size = UDim2.new(0, 25, 0, 30)
+        InputBox.BackgroundTransparency = 1
+        InputBox.ClearTextOnFocus = false
+        InputBox.Font = Enum.Font.Gotham
+        InputBox.TextColor3 = Library.Colors.TextColor
+        InputBox.TextSize = 12
+        InputBox.TextXAlignment = Enum.TextXAlignment.Center
+
+        table.insert(RGBInputs, InputBox)
     end
 
-    ColorPicker.HexInput.BackgroundColor3 = Library.Colors.Default
-    ColorPicker.HexInput.UIStroke.Color = Library.Colors.Hightlight
+    -- 8. HEX输入区
+    local HexInput = Instance.new("Frame")
+    HexInput.Name = "HexInput"
+    HexInput.Parent = Background
+    HexInput.Position = UDim2.new(0, -180, 0, 160)
+    HexInput.Size = UDim2.new(0, 173, 0, 30)
+    HexInput.BackgroundColor3 = Library.Colors.Default
+    HexInput.BackgroundTransparency = 0.5
+    HexInput.BorderSizePixel = 0
 
-    local opened = false 
+    local HexStroke = Instance.new("UIStroke")
+    HexStroke.Parent = HexInput
+    HexStroke.Color = Library.Colors.Hightlight
+    HexStroke.Transparency = 0.85
+
+    local HexLabel = Instance.new("TextLabel")
+    HexLabel.Parent = HexInput
+    HexLabel.Position = UDim2.new(0, 5, 0, 0)
+    HexLabel.Size = UDim2.new(0, 20, 0, 30)
+    HexLabel.BackgroundTransparency = 1
+    HexLabel.Font = Enum.Font.Gotham
+    HexLabel.Text = "#"
+    HexLabel.TextColor3 = Library.Colors.TextColor
+    HexLabel.TextSize = 14
+
+    local HexBox = Instance.new("TextBox")
+    HexBox.Name = "InputBox"
+    HexBox.Parent = HexInput
+    HexBox.Position = UDim2.new(0, 25, 0, 0)
+    HexBox.Size = UDim2.new(0, 143, 0, 30)
+    HexBox.BackgroundTransparency = 1
+    HexBox.ClearTextOnFocus = false
+    HexBox.Font = Enum.Font.Gotham
+    HexBox.TextColor3 = Library.Colors.TextColor
+    HexBox.TextSize = 12
+    HexBox.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- 9. 交互逻辑（对齐原UI的TweenLibrary）
+    local TweenService = game:GetService("TweenService")
+    local UserInputService = game:GetService("UserInputService")
+    local RunService = game:GetService("RunService")
+    local opened = false
     local mouse = game.Players.LocalPlayer:GetMouse()
-    Main.Image = "http://www.roblox.com/asset/?id=11415645739"
-    local mainDragging = false 
-    local sliderDragging = false 
-    ColorPicker.Interact.MouseButton1Down:Connect(function()
+    local mainDragging = false
+    local sliderDragging = false
+
+    -- 展开/收起按钮
+    local Interact = Instance.new("TextButton")
+    Interact.Name = "Interact"
+    Interact.Parent = ColorPicker
+    Interact.Size = UDim2.new(1, 0, 1, 0)
+    Interact.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Interact.BackgroundTransparency = 1
+    Interact.TextTransparency = 1
+    Interact.ZIndex = 10
+
+    Interact.MouseButton1Down:Connect(function()
+        -- 按钮点击动画（复用原UI的TweenInfo）
         task.spawn(function()
-            TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Library.Colors.ElementBackgroundHover}):Play()
-            TweenService:Create(ColorPicker.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+            TweenService:Create(ColorPicker, Library.TweenLibrary.SmallEffect, {
+                BackgroundColor3 = Library.Colors.Hightlight,
+                BackgroundTransparency = 0.1
+            }):Play()
             task.wait(0.2)
-            TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Library.Colors.ElementBackground}):Play()
-            TweenService:Create(ColorPicker.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+            TweenService:Create(ColorPicker, Library.TweenLibrary.SmallEffect, {
+                BackgroundColor3 = Library.Colors.Default,
+                BackgroundTransparency = 0.25
+            }):Play()
         end)
 
         if not opened then
-            opened = true 
-            TweenService:Create(Background, TweenInfo.new(0.45, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 18, 0, 15)}):Play()
-            task.wait(0.1)
-            TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 120)}):Play()
-            TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 173, 0, 86)}):Play()
-            TweenService:Create(Display, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-            TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Position = UDim2.new(0.289, 0, 0.5, 0)}):Play()
-            TweenService:Create(ColorPicker.RGB, TweenInfo.new(0.8, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 40)}):Play()
-            TweenService:Create(ColorPicker.HexInput, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 73)}):Play()
-            TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0.574, 0, 1, 0)}):Play()
-            TweenService:Create(Main.MainPoint, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-            TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = Library.Colors ~= Library.Theme.Default and 0.25 or 0.1}):Play()
-            TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+            -- 展开动画
+            opened = true
+            TweenService:Create(Background, Library.TweenLibrary.SmallEffect, {
+                Size = UDim2.new(0, 173, 0, 86)
+            }):Play()
+            TweenService:Create(Main, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(0, -180, 0, 30)
+            }):Play()
+            TweenService:Create(Slider, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(1, 10, 0, 0)
+            }):Play()
+            TweenService:Create(RGBContainer, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(0, -180, 0, 120)
+            }):Play()
+            TweenService:Create(HexInput, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(0, -180, 0, 160)
+            }):Play()
+            TweenService:Create(MainPoint, Library.TweenLibrary.SmallEffect, {
+                ImageTransparency = 0
+            }):Play()
+            TweenService:Create(Display, Library.TweenLibrary.SmallEffect, {
+                BackgroundTransparency = 1
+            }):Play()
         else
+            -- 收起动画
             opened = false
-            TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 45)}):Play()
-            TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 39, 0, 22)}):Play()
-            TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, 0, 1, 0)}):Play()
-            TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
-            TweenService:Create(ColorPicker.RGB, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 70)}):Play()
-            TweenService:Create(ColorPicker.HexInput, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 90)}):Play()
-            TweenService:Create(Display, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-            TweenService:Create(Main.MainPoint, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-            TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-            TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+            TweenService:Create(Background, Library.TweenLibrary.SmallEffect, {
+                Size = UDim2.new(0, 39, 0, 22)
+            }):Play()
+            TweenService:Create(Main, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(0, -180, 0, -100)
+            }):Play()
+            TweenService:Create(Slider, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(1, 10, 0, -100)
+            }):Play()
+            TweenService:Create(RGBContainer, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(0, -180, 0, -100)
+            }):Play()
+            TweenService:Create(HexInput, Library.TweenLibrary.SmallEffect, {
+                Position = UDim2.new(0, -180, 0, -100)
+            }):Play()
+            TweenService:Create(MainPoint, Library.TweenLibrary.SmallEffect, {
+                ImageTransparency = 1
+            }):Play()
+            TweenService:Create(Display, Library.TweenLibrary.SmallEffect, {
+                BackgroundTransparency = 0
+            }):Play()
         end
+    end)
 
-    end)
+    -- 10. 颜色逻辑计算
+    local h, s, v = ColorPickerSettings.Color:ToHSV()
+    local color = Color3.fromHSV(h, s, v)
+    local hex = string.format("#%02X%02X%02X", color.R*255, color.G*255, color.B*255)
+    HexBox.Text = hex:sub(2) -- 去除#号
+    RGBInputs[1].Text = tostring(math.floor(color.R*255))
+    RGBInputs[2].Text = tostring(math.floor(color.G*255))
+    RGBInputs[3].Text = tostring(math.floor(color.B*255))
 
-    UserInputService.InputEnded:Connect(function(input, gameProcessed) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
-        mainDragging = false
-        sliderDragging = false
-    end end)
-    Main.MouseButton1Down:Connect(function()
-        if opened then
-            mainDragging = true 
-        end
-    end)
-    Main.MainPoint.MouseButton1Down:Connect(function()
-        if opened then
-            mainDragging = true 
-        end
-    end)
-    Slider.MouseButton1Down:Connect(function()
-        sliderDragging = true 
-    end)
-    Slider.SliderPoint.MouseButton1Down:Connect(function()
-        sliderDragging = true 
-    end)
-    local h,s,v = ColorPickerSettings.Color:ToHSV()
-    local color = Color3.fromHSV(h,s,v) 
-    local hex = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
-    ColorPicker.HexInput.InputBox.Text = hex
+    -- 更新显示
     local function setDisplay()
-        --Main
-        Main.MainPoint.Position = UDim2.new(s,-Main.MainPoint.AbsoluteSize.X/2,1-v,-Main.MainPoint.AbsoluteSize.Y/2)
-        Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
-        Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
-        Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
-        --Slider 
-        local x = h * Slider.AbsoluteSize.X
-        Slider.SliderPoint.Position = UDim2.new(0,x-Slider.SliderPoint.AbsoluteSize.X/2,0.5,0)
-        Slider.SliderPoint.ImageColor3 = Color3.fromHSV(h,1,1)
-				local color = Color3.fromHSV(h,s,v) 
-				local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
-				ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
-				ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
-				ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
-				hex = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
-				ColorPicker.HexInput.InputBox.Text = hex
-			end
-			setDisplay()
-			ColorPicker.HexInput.InputBox.FocusLost:Connect(function()
-				if not pcall(function()
-						local r, g, b = string.match(ColorPicker.HexInput.InputBox.Text, "^#?(%w%w)(%w%w)(%w%w)$")
-						local rgbColor = Color3.fromRGB(tonumber(r, 16),tonumber(g, 16), tonumber(b, 16))
-						h,s,v = rgbColor:ToHSV()
-						hex = ColorPicker.HexInput.InputBox.Text
-						setDisplay()
-						ColorPickerSettings.Color = rgbColor
-					end) 
-				then 
-					ColorPicker.HexInput.InputBox.Text = hex 
-				end
-				pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-				local r,g,b = math.floor((h*255)+0.5),math.floor((s*255)+0.5),math.floor((v*255)+0.5)
-				ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
-				SaveConfiguration()
-			end)
-			--RGB
-			local function rgbBoxes(box,toChange)
-				local value = tonumber(box.Text) 
-				local color = Color3.fromHSV(h,s,v) 
-				local oldR,oldG,oldB = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
-				local save 
-				if toChange == "R" then save = oldR;oldR = value elseif toChange == "G" then save = oldG;oldG = value else save = oldB;oldB = value end
-				if value then 
-					value = math.clamp(value,0,255)
-					h,s,v = Color3.fromRGB(oldR,oldG,oldB):ToHSV()
-					setDisplay()
-    else 
-        box.Text = tostring(save)
-    end
-    local r,g,b = math.floor((h*255)+0.5),math.floor((s*255)+0.5),math.floor((v*255)+0.5)
-    ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
-    SaveConfiguration()
-end
-ColorPicker.RGB.RInput.InputBox.FocusLost:connect(function()
-    rgbBoxes(ColorPicker.RGB.RInput.InputBox,"R")
-    pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-end)
-ColorPicker.RGB.GInput.InputBox.FocusLost:connect(function()
-    rgbBoxes(ColorPicker.RGB.GInput.InputBox,"G")
-    pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-end)
-ColorPicker.RGB.BInput.InputBox.FocusLost:connect(function()
-    rgbBoxes(ColorPicker.RGB.BInput.InputBox,"B")
-    pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-end)
+        -- 更新颜色点位置
+        MainPoint.Position = UDim2.new(s, -MainPoint.AbsoluteSize.X/2, 1-v, -MainPoint.AbsoluteSize.Y/2)
+        MainPoint.ImageColor3 = Color3.fromHSV(h, s, v)
+        Background.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+        Display.BackgroundColor3 = Color3.fromHSV(h, s, v)
 
-RunService.RenderStepped:connect(function()
-    if mainDragging then 
-        local localX = math.clamp(mouse.X-Main.AbsolutePosition.X,0,Main.AbsoluteSize.X)
-        local localY = math.clamp(mouse.Y-Main.AbsolutePosition.Y,0,Main.AbsoluteSize.Y)
-        Main.MainPoint.Position = UDim2.new(0,localX-Main.MainPoint.AbsoluteSize.X/2,0,localY-Main.MainPoint.AbsoluteSize.Y/2)
-        s = localX / Main.AbsoluteSize.X
-        v = 1 - (localY / Main.AbsoluteSize.Y)
-        Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
-        Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
-        Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
-        local color = Color3.fromHSV(h,s,v) 
-        local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
-        ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
-        ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
-        ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
-        ColorPicker.HexInput.InputBox.Text = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
-        pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-        ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
-        SaveConfiguration()
-    end
-    if sliderDragging then 
-        local localX = math.clamp(mouse.X-Slider.AbsolutePosition.X,0,Slider.AbsoluteSize.X)
-        h = localX / Slider.AbsoluteSize.X
-        Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
-        Slider.SliderPoint.Position = UDim2.new(0,localX-Slider.SliderPoint.AbsoluteSize.X/2,0.5,0)
-        Slider.SliderPoint.ImageColor3 = Color3.fromHSV(h,1,1)
-        Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
-        Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
-        local color = Color3.fromHSV(h,s,v) 
-        local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
-        ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
-        ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
-        ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
-        ColorPicker.HexInput.InputBox.Text = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
-        pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-        ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
-        SaveConfiguration()
-    end
-end)
+        -- 更新滑块位置
+        local sliderX = h * Slider.AbsoluteSize.X
+        SliderPoint.Position = UDim2.new(0, sliderX - SliderPoint.AbsoluteSize.X/2, 0.5, 0)
+        SliderPoint.ImageColor3 = Color3.fromHSV(h, 1, 1)
 
-if Settings.ConfigurationSaving then
-    if Settings.ConfigurationSaving.Enabled and ColorPickerSettings.Flag then
-        RayfieldLibrary.Flags[ColorPickerSettings.Flag] = ColorPickerSettings
+        -- 更新输入框值
+        local r = math.floor(color.R*255)
+        local g = math.floor(color.G*255)
+        local b = math.floor(color.B*255)
+        RGBInputs[1].Text = tostring(r)
+        RGBInputs[2].Text = tostring(g)
+        RGBInputs[3].Text = tostring(b)
+        hex = string.format("#%02X%02X%02X", r, g, b)
+        HexBox.Text = hex:sub(2)
     end
-end
-
-function ColorPickerSettings:Set(RGBColor)
-    ColorPickerSettings.Color = RGBColor
-    h,s,v = ColorPickerSettings.Color:ToHSV()
-    color = Color3.fromHSV(h,s,v)
     setDisplay()
-end
 
-ColorPicker.MouseEnter:Connect(function()
-    TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Library.Colors.ElementBackgroundHover}):Play()
-end)
+    -- 11. 输入框交互
+    HexBox.FocusLost:Connect(function()
+        if not pcall(function()
+            local hexText = HexBox.Text:gsub("#", "")
+            local r = tonumber(hexText:sub(1, 2), 16)
+            local g = tonumber(hexText:sub(3, 4), 16)
+            local b = tonumber(hexText:sub(5, 6), 16)
+            if r and g and b then
+                local rgbColor = Color3.fromRGB(r, g, b)
+                h, s, v = rgbColor:ToHSV()
+                color = rgbColor
+                setDisplay()
+                ColorPickerSettings.Color = rgbColor
+                ColorPickerSettings.Callback(rgbColor)
+                SaveConfiguration()
+            end
+        end) then
+            HexBox.Text = hex:sub(2)
+        end
+    end)
 
-ColorPicker.MouseLeave:Connect(function()
-    TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Library.Colors.ElementBackground}):Play()
-end)
+    -- RGB输入框逻辑
+    local function handleRGBInput(box, index)
+        box.FocusLost:Connect(function()
+            local value = tonumber(box.Text)
+            if value then
+                value = math.clamp(value, 0, 255)
+                local r, g, b = math.floor(color.R*255), math.floor(color.G*255), math.floor(color.B*255)
+                if index == 1 then r = value end
+                if index == 2 then g = value end
+                if index == 3 then b = value end
+                color = Color3.fromRGB(r, g, b)
+                h, s, v = color:ToHSV()
+                setDisplay()
+                ColorPickerSettings.Color = color
+                ColorPickerSettings.Callback(color)
+                SaveConfiguration()
+            else
+                box.Text = tostring(math.floor(index == 1 and color.R*255 or index == 2 and color.G*255 or color.B*255))
+            end
+        end)
+    end
+    for i, box in ipairs(RGBInputs) do
+        handleRGBInput(box, i)
+    end
 
-Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
-    for _, rgbinput in ipairs(ColorPicker.RGB:GetChildren()) do
-        if rgbinput:IsA("Frame") then
-            rgbinput.BackgroundColor3 = Library.Colors.InputBackground
-            rgbinput.UIStroke.Color = Library.Colors.InputStroke
+    -- 12. 鼠标拖动交互
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            mainDragging = false
+            sliderDragging = false
+        end
+    end)
+
+    Main.MouseButton1Down:Connect(function()
+        if opened then mainDragging = true end
+    end)
+
+    Slider.MouseButton1Down:Connect(function()
+        sliderDragging = true
+    end)
+
+    -- 实时更新拖动逻辑
+    RunService.RenderStepped:Connect(function()
+        if mainDragging and opened then
+            local localX = math.clamp(mouse.X - Main.AbsolutePosition.X, 0, Main.AbsoluteSize.X)
+            local localY = math.clamp(mouse.Y - Main.AbsolutePosition.Y, 0, Main.AbsoluteSize.Y)
+            s = localX / Main.AbsoluteSize.X
+            v = 1 - (localY / Main.AbsoluteSize.Y)
+            color = Color3.fromHSV(h, s, v)
+            setDisplay()
+            ColorPickerSettings.Color = color
+            ColorPickerSettings.Callback(color)
+            SaveConfiguration()
+        end
+
+        if sliderDragging then
+            local localX = math.clamp(mouse.X - Slider.AbsolutePosition.X, 0, Slider.AbsoluteSize.X)
+            h = localX / Slider.AbsoluteSize.X
+            color = Color3.fromHSV(h, s, v)
+            setDisplay()
+            ColorPickerSettings.Color = color
+            ColorPickerSettings.Callback(color)
+            SaveConfiguration()
+        end
+    end)
+
+    -- 13. 鼠标悬停效果（对齐原UI的hover逻辑）
+    ColorPicker.MouseEnter:Connect(function()
+        TweenService:Create(ColorPicker, Library.TweenLibrary.SmallEffect, {
+            BackgroundTransparency = 0.15
+        }):Play()
+    end)
+
+    ColorPicker.MouseLeave:Connect(function()
+        TweenService:Create(ColorPicker, Library.TweenLibrary.SmallEffect, {
+            BackgroundTransparency = 0.25
+        }):Play()
+    end)
+
+    -- 14. 配置保存适配
+    if RayfieldLibrary and RayfieldLibrary.Settings and RayfieldLibrary.Settings.ConfigurationSaving then
+        if RayfieldLibrary.Settings.ConfigurationSaving.Enabled and ColorPickerSettings.Flag then
+            RayfieldLibrary.Flags[ColorPickerSettings.Flag] = ColorPickerSettings
         end
     end
 
-    ColorPicker.HexInput.BackgroundColor3 = Library.Colors.InputBackground
-    ColorPicker.HexInput.UIStroke.Color = Library.Colors.InputStroke
-end)
+    -- 15. 外部控制接口
+    function ColorPickerSettings:Set(RGBColor)
+        ColorPickerSettings.Color = RGBColor
+        h, s, v = RGBColor:ToHSV()
+        color = RGBColor
+        setDisplay()
+    end
 
-return ColorPickerSettings
---]]---- // 按钮组件   ----------------------------------------------------------------------------------------
+    return ColorPickerSettings
+end
+------ // 按钮组件   ----------------------------------------------------------------------------------------
         function Root:Button(setup)
             setup = setup or {};
             setup.Title = setup.Title or "按钮";
