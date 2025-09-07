@@ -85,6 +85,7 @@ local a = Instance.new("ScreenGui")
 a.Name = "xgo Hub 作者XGO"
 a.Parent = playerGui
 a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+a.ResetOnSpawn = false -- 添加这一行，防止UI在角色重生时消失
 
 -- 创建文本标签
 local b = Instance.new("TextLabel")
@@ -151,6 +152,15 @@ if positionConnection then
     positionConnection:Disconnect()
 end
 positionConnection = game:GetService("RunService").Heartbeat:Connect(updateUIPosition)
+
+local function getDeviceType()
+    local UIS = game:GetService("UserInputService")
+    if UIS.TouchEnabled and not UIS.KeyboardEnabled then
+        return "移动"
+    else
+        return "PC端"
+    end
+end
 
 -- 帧率计数器
 local currentFps = 0
@@ -220,7 +230,7 @@ if textUpdateConnection then
     task.cancel(textUpdateConnection)
 end
 textUpdateConnection = spawn(function()
-    local startTime = tick()  -- 重启时重置脚本时长计时
+    local startTime = tick()  
     while task.wait(0.5) do 
         pcall(function()
             -- 1. 脚本时长
@@ -275,12 +285,13 @@ textUpdateConnection = spawn(function()
             end
 
             -- 6. 最终更新文本（分行清晰，避免拥挤）
-            b.Text = "脚本时长: " .. scriptTime .. " | 帧率: " .. currentFps .. " | PING: " .. ping ..
+            b.Text = "脚本时长: " .. scriptTime .. " | 设备: " .. getDeviceType() .. " | 帧率: " .. currentFps .. " | PING: " .. ping ..
                 "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
                 "正在玩: " .. NG .. " | " .. timeOfDay
         end)
     end
 end)
+
 local userInputService = game:GetService("UserInputService")
 local function onKeyActivated(inputObject)
     if inputObject.KeyCode == Enum.KeyCode.K then
