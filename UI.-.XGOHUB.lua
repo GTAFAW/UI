@@ -1,9 +1,8 @@
 -- 更新：延迟修复与主题更新 | 主要添加次副标 --
--- 这不是 hyprland --
 -- UI.XGO修改更新 --
 -- 边框v1.122
-
--- 此源码永不加密 | 也尽量保持更新 |
+-- 以内置独家水印
+-- 此源码不加密 | 也尽量保持更新 |
 -- 
 -- 
 local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
@@ -17,7 +16,7 @@ executionCountDataStore.Value = executionCount
 
 local function sendNotification(text)
     game.StarterGui:SetCore("SendNotification", {
-        Title = "脚本通知",
+        Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
         Text = text,
         Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
         Duration = 1.5
@@ -39,28 +38,28 @@ if executionCount == 1 then
    
 elseif executionCount == 2 then
     
-    sendNotification("脚本已执行，无需再重复执行.")
+    sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
     playSound(3398620867)
     return  -- 终止脚本执行
 elseif executionCount == 3 then
     -- 第三次执行，提醒用户再点击两次将重启脚本
-    sendNotification("再点击两次将重启脚本.")
+    sendNotification("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")
     playSound(3398620867)
     return  -- 终止脚本执行
 elseif executionCount == 4 then
-    sendNotification("再点击一次，重新启动脚本.")
+    sendNotification("\229\134\141\231\130\185\229\135\187\228\184\128\230\172\161\239\188\140\233\135\141\230\150\176\229\144\175\229\138\168\232\132\154\230\156\172\46")
     playSound(3398620867)
     return  -- 终止脚本执行
 elseif executionCount == 5 then
     -- 第五次执行，提醒用户脚本将重新启动，并继续执行脚本
-    sendNotification("脚本已重新启动，请稍后.")
+    sendNotification("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")
     playSound(3398620867)
     -- 重置计数器
     executionCountDataStore.Value = 1
     -- 这里可以继续执行脚本的其他部分
 else
     -- 第六次及以后执行，执行第二次执行时的逻辑
-    sendNotification("脚本已执行，无需再重复执行.")
+    sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
     playSound(3398620867)
     return
 end
@@ -69,7 +68,7 @@ end
 -- 1. 先销毁旧UI及关联资源，避免重启重叠/性能问题
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local existingGui = playerGui:FindFirstChild("xgo Hub 作者XGO")
+local existingGui = playerGui:FindFirstChild("\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79")
 if existingGui then
     existingGui:Destroy()
 end
@@ -82,7 +81,7 @@ local textUpdateConnection = nil-- 文本更新线程
 
 -- ===================== 【原UI与功能逻辑，仅补充事件管理】 =====================
 local a = Instance.new("ScreenGui")
-a.Name = "xgo Hub 作者XGO"
+a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
 a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 a.ResetOnSpawn = false -- 添加这一行，防止UI在角色重生时消失
@@ -101,7 +100,7 @@ b.TextStrokeTransparency = 0.8
 b.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 b.TextWrapped = true
 b.TextXAlignment = Enum.TextXAlignment.Center
-b.Text = "xgo Hub TIME\n如果卡在这个页面,请重新启动."
+b.Text = "\120\103\111\32\72\117\98\32\84\73\77\69\n\229\166\130\230\158\156\229\141\161\229\156\168\232\191\153\228\184\170\233\161\181\233\157\162\44\232\175\183\233\135\141\230\150\176\229\144\175\229\138\168\46"
 
 -- 旋转螺旋彩虹动态效果
 local c = Instance.new("UIGradient")
@@ -178,51 +177,51 @@ end)
 -- 季节判断函数
 local function getSeason(month, day)
     if (month == 3 and day >= 21) or (month == 4) or (month == 5) or (month == 6 and day < 22) then
-        return "【春季】"
+        return "\227\128\144\230\152\165\229\173\163\227\128\145"
     elseif (month == 6 and day >= 22) or (month == 7) or (month == 8) or (month == 9 and day < 23) then
-        return "【夏季】"
+        return "\227\128\144\229\164\143\229\173\163\227\128\145"
     elseif (month == 9 and day >= 23) or (month == 10) or (month == 11) or (month == 12 and day < 22) then
-        return "【秋季】"
+        return "\227\128\144\231\167\139\229\173\163\227\128\145"
     else
-        return "【冬季】"
+        return "\227\128\144\229\134\172\229\173\163\227\128\145"
     end
 end
 
 -- 节日判断函数
 local function getFestival(month, day)
     local festivals = {
-        {1, 1, "元旦"},
-        {1, 22, "春节"},
-        {2, 2, "龙抬头"},
-        {2, 14, "情人节"},
-        {3, 8, "妇女节"},
-        {3, 12, "植树节"},
-        {4, 5, "清明节"},
-        {4, 1, "愚人节"},
-        {5, 1, "劳动节"},
-        {5, 4, "青年节"},
-        {5, 20, "端午节"},
-        {6, 1, "儿童节"},
-        {7, 1, "建党节"},
-        {7, 7, "七夕节"},
-        {8, 1, "建军节"},
-        {8, 15, "中秋节"},
-        {9, 10, "教师节"},
-        {9, 9, "重阳节"},
-        {10, 1, "国庆节"},
-        {11, 21, "今天祝我生日"},
-        {12, 8, "腊八节"},
-        {12, 23, "小年"},
-        {12, 24, "小年"},
-        {12, 22, "冬至"},
-        {12, 25, "圣诞节"}
+        {1, 1, "\229\133\131\230\151\166"},
+        {1, 22, "\230\152\165\232\138\130"},
+        {2, 2, "\233\190\153\230\138\172\229\164\180"},
+        {2, 14, "\230\131\133\228\186\186\232\138\130"},
+        {3, 8, "\229\166\135\229\165\179\232\138\130"},
+        {3, 12, "\230\164\141\230\160\145\232\138\130"},
+        {4, 5, "\230\184\133\230\152\142\232\138\130"},
+        {4, 1, "\230\132\154\228\186\186\232\138\130"},
+        {5, 1, "\229\138\179\229\138\168\232\138\130"},
+        {5, 4, "\233\157\146\229\185\180\232\138\130"},
+        {5, 20, "\231\171\175\229\141\136\232\138\130"},
+        {6, 1, "\229\132\191\231\171\165\232\138\130"},
+        {7, 1, "\229\187\186\229\133\154\232\138\130"},
+        {7, 7, "\228\184\131\229\164\149\232\138\130"},
+        {8, 1, "\229\187\186\229\134\155\232\138\130"},
+        {8, 15, "\228\184\173\231\167\139\232\138\130"},
+        {9, 10, "\230\149\153\229\184\136\232\138\130"},
+        {9, 9, "\233\135\141\233\152\179\232\138\130"},
+        {10, 1, "\229\155\189\229\186\134\232\138\130"},
+        {11, 21, "\228\189\156\232\128\133\231\148\159\230\151\165"},
+        {12, 8, "\232\133\138\229\133\171\232\138\130"},
+        {12, 23, "\229\176\143\229\185\180"},
+        {12, 24, "\229\176\143\229\185\180"},
+        {12, 22, "\229\134\172\232\135\179"},
+        {12, 25, "\229\156\163\232\175\158\232\138\130"}
     }
     for _, fest in ipairs(festivals) do
         if fest[1] == month and fest[2] == day then
-            return "【节】:" .. fest[3] .. "快乐 "
+            return "\227\128\144\232\138\130\227\128\145\58" .. fest[3] .. "\229\191\171\228\185\144 "
         end
     end
-    return ""
+    return "脚本认准XGOHUB"
 end
 
 -- ===================== 修复：星期几显示逻辑（补充重启重置） =====================
@@ -247,15 +246,15 @@ textUpdateConnection = spawn(function()
             local weekNum = os.date("%w") -- 0=周日，1=周一...6=周六
             -- 直接映射星期，避免数组+1可能导致的索引错误
             local weekStr
-            if weekNum == "0" then weekStr = "日】"
-            elseif weekNum == "1" then weekStr = "一】"
-            elseif weekNum == "2" then weekStr = "二】"
-            elseif weekNum == "3" then weekStr = "三】"
-            elseif weekNum == "4" then weekStr = "四】"
-            elseif weekNum == "5" then weekStr = "五】"
-            else weekStr = "六" end
+            if weekNum == "\48" then weekStr = "\230\151\165\227\128\145"
+            elseif weekNum == "\92" then weekStr = "\228\184\128\227\128\145"
+            elseif weekNum == "\50" then weekStr = "\228\186\140\227\128\145"
+            elseif weekNum == "\51" then weekStr = "\228\184\137\227\128\145"
+            elseif weekNum == "\52" then weekStr = "\229\155\155\227\128\145"
+            elseif weekNum == "\53" then weekStr = "\228\186\148\227\128\145"
+            else weekStr = "\229\133\173" end
             
-            local dateStr = year .. "年" .. month .. "月" .. day .. "日 【周" .. weekStr
+            local dateStr = year .. "\229\185\180" .. month .. "\230\156\136" .. day .. "\230\151\165\32\227\128\144\229\145\168" .. weekStr
             local timeStr = os.date("%H:%M:%S") 
 
             -- 3. 季节和节日
@@ -266,15 +265,15 @@ textUpdateConnection = spawn(function()
             local hour = tonumber(os.date("%H"))
             local timeOfDay
             if hour >= 0 and hour < 5 then
-                timeOfDay = "已经<凌晨>了,还不睡"
+                timeOfDay = "\229\183\178\231\187\143\60\229\135\140\230\153\168\62\228\186\134\44\232\191\152\228\184\141\231\157\161"
             elseif hour >= 5 and hour < 12 then
-                timeOfDay = "哎呀已经<早上>了"
+                timeOfDay = "\229\147\142\229\145\128\229\183\178\231\187\143\60\230\151\169\228\184\138\62\228\186\134"
             elseif hour == 12 then
-                timeOfDay = "<中午>吃饭的时间到喽"
+                timeOfDay = "\60\228\184\173\229\141\136\62\229\144\131\233\165\173\231\154\132\230\151\182\233\151\180\229\136\176\229\150\189"
             elseif hour > 12 and hour < 18 then
-                timeOfDay = "<下午>时间没事做˂⁽ˈ₍ ⁾˲₎₌"
+                timeOfDay = "\60\228\184\139\229\141\136\62\230\151\182\233\151\180\230\178\161\228\186\139\229\129\154\203\130\226\129\189\203\136\226\130\141\32\226\129\190\203\178\226\130\142\226\130\140"
             else
-                timeOfDay = "已经<晚上>了呀,早点睡"
+                timeOfDay = "\229\183\178\231\187\143\60\230\153\154\228\184\138\62\228\186\134\229\145\128\44\230\151\169\231\130\185\231\157\161"
             end
 
             -- 5. PING值（增加判空，避免报错）
@@ -285,9 +284,9 @@ textUpdateConnection = spawn(function()
             end
 
             -- 6. 最终更新文本（分行清晰，避免拥挤）
-            b.Text = "脚本时长: " .. scriptTime .. " | 设备: " .. getDeviceType() .. " | 帧率: " .. currentFps .. " | PING: " .. ping ..
+            b.Text = "\232\132\154\230\156\172\230\151\182\233\149\191\58\32" .. scriptTime .. "\32\124\32\232\174\190\229\164\135\58\32" .. getDeviceType() .. "\32\124\32\229\184\167\231\142\135\58\32" .. currentFps .. "\32\32\124\32\80\73\78\71\58\32" .. ping ..
                 "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
-                "正在玩: " .. NG .. " | " .. timeOfDay
+                "\230\173\163\229\156\168\231\142\169\58\32" .. NG .. " | " .. timeOfDay
         end)
     end
 end)
