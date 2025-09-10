@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音1
+   4. 更新: 声音1.2
                                                 ]]--
 
 -- 
@@ -2796,6 +2796,7 @@ function Library:Windowxgo(setup)
 		local UIStroke_4 = Instance.new("UIStroke")
 		local LTitle = Instance.new("TextLabel")
 		local LButton = Instance.new("TextButton")
+		local Workspace = game:GetService("Workspace")
         local CloseSound = Instance.new("Sound")
         local CloseButton = Instance.new("TextButton")
         
@@ -3004,8 +3005,8 @@ function Library:Windowxgo(setup)
         CloseSound.SoundId = "rbxassetid://104269922408932"
         CloseSound.Volume = 1.0
         CloseSound.PlayOnRemove = false
-        CloseSound.Parent = ScreenGui
-        
+        CloseSound.Parent = Workspace
+    
         CloseButton.Name = "CloseButton"
         CloseButton.Parent = AuthFunction
         CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
@@ -3018,14 +3019,15 @@ function Library:Windowxgo(setup)
         CloseButton.TextSize = 14
         CloseButton.MouseButton1Click:Connect(function()
             -- 【仅新增】播放音效 + 等待音效播放完成
-            CloseSound:Play()
-            while CloseSound.Playing do -- 循环等待，直到音效停止播放
-                task.wait(0.05) -- 降低循环频率，不影响性能
-            end
-    
+            CloseSound:Play()  
             Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
             task.wait(0.5)
             ScreenGui:Destroy()
+            -- 新增：音效播放完后自动删除，避免内存占用
+            task.spawn(function()
+                while CloseSound.Playing do task.wait(0.05) end
+                CloseSound:Destroy()
+            end)
         end)
         
         Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
