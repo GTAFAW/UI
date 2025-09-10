@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音1.2
+   4. 更新: 声音1.3
                                                 ]]--
 
 -- 
@@ -380,14 +380,6 @@ local Library = {
 	info = debug.info,
 	xpcall = xpcall,
 };
--- 新增：全局音效，让弹窗和关闭逻辑都能访问
-local Workspace = game:GetService("Workspace")
-local CloseSound = Instance.new("Sound")
-    CloseSound.Name = "CloseSound"
-    CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
-    CloseSound.Volume = 1.0
-    CloseSound.PlayOnRemove = false
-    CloseSound.Parent = Workspace
 
 Library.Icons = { -- 图片/常用图片
     ["手"] = "rbxassetid://7733955740",     ["家"] = "rbxassetid://7733960981",
@@ -2664,6 +2656,20 @@ function Library:Windowxgo(setup)
     local BackgroundImage = Instance.new("ImageLabel")
 	local DropShadow = Instance.new("ImageLabel")
 	local Ico = Instance.new("ImageLabel")
+	
+	
+	-- 新增：全局音效，让弹窗和关闭逻辑都能访问
+local Workspace = game:GetService("Workspace")
+local CloseSound = Instance.new("Sound")
+    CloseSound.Name = "CloseSound"
+    CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
+    CloseSound.Volume = 1.0
+    CloseSound.PlayOnRemove = false
+    CloseSound.Parent = Workspace
+    
+    
+    
+    
 
     local images = {
         "rbxassetid://123698784885744",
