@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音1.3
+   4. 更新: 声音1.35
                                                 ]]--
 
 -- 
@@ -2657,20 +2657,6 @@ function Library:Windowxgo(setup)
 	local DropShadow = Instance.new("ImageLabel")
 	local Ico = Instance.new("ImageLabel")
 	
-	
-	-- 新增：全局音效，让弹窗和关闭逻辑都能访问
-local Workspace = game:GetService("Workspace")
-local CloseSound = Instance.new("Sound")
-    CloseSound.Name = "CloseSound"
-    CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
-    CloseSound.Volume = 1.0
-    CloseSound.PlayOnRemove = false
-    CloseSound.Parent = Workspace
-    
-    
-    
-    
-
     local images = {
         "rbxassetid://123698784885744",
         "rbxassetid://88666635012556",
@@ -2793,6 +2779,14 @@ local CloseSound = Instance.new("Sound")
 		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
 
 		task.wait(1);
+------ //  新增：全局音效，让弹窗和关闭逻辑都能访问    ----------------------------------------------------------------------------------------
+       local Workspace = game:GetService("Workspace")
+       local CloseSound = Instance.new("Sound")
+       CloseSound.Name = "CloseSound"
+       CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
+       CloseSound.Volume = 1.0
+       CloseSound.PlayOnRemove = false
+       CloseSound.Parent = Workspace
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 		local AuthFunction = Instance.new("Frame")
 		local Title = Instance.new("TextLabel")
@@ -2810,8 +2804,6 @@ local CloseSound = Instance.new("Sound")
 		local UIStroke_4 = Instance.new("UIStroke")
 		local LTitle = Instance.new("TextLabel")
 		local LButton = Instance.new("TextButton")
-		
-        local CloseSound = Instance.new("Sound")
         local CloseButton = Instance.new("TextButton")
         
         AuthFunction.Name = "AuthFunction"
