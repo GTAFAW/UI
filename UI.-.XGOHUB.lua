@@ -1,19 +1,25 @@
--- 更新：延迟修复与主题更新 | 主要添加次副标 --
--- UI.XGO修改更新 --
--- 边框v1.125   -- 修复切换按钮图层
--- 以内置独家水印
--- 此源码不加密 | 也尽量保持更新 |
+
+
+-- 此源码不加密 | 也尽量保持更新 | UI.XGO修改更新 | 以内置独家水印 --
+-- UI版本: v2
+--[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
+   2. 边框v1.125 | 修复切换按钮图层
+   3. 修复重启时主线程被重复刷新
+                                                ]]--
+
 -- 
 -- 
+
 local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
 executionCountDataStore.Name = "ExecutionCount"
 executionCountDataStore.Parent = game.ReplicatedStorage
 
--- 增加执行次数，值则从0开始
+-- 增加执行次数，值从0开始
 local executionCount = executionCountDataStore.Value or 0
 executionCount = executionCount + 1
 executionCountDataStore.Value = executionCount
 
+-- 通知函数（保留原有中文编码标题）
 local function sendNotification(text)
     game.StarterGui:SetCore("SendNotification", {
         Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
@@ -36,55 +42,59 @@ end
 -- 检查执行次数并给出反馈
 if executionCount == 1 then
    
-elseif executionCount == 2 then
+    elseif executionCount == 2 then
     
-    sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
-    playSound(3398620867)
-    return  -- 终止脚本执行
-elseif executionCount == 3 then
+        sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
+        playSound(3398620867)
+       return  -- 终止脚本执行
+    elseif executionCount == 3 then
     -- 第三次执行，提醒用户再点击两次将重启脚本
-    sendNotification("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")
-    playSound(3398620867)
-    return  -- 终止脚本执行
-elseif executionCount == 4 then
-    sendNotification("\229\134\141\231\130\185\229\135\187\228\184\128\230\172\161\239\188\140\233\135\141\230\150\176\229\144\175\229\138\168\232\132\154\230\156\172\46")
-    playSound(3398620867)
-    return  -- 终止脚本执行
-elseif executionCount == 5 then
+        sendNotification("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")
+        playSound(3398620867)
+       return  -- 终止脚本执行
+    elseif executionCount == 4 then
+        sendNotification("\229\134\141\231\130\185\229\135\187\228\184\128\230\172\161\239\188\140\233\135\141\230\150\176\229\144\175\229\138\168\232\132\154\230\156\172\46")
+        playSound(3398620867)
+       return  -- 终止脚本执行
+    elseif executionCount == 5 then
     -- 第五次执行，提醒用户脚本将重新启动，并继续执行脚本
-    sendNotification("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")
-    playSound(3398620867)
+        sendNotification("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")
+        playSound(3398620867)
     -- 重置计数器
-    executionCountDataStore.Value = 1
+        executionCountDataStore.Value = 1
     -- 这里可以继续执行脚本的其他部分
-else
+    else
     -- 第六次及以后执行，执行第二次执行时的逻辑
-    sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
-    playSound(3398620867)
-    return
+        sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
+        playSound(3398620867)
+       return
 end
 
 -- ===================== 【优化部分：多次重启时的UI与事件管理】 =====================
--- 1. 先销毁旧UI及关联资源，避免重启重叠/性能问题
+-- 1. 先销毁旧UI及关联资源，避免重叠/性能问题
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local existingGui = playerGui:FindFirstChild("\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79")
-if existingGui then
-    existingGui:Destroy()
-end
+-- 全局存储事件连接，用于重启时断开（避免内存泄漏）
+local gradientConnection = _G.XGO_GradientConn
+local positionConnection = _G.XGO_PositionConn
+local fpsConnection = _G.XGO_FpsConn
+local textUpdateConnection = _G.XGO_TextConn
 
--- 2. 定义事件连接变量，用于重启时断开旧循环
-local gradientConnection = nil  -- 彩虹渐变循环
-local positionConnection = nil  -- 屏幕自适应循环
-local fpsConnection = nil       -- 帧率计算线程
-local textUpdateConnection = nil-- 文本更新线程
+-- 断开旧事件连接
+if gradientConnection then gradientConnection:Disconnect() end
+if positionConnection then positionConnection:Disconnect() end
+if fpsConnection then task.cancel(fpsConnection) end
+if textUpdateConnection then task.cancel(textUpdateConnection) end
+-- 销毁旧UI
+if existingGui then existingGui:Destroy() end
 
--- ===================== 【原UI与功能逻辑，仅补充事件管理】 =====================
+-- ===================== 【原UI与功能逻辑，保留所有编码格式】 =====================
 local a = Instance.new("ScreenGui")
 a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
 a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-a.ResetOnSpawn = false -- 添加这一行，防止UI在角色重生时消失
+a.ResetOnSpawn = false -- 防止UI在角色重生时消失
 
 -- 创建文本标签
 local b = Instance.new("TextLabel")
@@ -126,10 +136,9 @@ local function updateRainbowGradient()
     table.insert(colorPoints, ColorSequenceKeypoint.new(1, rainbowColors[1]))
     c.Color = ColorSequence.new(colorPoints)
 end
-if gradientConnection then
-    gradientConnection:Disconnect()
-end
+-- 绑定新事件并全局存储
 gradientConnection = game:GetService("RunService").RenderStepped:Connect(updateRainbowGradient)
+_G.XGO_GradientConn = gradientConnection
 
 -- 圆角效果
 local d = Instance.new("UICorner")
@@ -147,11 +156,11 @@ local function updateUIPosition()
     b.Position = UDim2.new(0, uiXPos, 0, uiYPos)
 end
 updateUIPosition()
-if positionConnection then
-    positionConnection:Disconnect()
-end
+-- 绑定新事件并全局存储
 positionConnection = game:GetService("RunService").Heartbeat:Connect(updateUIPosition)
+_G.XGO_PositionConn = positionConnection
 
+-- 设备类型判断函数
 local function getDeviceType()
     local UIS = game:GetService("UserInputService")
     if UIS.TouchEnabled and not UIS.KeyboardEnabled then
@@ -161,18 +170,43 @@ local function getDeviceType()
     end
 end
 
--- 帧率计数器
+-- ===================== 修复：帧率真实性（限制上限+精准计算） =====================
 local currentFps = 0
+-- 先断开旧帧率线程，避免重复
 if fpsConnection then
     task.cancel(fpsConnection)
 end
 fpsConnection = spawn(function()
-    while task.wait(1) do 
-        local start = tick()
-        game:GetService("RunService").RenderStepped:Wait()
-        currentFps = math.floor(1 / (tick() - start))
+    local runService = game:GetService("RunService")
+    -- 1. 检测设备理论最高帧率（避免显示超硬件上限的假帧率）
+    local maxPossibleFps = 60 -- 基础默认值（覆盖多数手机）
+    if runService:IsRunning() then
+        -- 多次采样估算实际刷新上限，减少误差
+        local testStart = tick()
+        local sampleCount = 10
+        for _ = 1, sampleCount do
+            runService.RenderStepped:Wait()
+        end
+        local avgFrameTime = (tick() - testStart) / sampleCount
+        local estimatedMax = math.floor(1 / avgFrameTime)
+        -- 最终上限：取估算值和240（主流设备最高帧）的较小值
+        maxPossibleFps = math.min(estimatedMax, 240)
+    end
+
+    -- 2. 实时计算真实帧率（1秒内统计实际渲染次数）
+    while task.wait(1) do
+        local frameCount = 0
+        local startTime = tick()
+        -- 1秒内持续统计RenderStepped触发次数（真实渲染帧）
+        while tick() - startTime < 1 do
+            runService.RenderStepped:Wait()
+            frameCount = frameCount + 1
+        end
+        -- 限制帧率不超过设备上限
+        currentFps = math.min(frameCount, maxPossibleFps)
     end
 end)
+_G.XGO_FpsConn = fpsConnection
 
 -- 季节判断函数
 local function getSeason(month, day)
@@ -224,44 +258,59 @@ local function getFestival(month, day)
     return "脚本认准XGOHUB"
 end
 
--- ===================== 修复：星期几显示逻辑（补充重启重置） =====================
+-- ===================== 核心：累计时长持久化（重启不重置） =====================
+-- 从全局存储获取首次启动时间（仅记录第一次启动）
+local globalDataStore = game.ReplicatedStorage:FindFirstChild("XGO_GlobalData") 
+if not globalDataStore then
+    globalDataStore = Instance.new("NumberValue")
+    globalDataStore.Name = "XGO_GlobalData"
+    globalDataStore.Value = tick() -- 存储首次启动时间戳（秒）
+    globalDataStore.Parent = game.ReplicatedStorage
+end
+local firstStartTime = globalDataStore.Value -- 固定首次启动时间
+
+-- ===================== 文本更新逻辑（真实帧率+累计时长） =====================
+-- 先断开旧文本线程，避免重复
 if textUpdateConnection then
     task.cancel(textUpdateConnection)
 end
 textUpdateConnection = spawn(function()
-    local startTime = tick()  
-    while task.wait(0.5) do 
+    while task.wait(0.5) do  -- 每0.5秒更新一次
         pcall(function()
-            -- 1. 脚本时长
-            local elapsedTime = tick() - startTime
-            local hours = math.floor(elapsedTime / 3600)
-            local minutes = math.floor((elapsedTime % 3600) / 60)
-            local seconds = math.floor(elapsedTime % 60)
+            -- 1. 计算累计脚本时长（当前时间-首次启动时间，不重置）
+            local totalElapsed = tick() - firstStartTime
+            local hours = math.floor(totalElapsed / 3600)
+            local minutes = math.floor((totalElapsed % 3600) / 60)
+            local seconds = math.floor(totalElapsed % 60)
             local scriptTime = string.format("%02d:%02d:%02d", hours, minutes, seconds)
 
-            -- 2. 系统时间（简化星期获取：直接用os.date("%w")映射，避免数组索引问题）
-            local year = os.date("%Y") -- 获取4位年份
-            local month = os.date("%m") -- 2位月份
-            local day = os.date("%d") -- 2位日期
+            -- 2. 系统时间与星期
+            local year = os.date("%Y")
+            local month = os.date("%m")
+            local day = os.date("%d")
             local weekNum = os.date("%w") -- 0=周日，1=周一...6=周六
-            -- 直接映射星期，避免数组+1可能导致的索引错误
             local weekStr
-            if weekNum == "\48" then weekStr = "\230\151\165\227\128\145"
-            elseif weekNum == "\92" then weekStr = "\228\184\128\227\128\145"
-            elseif weekNum == "\50" then weekStr = "\228\186\140\227\128\145"
-            elseif weekNum == "\51" then weekStr = "\228\184\137\227\128\145"
-            elseif weekNum == "\52" then weekStr = "\229\155\155\227\128\145"
-            elseif weekNum == "\53" then weekStr = "\228\186\148\227\128\145"
-            else weekStr = "\229\133\173" end
-            
+            if weekNum == "\48" then 
+                weekStr = "\230\151\165\227\128\145"
+            elseif weekNum == "\49" then  -- 修复原"\92"错误，对应数字1
+                weekStr = "\228\184\128\227\128\145"
+            elseif weekNum == "\50" then 
+                weekStr = "\228\186\140\227\128\145"
+            elseif weekNum == "\51" then 
+                weekStr = "\228\184\137\227\128\145"
+            elseif weekNum == "\52" then 
+                weekStr = "\229\155\155\227\128\145"
+            elseif weekNum == "\53" then 
+                weekStr = "\228\186\148\227\128\145"
+            else 
+                weekStr = "\229\133\173" 
+            end
             local dateStr = year .. "\229\185\180" .. month .. "\230\156\136" .. day .. "\230\151\165\32\227\128\144\229\145\168" .. weekStr
-            local timeStr = os.date("%H:%M:%S") 
+            local timeStr = os.date("%H:%M:%S")
 
-            -- 3. 季节和节日
+            -- 3. 季节、节日与时间段提示
             local season = getSeason(tonumber(month), tonumber(day))
             local festival = getFestival(tonumber(month), tonumber(day))
-
-            -- 4. 时间段提示
             local hour = tonumber(os.date("%H"))
             local timeOfDay
             if hour >= 0 and hour < 5 then
@@ -276,20 +325,22 @@ textUpdateConnection = spawn(function()
                 timeOfDay = "\229\183\178\231\187\143\60\230\153\154\228\184\138\62\228\186\134\229\145\128\44\230\151\169\231\130\185\231\157\161"
             end
 
-            -- 5. PING值（增加判空，避免报错）
+            -- 4. PING值获取
             local ping = "未知"
             local stats = game:GetService("Stats")
             if stats and stats.Network and stats.Network.ServerStatsItem["Data Ping"] then
                 ping = stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
             end
 
-            -- 6. 最终更新文本（分行清晰，避免拥挤）
+            -- 5. 最终更新UI文本
             b.Text = "\232\132\154\230\156\172\230\151\182\233\149\191\58\32" .. scriptTime .. "\32\124\32\232\174\190\229\164\135\58\32" .. getDeviceType() .. "\32\124\32\229\184\167\231\142\135\58\32" .. currentFps .. "\32\32\124\32\80\73\78\71\58\32" .. ping ..
                 "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
                 "\230\173\163\229\156\168\231\142\169\58\32" .. NG .. " | " .. timeOfDay
         end)
     end
 end)
+-- 全局存储文本线程，供下次重启断开
+_G.XGO_TextConn = textUpdateConnection
 
 local userInputService = game:GetService("UserInputService")
 local function onKeyActivated(inputObject)
