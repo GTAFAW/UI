@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音1.378
+   4. 更新: 声音1.12  104269922408932
                                                 ]]--
 
 -- 
@@ -7366,7 +7366,8 @@ end
 							Position = UDim2.fromScale(0.5,0.5)
 						}).Completed:Connect(function()
 							task.wait()
-							WindowLibrary:Destroy()						
+							WindowLibrary:Destroy()	
+							playSound(104269922408932)					
 						end)
 					end,
 				},{
