@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音1.2
+   4. 更新: 声音1.3
                                                 ]]--
 
 -- 
@@ -7353,7 +7353,7 @@ end
 		return true;
 	end;
 
-	CloseButton.MouseButton1Click:Connect(function()
+    CloseButton.MouseButton1Click:Connect(function()
 		WindowLibrary:Dialog({
 			Title = "-- 你要关闭脚本吗 --",
 			Content = "关闭后不会隐藏\n请选择",
@@ -7361,12 +7361,21 @@ end
 				{
 					Title = '执意关闭',
 					Callback = function()
+						-- 新增：播放关闭音效（使用之前定义的CloseSound）
+						CloseSound:Play()
+						
+						-- 原有逻辑不变
 						Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{
 							Size = UDim2.fromScale(0,0),
 							Position = UDim2.fromScale(0.5,0.5)
 						}).Completed:Connect(function()
 							task.wait()
 							WindowLibrary:Destroy()
+							-- 新增：音效播放完后自动删除（避免内存占用）
+							task.spawn(function()
+								while CloseSound.Playing do task.wait(0.05) end
+								CloseSound:Destroy()
+							end)
 						end)
 					end,
 				},{
