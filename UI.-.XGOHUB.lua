@@ -342,6 +342,8 @@ end)
 -- 全局存储文本线程，供下次重启断开
 _G.XGO_TextConn = textUpdateConnection
 
+if executionCount == 1 then
+
 local userInputService = game:GetService("UserInputService")
 local function onKeyActivated(inputObject)
     if inputObject.KeyCode == Enum.KeyCode.K then
@@ -7755,3 +7757,5 @@ end
 end;
 
 return Library;
+
+end  -- 闭合“仅首次执行”的判断
