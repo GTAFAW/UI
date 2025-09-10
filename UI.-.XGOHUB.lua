@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音
+   4. 更新: 声音12
                                                 ]]--
 
 -- 
@@ -2798,13 +2798,13 @@ local LTitle = Instance.new("TextLabel")
 local LButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
 
--- 【修复1】将音效父对象改为ScreenGui（确保优先加载，不依赖AuthFunction），并使用正确格式的音频ID
+-- 【仅新增】创建关闭音效对象（使用你的音频ID，带正确前缀）
 local CloseSound = Instance.new("Sound")
 CloseSound.Name = "CloseSound"
-CloseSound.SoundId = "rbxassetid://104269922408932" -- 你的音频ID，必须加前缀
-CloseSound.Volume = 1.0 -- 调大音量确保能听到（0-1，可根据需求调整）
+CloseSound.SoundId = "rbxassetid://104269922408932" -- 你的音频ID
+CloseSound.Volume = 1.0 -- 音量可按需调整
 CloseSound.PlayOnRemove = false
-CloseSound.Parent = ScreenGui -- 挂载到ScreenGui，确保创建后立即加载
+CloseSound.Parent = ScreenGui -- 挂载到ScreenGui确保加载
 
 AuthFunction.Name = "AuthFunction"
 AuthFunction.Parent = MainFrame
@@ -3017,10 +3017,10 @@ CloseButton.Font = Enum.Font.GothamSemibold
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.Text = "X"
 CloseButton.TextSize = 14
--- 【修复2】确保点击时优先播放音效，再执行关闭逻辑
 CloseButton.MouseButton1Click:Connect(function()
-    CloseSound:Play() -- 先播放音效
-    task.wait(0.1) -- 等待0.1秒，确保音效开始播放后再关闭界面（避免音效被提前销毁）
+    -- 【仅新增】点击时播放音效
+    CloseSound:Play()
+    -- 以下为你原有关闭逻辑，未做任何修改
     Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
     task.wait(0.5)
     ScreenGui:Destroy()
@@ -3081,7 +3081,8 @@ else
     repeat task.wait(1.5) until game:IsLoaded();		
 end;
 
-Library
+Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
+Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
 
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
