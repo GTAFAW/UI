@@ -5,6 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
+   4. 更新: 关闭声音
                                                 ]]--
 
 -- 
@@ -255,7 +256,7 @@ local function getFestival(month, day)
             return "\227\128\144\232\138\130\227\128\145\58" .. fest[3] .. "\229\191\171\228\185\144 "
         end
     end
-    return "脚本认准XGOHUB"
+    return "\232\132\154\230\156\172\232\174\164\229\135\134\88\71\79\72\85\66\32\124\32"
 end
 
 -- ===================== 核心：累计时长持久化（重启不重置） =====================
@@ -2779,298 +2780,308 @@ function Library:Windowxgo(setup)
 
 		task.wait(1);
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
-		local AuthFunction = Instance.new("Frame")
-		local Title = Instance.new("TextLabel")
-		local TextBox = Instance.new("TextBox")
-		local DropShadow = Instance.new("ImageLabel")
-		local UIStroke = Instance.new("UIStroke") -- 边框
-		local UIStroke_2 = Instance.new("UIStroke")
-		local GetButton = Instance.new("Frame")
-		local DropShadow_2 = Instance.new("ImageLabel")
-		local UIStroke_3 = Instance.new("UIStroke")
-		local GTitle = Instance.new("TextLabel")
-		local GButton = Instance.new("TextButton")
-		local LoginButton = Instance.new("Frame")
-		local DropShadow_3 = Instance.new("ImageLabel")
-		local UIStroke_4 = Instance.new("UIStroke")
-		local LTitle = Instance.new("TextLabel")
-		local LButton = Instance.new("TextButton")
-        local CloseButton = Instance.new("TextButton")
-        
-        AuthFunction.Name = "AuthFunction"
-		AuthFunction.Parent = MainFrame
-		AuthFunction.Active = true
-		AuthFunction.AnchorPoint = Vector2.new(0.5, 0.5)
-		AuthFunction.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		AuthFunction.BackgroundTransparency = 1.000
-		AuthFunction.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		AuthFunction.BorderSizePixel = 0
-		AuthFunction.Position = UDim2.new(0.5, 0, -1.5, 0)
-		AuthFunction.Size = UDim2.new(1, 0, 1, 0)
+local AuthFunction = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local TextBox = Instance.new("TextBox")
+local DropShadow = Instance.new("ImageLabel")
+local UIStroke = Instance.new("UIStroke") -- 边框
+local UIStroke_2 = Instance.new("UIStroke")
+local GetButton = Instance.new("Frame")
+local DropShadow_2 = Instance.new("ImageLabel")
+local UIStroke_3 = Instance.new("UIStroke")
+local GTitle = Instance.new("TextLabel")
+local GButton = Instance.new("TextButton")
+local LoginButton = Instance.new("Frame")
+local DropShadow_3 = Instance.new("ImageLabel")
+local UIStroke_4 = Instance.new("UIStroke")
+local LTitle = Instance.new("TextLabel")
+local LButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
 
-		Library:Tween(AuthFunction , Library.TweenLibrary.SmallEffect,{Position = UDim2.new(0.5, 0, 0.5, 0)})
-          
-		Title.Name = "Title"
-		Title.Parent = AuthFunction
-		Title.AnchorPoint = Vector2.new(0.5, 0.5)
-		Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		Title.BackgroundTransparency = 1.000
-		Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		Title.BorderSizePixel = 0
-		Title.Position = UDim2.new(0.5, 0, 0.100000001, 0)
-		Title.Size = UDim2.new(0.899999976, 0, 0.100000001, 0)
-		Title.Font = Enum.Font.Gotham
-		Title.Text = setup.KeySystemInfo.Title
-		Title.TextColor3 = Library.Colors.TextColor
-		Title.TextScaled = true
-		Title.TextSize = 14.000
-		Title.TextStrokeColor3 = Library.Colors.TextColor
-		Title.TextStrokeTransparency = 0.950
-		Title.TextWrapped = true
-		Title.RichText = true;
+-- 【新增】创建关闭按钮音效对象（关键修改1）
+local CloseSound = Instance.new("Sound")
+CloseSound.Name = "CloseSound"
+CloseSound.SoundId = "rbxassetid://151716081" -- 关闭音效的Roblox音频ID（可替换）
+CloseSound.Volume = 0.5 -- 音效音量（0-1，可调整）
+CloseSound.PlayOnRemove = false
+CloseSound.Parent = AuthFunction -- 挂载到面板，随面板销毁
 
-		TextBox.Parent = AuthFunction
-		TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
-		TextBox.BackgroundColor3 = Library.Colors.Default
-		TextBox.BackgroundTransparency = 0.250
-		TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		TextBox.BorderSizePixel = 0
-		TextBox.Position = UDim2.new(0.5, 0, 0.349999994, 0)
-		TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
-		TextBox.ZIndex = 5
-		TextBox.ClearTextOnFocus = false
-		TextBox.Font = Enum.Font.SourceSans
-		TextBox.PlaceholderText = "请输入卡密"
-		TextBox.Text = ""
-		TextBox.TextColor3 = Library.Colors.TextColor
-		TextBox.TextSize = 13.000
-		TextBox.TextStrokeColor3 = Library.Colors.TextColor
-		TextBox.TextStrokeTransparency = 0.950
-		TextBox.TextTransparency = 0.250
-		TextBox.TextWrapped = true
+AuthFunction.Name = "AuthFunction"
+AuthFunction.Parent = MainFrame
+AuthFunction.Active = true
+AuthFunction.AnchorPoint = Vector2.new(0.5, 0.5)
+AuthFunction.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+AuthFunction.BackgroundTransparency = 1.000
+AuthFunction.BorderColor3 = Color3.fromRGB(0, 0, 0)
+AuthFunction.BorderSizePixel = 0
+AuthFunction.Position = UDim2.new(0.5, 0, -1.5, 0)
+AuthFunction.Size = UDim2.new(1, 0, 1, 0)
 
-		DropShadow.Name = "DropShadow"
-		DropShadow.Parent = TextBox
-		DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		DropShadow.BackgroundTransparency = 1.000
-		DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		DropShadow.Position = UDim2.new(0, -5, 0, -5)
-		DropShadow.Size = UDim2.new(1, 10, 1, 10)
-		DropShadow.ZIndex = 4
-		DropShadow.Image = "rbxassetid://297694300"  --2
-		DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-		DropShadow.ImageTransparency = 0.500
-		DropShadow.ScaleType = Enum.ScaleType.Slice
-		DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-		DropShadow.SliceScale = 0.050
+Library:Tween(AuthFunction , Library.TweenLibrary.SmallEffect,{Position = UDim2.new(0.5, 0, 0.5, 0)})
 
-		UIStroke.Transparency = 0.850
-		UIStroke.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		UIStroke.Parent = TextBox
+Title.Name = "Title"
+Title.Parent = AuthFunction
+Title.AnchorPoint = Vector2.new(0.5, 0.5)
+Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1.000
+Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title.BorderSizePixel = 0
+Title.Position = UDim2.new(0.5, 0, 0.100000001, 0)
+Title.Size = UDim2.new(0.899999976, 0, 0.100000001, 0)
+Title.Font = Enum.Font.Gotham
+Title.Text = setup.KeySystemInfo.Title
+Title.TextColor3 = Library.Colors.TextColor
+Title.TextScaled = true
+Title.TextSize = 14.000
+Title.TextStrokeColor3 = Library.Colors.TextColor
+Title.TextStrokeTransparency = 0.950
+Title.TextWrapped = true
+Title.RichText = true;
 
-		UIStroke_2.Transparency = 0.850
-		UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke_2.Parent = AuthFunction
+TextBox.Parent = AuthFunction
+TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
+TextBox.BackgroundColor3 = Library.Colors.Default
+TextBox.BackgroundTransparency = 0.250
+TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.BorderSizePixel = 0
+TextBox.Position = UDim2.new(0.5, 0, 0.349999994, 0)
+TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
+TextBox.ZIndex = 5
+TextBox.ClearTextOnFocus = false
+TextBox.Font = Enum.Font.SourceSans
+TextBox.PlaceholderText = "请输入卡密"
+TextBox.Text = ""
+TextBox.TextColor3 = Library.Colors.TextColor
+TextBox.TextSize = 13.000
+TextBox.TextStrokeColor3 = Library.Colors.TextColor
+TextBox.TextStrokeTransparency = 0.950
+TextBox.TextTransparency = 0.250
+TextBox.TextWrapped = true
 
-		GetButton.Name = "GetButton"
-		GetButton.Parent = AuthFunction
-		GetButton.AnchorPoint = Vector2.new(0.5, 0.5)
-		GetButton.BackgroundColor3 = Library.Colors.Default
-		GetButton.BackgroundTransparency = 0.250
-		GetButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		GetButton.BorderSizePixel = 0
-		GetButton.Position = UDim2.new(0.25, 0, 0.649999976, 0)
-		GetButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
-		GetButton.ZIndex = 5
+DropShadow.Name = "DropShadow"
+DropShadow.Parent = TextBox
+DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DropShadow.BackgroundTransparency = 1.000
+DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+DropShadow.Position = UDim2.new(0, -5, 0, -5)
+DropShadow.Size = UDim2.new(1, 10, 1, 10)
+DropShadow.ZIndex = 4
+DropShadow.Image = "rbxassetid://297694300"  --2
+DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+DropShadow.ImageTransparency = 0.500
+DropShadow.ScaleType = Enum.ScaleType.Slice
+DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+DropShadow.SliceScale = 0.050
 
-		DropShadow_2.Name = "DropShadow"
-		DropShadow_2.Parent = GetButton
-		DropShadow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		DropShadow_2.BackgroundTransparency = 1.000
-		DropShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		DropShadow_2.Position = UDim2.new(0, -5, 0, -5)
-		DropShadow_2.Size = UDim2.new(1, 10, 1, 10)
-		DropShadow_2.ZIndex = 4
-		DropShadow_2.Image = "rbxassetid://297694300"  --3
-		DropShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
-		DropShadow_2.ImageTransparency = 0.500
-		DropShadow_2.ScaleType = Enum.ScaleType.Slice
-		DropShadow_2.SliceCenter = Rect.new(95, 103, 894, 902)
-		DropShadow_2.SliceScale = 0.050
+UIStroke.Transparency = 0.850
+UIStroke.Color = Color3.fromRGB(156, 156, 156)
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Parent = TextBox
 
-		UIStroke_3.Transparency = 0.850
-		UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke_3.Parent = GetButton
+UIStroke_2.Transparency = 0.850
+UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+UIStroke_2.Parent = AuthFunction
 
-		GTitle.Name = "GTitle"
-		GTitle.Parent = GetButton
-		GTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-		GTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		GTitle.BackgroundTransparency = 1.000
-		GTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		GTitle.BorderSizePixel = 0
-		GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-		GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
-		GTitle.ZIndex = 6
-		GTitle.Font = Enum.Font.Gotham
-		GTitle.Text = "链接"
-		GTitle.TextColor3 = Library.Colors.TextColor
-		GTitle.TextScaled = true
-		GTitle.TextSize = 14.000
-		GTitle.TextStrokeColor3 = Library.Colors.TextColor
-		GTitle.TextStrokeTransparency = 0.950
-		GTitle.TextWrapped = true
-		
-		GButton.Name = "GButton"
-		GButton.Parent = GetButton
-		GButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		GButton.BackgroundTransparency = 1.000
-		GButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		GButton.BorderSizePixel = 0
-		GButton.Size = UDim2.new(1, 0, 1, 0)
-		GButton.ZIndex = 15
-		GButton.Font = Enum.Font.SourceSans
-		GButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-		GButton.TextSize = 14.000
-		GButton.TextTransparency = 1.000
-		
-		LoginButton.Name = "LoginButton"
-		LoginButton.Parent = AuthFunction
-		LoginButton.AnchorPoint = Vector2.new(0.5, 0.5)
-		LoginButton.BackgroundColor3 = Library.Colors.Default
-		LoginButton.BackgroundTransparency = 0.250
-		LoginButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		LoginButton.BorderSizePixel = 0
-		LoginButton.Position = UDim2.new(0.75, 0, 0.649999976, 0)
-		LoginButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
-		LoginButton.ZIndex = 5
+GetButton.Name = "GetButton"
+GetButton.Parent = AuthFunction
+GetButton.AnchorPoint = Vector2.new(0.5, 0.5)
+GetButton.BackgroundColor3 = Library.Colors.Default
+GetButton.BackgroundTransparency = 0.250
+GetButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GetButton.BorderSizePixel = 0
+GetButton.Position = UDim2.new(0.25, 0, 0.649999976, 0)
+GetButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
+GetButton.ZIndex = 5
 
-		DropShadow_3.Name = "DropShadow"
-		DropShadow_3.Parent = LoginButton
-		DropShadow_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		DropShadow_3.BackgroundTransparency = 1.000
-		DropShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		DropShadow_3.Position = UDim2.new(0, -5, 0, -5)
-		DropShadow_3.Size = UDim2.new(1, 10, 1, 10)
-		DropShadow_3.ZIndex = 4
-		DropShadow_3.Image = "rbxassetid://297694300"  --4
-		DropShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
-		DropShadow_3.ImageTransparency = 0.500
-		DropShadow_3.ScaleType = Enum.ScaleType.Slice
-		DropShadow_3.SliceCenter = Rect.new(95, 103, 894, 902)
-		DropShadow_3.SliceScale = 0.050
+DropShadow_2.Name = "DropShadow"
+DropShadow_2.Parent = GetButton
+DropShadow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DropShadow_2.BackgroundTransparency = 1.000
+DropShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
+DropShadow_2.Position = UDim2.new(0, -5, 0, -5)
+DropShadow_2.Size = UDim2.new(1, 10, 1, 10)
+DropShadow_2.ZIndex = 4
+DropShadow_2.Image = "rbxassetid://297694300"  --3
+DropShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
+DropShadow_2.ImageTransparency = 0.500
+DropShadow_2.ScaleType = Enum.ScaleType.Slice
+DropShadow_2.SliceCenter = Rect.new(95, 103, 894, 902)
+DropShadow_2.SliceScale = 0.050
 
-		UIStroke_4.Transparency = 0.850
-		UIStroke_4.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke_4.Parent = LoginButton
+UIStroke_3.Transparency = 0.850
+UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
+UIStroke_3.Parent = GetButton
 
-		LTitle.Name = "LTitle"
-		LTitle.Parent = LoginButton
-		LTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-		LTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		LTitle.BackgroundTransparency = 1.000
-		LTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		LTitle.BorderSizePixel = 0
-		LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-		LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
-		LTitle.ZIndex = 6
-		LTitle.Font = Enum.Font.Gotham
-		LTitle.Text = "确认"
-		LTitle.TextColor3 = Library.Colors.TextColor
-		LTitle.TextScaled = true
-		LTitle.TextSize = 14.000
-		LTitle.TextStrokeColor3 = Library.Colors.TextColor
-		LTitle.TextStrokeTransparency = 0.950
-		LTitle.TextWrapped = true
+GTitle.Name = "GTitle"
+GTitle.Parent = GetButton
+GTitle.AnchorPoint = Vector2.new(0.5, 0.5)
+GTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GTitle.BackgroundTransparency = 1.000
+GTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GTitle.BorderSizePixel = 0
+GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
+GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
+GTitle.ZIndex = 6
+GTitle.Font = Enum.Font.Gotham
+GTitle.Text = "链接"
+GTitle.TextColor3 = Library.Colors.TextColor
+GTitle.TextScaled = true
+GTitle.TextSize = 14.000
+GTitle.TextStrokeColor3 = Library.Colors.TextColor
+GTitle.TextStrokeTransparency = 0.950
+GTitle.TextWrapped = true
 
-		LButton.Name = "LButton"
-		LButton.Parent = LoginButton
-		LButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		LButton.BackgroundTransparency = 1.000
-		LButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		LButton.BorderSizePixel = 0
-		LButton.Size = UDim2.new(1, 0, 1, 0)
-		LButton.ZIndex = 15
-		LButton.Font = Enum.Font.SourceSans
-		LButton.Text = "确认"
-		LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-		LButton.TextSize = 14.000
-		LButton.TextTransparency = 1.000
-		
-        CloseButton.Name = "CloseButton"
-        CloseButton.Parent = AuthFunction
-        CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
-        CloseButton.BackgroundTransparency = 1 
-        CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-        CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
-        CloseButton.Font = Enum.Font.GothamSemibold
-        CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        CloseButton.Text = "X"
-        CloseButton.TextSize = 14
-        CloseButton.MouseButton1Click:Connect(function()
-            Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
-            task.wait(0.5)
-            ScreenGui:Destroy()
-        end)
-        
-        Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
-		Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
-		Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
-		setup.KeySystemInfo.CodeId = game:GetService('HttpService'):GenerateGUID(false);
-        setup.KeySystemInfo.AntiSpam = false;
+GButton.Name = "GButton"
+GButton.Parent = GetButton
+GButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GButton.BackgroundTransparency = 1.000
+GButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+GButton.BorderSizePixel = 0
+GButton.Size = UDim2.new(1, 0, 1, 0)
+GButton.ZIndex = 15
+GButton.Font = Enum.Font.SourceSans
+GButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+GButton.TextSize = 14.000
+GButton.TextTransparency = 1.000
 
-		LButton.MouseButton1Click:Connect(function()
-		    if setup.KeySystemInfo.AntiSpam then return end;
-		    setup.KeySystemInfo.AntiSpam = true;
-		    
-		    if TextBox.Text == "" then
-		        TextBox.PlaceholderText = "你没有填入卡密"
-		        task.wait(1.5)
-		        TextBox.PlaceholderText = "请输入卡密"
-		    else
-		        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
-		        if verify then
-		            setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-		            
-		            CloseButton.Visible = false;
-		            return TextBox.Text;
-		        else
-		            task.wait(0.1)
-		            TextBox.Text = ""
-		            TextBox.PlaceholderText = "你输入的卡密错误"
-		            task.wait(1.5)
-		            TextBox.PlaceholderText = "请重新输入卡密"
-		        end;
-		    end;
-		    setup.KeySystemInfo.AntiSpam = false;
-		end)
-	    
-		GButton.MouseButton1Click:Connect(setup.KeySystemInfo.OnGetKey)
+LoginButton.Name = "LoginButton"
+LoginButton.Parent = AuthFunction
+LoginButton.AnchorPoint = Vector2.new(0.5, 0.5)
+LoginButton.BackgroundColor3 = Library.Colors.Default
+LoginButton.BackgroundTransparency = 0.250
+LoginButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+LoginButton.BorderSizePixel = 0
+LoginButton.Position = UDim2.new(0.75, 0, 0.649999976, 0)
+LoginButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
+LoginButton.ZIndex = 5
 
-		function setup:CancelLogin()
-			setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-		end;
+DropShadow_3.Name = "DropShadow"
+DropShadow_3.Parent = LoginButton
+DropShadow_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+DropShadow_3.BackgroundTransparency = 1.000
+DropShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
+DropShadow_3.Position = UDim2.new(0, -5, 0, -5)
+DropShadow_3.Size = UDim2.new(1, 10, 1, 10)
+DropShadow_3.ZIndex = 4
+DropShadow_3.Image = "rbxassetid://297694300"  --4
+DropShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
+DropShadow_3.ImageTransparency = 0.500
+DropShadow_3.ScaleType = Enum.ScaleType.Slice
+DropShadow_3.SliceCenter = Rect.new(95, 103, 894, 902)
+DropShadow_3.SliceScale = 0.050
 
-		while true do 
-			local this = setup.KeySystemInfo.Finished.Event:Wait();
+UIStroke_4.Transparency = 0.850
+UIStroke_4.Color = Color3.fromRGB(156, 156, 156)
+UIStroke_4.Parent = LoginButton
 
-			if this == setup.KeySystemInfo.CodeId then
-				break;
-			end;
-		end;
+LTitle.Name = "LTitle"
+LTitle.Parent = LoginButton
+LTitle.AnchorPoint = Vector2.new(0.5, 0.5)
+LTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+LTitle.BackgroundTransparency = 1.000
+LTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+LTitle.BorderSizePixel = 0
+LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
+LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
+LTitle.ZIndex = 6
+LTitle.Font = Enum.Font.Gotham
+LTitle.Text = "确认"
+LTitle.TextColor3 = Library.Colors.TextColor
+LTitle.TextScaled = true
+LTitle.TextSize = 14.000
+LTitle.TextStrokeColor3 = Library.Colors.TextColor
+LTitle.TextStrokeTransparency = 0.950
+LTitle.TextWrapped = true
 
-		TextBox.TextEditable = false;
+LButton.Name = "LButton"
+LButton.Parent = LoginButton
+LButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+LButton.BackgroundTransparency = 1.000
+LButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+LButton.BorderSizePixel = 0
+LButton.Size = UDim2.new(1, 0, 1, 0)
+LButton.ZIndex = 15
+LButton.Font = Enum.Font.SourceSans
+LButton.Text = "确认"
+LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+LButton.TextSize = 14.000
+LButton.TextTransparency = 1.000
 
-		Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)});
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = AuthFunction
+CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
+CloseButton.BackgroundTransparency = 1 
+CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+CloseButton.Font = Enum.Font.GothamSemibold
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Text = "X"
+CloseButton.TextSize = 14
+-- 【修改】关闭按钮点击事件中添加音效播放（关键修改2）
+CloseButton.MouseButton1Click:Connect(function()
+    CloseSound:Play(104269922408932) -- 播放关闭音效
+    Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
+    task.wait(0.5)
+    ScreenGui:Destroy()
+end)
 
-		task.wait(0.5)
-	else
-		repeat task.wait(1.5) until game:IsLoaded();		
-	end;
+Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
+Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
+Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
+setup.KeySystemInfo.CodeId = game:GetService('HttpService'):GenerateGUID(false);
+setup.KeySystemInfo.AntiSpam = false;
 
-	Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
-	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
+LButton.MouseButton1Click:Connect(function()
+    if setup.KeySystemInfo.AntiSpam then return end;
+    setup.KeySystemInfo.AntiSpam = true;
+    
+    if TextBox.Text == "" then
+        TextBox.PlaceholderText = "你没有填入卡密"
+        task.wait(1.5)
+        TextBox.PlaceholderText = "请输入卡密"
+    else
+        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
+        if verify then
+            setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
+            
+            CloseButton.Visible = false;
+            return TextBox.Text;
+        else
+            task.wait(0.1)
+            TextBox.Text = ""
+            TextBox.PlaceholderText = "你输入的卡密错误"
+            task.wait(1.5)
+            TextBox.PlaceholderText = "请重新输入卡密"
+        end;
+    end;
+    setup.KeySystemInfo.AntiSpam = false;
+end)
+
+GButton.MouseButton1Click:Connect(setup.KeySystemInfo.OnGetKey)
+
+function setup:CancelLogin()
+    setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
+end;
+
+while true do 
+    local this = setup.KeySystemInfo.Finished.Event:Wait();
+
+    if this == setup.KeySystemInfo.CodeId then
+        break;
+    end;
+end;
+
+TextBox.TextEditable = false;
+
+Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)});
+
+task.wait(0.5)
+else
+    repeat task.wait(1.5) until game:IsLoaded();		
+end;
+
+Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
+Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
 	
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
