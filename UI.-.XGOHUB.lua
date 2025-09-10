@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 关闭声音
+   4. 更新: 声音
                                                 ]]--
 
 -- 
@@ -367,7 +367,7 @@ local function onKeyActivated(inputObject)
     end
 end
 userInputService.InputBegan:Connect(onKeyActivated)
-
+end  -- 闭合“仅首次执行”的判断
 local Library = {
 	Version = '\88\71\79\72\85\66\32\45\32\98\121\46\120\103\111',
 	Loaded = true,
@@ -2798,13 +2798,13 @@ local LTitle = Instance.new("TextLabel")
 local LButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
 
--- 【新增】创建关闭按钮音效对象（关键修改1）
+-- 【修复1】将音效父对象改为ScreenGui（确保优先加载，不依赖AuthFunction），并使用正确格式的音频ID
 local CloseSound = Instance.new("Sound")
 CloseSound.Name = "CloseSound"
-CloseSound.SoundId = "rbxassetid://151716081" -- 关闭音效的Roblox音频ID（可替换）
-CloseSound.Volume = 0.5 -- 音效音量（0-1，可调整）
+CloseSound.SoundId = "rbxassetid://104269922408932" -- 你的音频ID，必须加前缀
+CloseSound.Volume = 1.0 -- 调大音量确保能听到（0-1，可根据需求调整）
 CloseSound.PlayOnRemove = false
-CloseSound.Parent = AuthFunction -- 挂载到面板，随面板销毁
+CloseSound.Parent = ScreenGui -- 挂载到ScreenGui，确保创建后立即加载
 
 AuthFunction.Name = "AuthFunction"
 AuthFunction.Parent = MainFrame
@@ -3017,9 +3017,10 @@ CloseButton.Font = Enum.Font.GothamSemibold
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.Text = "X"
 CloseButton.TextSize = 14
--- 【修改】关闭按钮点击事件中添加音效播放（关键修改2）
+-- 【修复2】确保点击时优先播放音效，再执行关闭逻辑
 CloseButton.MouseButton1Click:Connect(function()
-    CloseSound:Play(104269922408932) -- 播放关闭音效
+    CloseSound:Play() -- 先播放音效
+    task.wait(0.1) -- 等待0.1秒，确保音效开始播放后再关闭界面（避免音效被提前销毁）
     Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
     task.wait(0.5)
     ScreenGui:Destroy()
@@ -3080,9 +3081,8 @@ else
     repeat task.wait(1.5) until game:IsLoaded();		
 end;
 
-Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
-Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
-	
+Library
+
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
 	local OpenDelay = tick();
@@ -7769,4 +7769,3 @@ end;
 
 return Library;
 
-end  -- 闭合“仅首次执行”的判断
