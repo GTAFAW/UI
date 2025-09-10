@@ -5,7 +5,7 @@
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
    3. 修复重启时主线程被重复刷新
-   4. 更新: 声音1.35
+   4. 更新: 声音1.378
                                                 ]]--
 
 -- 
@@ -2778,15 +2778,7 @@ function Library:Windowxgo(setup)
 
 		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
 
-		task.wait(1);
------- //  新增：全局音效，让弹窗和关闭逻辑都能访问    ----------------------------------------------------------------------------------------
-       local Workspace = game:GetService("Workspace")
-       local CloseSound = Instance.new("Sound")
-       CloseSound.Name = "CloseSound"
-       CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
-       CloseSound.Volume = 1.0
-       CloseSound.PlayOnRemove = false
-       CloseSound.Parent = Workspace
+		task.wait(1);       
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 		local AuthFunction = Instance.new("Frame")
 		local Title = Instance.new("TextLabel")
@@ -2805,7 +2797,9 @@ function Library:Windowxgo(setup)
 		local LTitle = Instance.new("TextLabel")
 		local LButton = Instance.new("TextButton")
         local CloseButton = Instance.new("TextButton")
-        
+        local Workspace = game:GetService("Workspace")
+        local CloseSound = Instance.new("Sound")
+       
         AuthFunction.Name = "AuthFunction"
 		AuthFunction.Parent = MainFrame
 		AuthFunction.Active = true
@@ -3006,6 +3000,12 @@ function Library:Windowxgo(setup)
 		LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 		LButton.TextSize = 14.000
 		LButton.TextTransparency = 1.000
+		
+		CloseSound.Name = "CloseSound"
+        CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
+        CloseSound.Volume = 1.0
+        CloseSound.PlayOnRemove = false
+        CloseSound.Parent = Workspace
 		   
         CloseButton.Name = "CloseButton"
         CloseButton.Parent = AuthFunction
@@ -7361,19 +7361,12 @@ end
 				{
 					Title = '执意关闭',
 					Callback = function()
-					    -- 新增：播放关闭音效
-                        CloseSound:Play()
 						Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{
 							Size = UDim2.fromScale(0,0),
 							Position = UDim2.fromScale(0.5,0.5)
 						}).Completed:Connect(function()
 							task.wait()
-							WindowLibrary:Destroy()
-							
-							-- 新增：音效播完后自动删除，避免占内存
-                            task.spawn(function()
-                            while CloseSound.Playing do task.wait(0.05) end
-                            CloseSound:Destroy()
+							WindowLibrary:Destroy()						
 						end)
 					end,
 				},{
