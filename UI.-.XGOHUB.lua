@@ -35,7 +35,7 @@ local function playSound(audioId)
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://" .. audioId
     sound.Volume = 3
-    sound.Pitch = 3
+    sound.Pitch = 1
     sound.Parent = game.Workspace
     sound:Play()
 end
