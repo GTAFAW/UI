@@ -2644,16 +2644,15 @@ function Library:Windowxgo(setup)
 	
 	if setup.KeySystem then
 		setup.KeySystemInfo = setup.KeySystemInfo or {};
-
 		setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
 		setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait( 0.1) return true end;
-
+		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
 	end
 	
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
-    local BackgroundImage = Instance.new("ImageLabel")
+    local BackgroundImage1 = Instance.new("ImageLabel") -- 当前显示的图
+    local BackgroundImage2 = Instance.new("ImageLabel")
 	local DropShadow = Instance.new("ImageLabel")
 	local Ico = Instance.new("ImageLabel")
 	
@@ -2671,26 +2670,71 @@ function Library:Windowxgo(setup)
         "rbxassetid://108391089326665",
         "rbxassetid://138013328013091",
         "rbxassetid://110990525726887",
---        "rbxassetid://",
---        "rbxassetid://",
---        "rbxassetid://",
---        "rbxassetid://",
---        "rbxassetid://",
---        "rbxassetid://",
---        "rbxassetid://",
---        "rbxassetid://"
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB"
     }
-    local currentImageIndex = 1
+    
+    local currentImageIndex = 1 
+    local slideDuration = 1.5 
+    local interval = 5.5 
 
-    local function changeImage()
-        if images[currentImageIndex] then
-            BackgroundImage.Image = images[currentImageIndex]
-            BackgroundImage.ImageTransparency = 0
-        else
-            warn("\73\110\118\97\108\105\100\32\105\109\97\103\101\32\73\68\32\97\116\32\105\110\100\101\120\32" .. currentImageIndex)
-        end
+    local function initBackgrounds()
+        BackgroundImage1.Parent = MainFrame
+        BackgroundImage1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        BackgroundImage1.BackgroundTransparency = 1
+        BackgroundImage1.Size = UDim2.new(1, 0, 1, 1)
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage1.ImageColor3 = Color3.fromRGB(255, 255, 255)
+        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage1.Image = images[currentImageIndex]
+        BackgroundImage1.ZIndex = 1 
+
+        BackgroundImage2.Parent = MainFrame
+        BackgroundImage2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        BackgroundImage2.BackgroundTransparency = 1
+        BackgroundImage2.Size = UDim2.new(1, 0, 1, 1)
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0) 
+        BackgroundImage2.ImageColor3 = Color3.fromRGB(255, 255, 255)
+        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage2.ZIndex = 2 
     end
 
+    local function slideToNextImage()
+       
+        local nextIndex = currentImageIndex + 1
+        if nextIndex > #images then
+            nextIndex = 1
+        end
+
+        if images[nextIndex] then
+            BackgroundImage2.Image = images[nextIndex]
+        else
+            warn("Invalid image ID at index " .. nextIndex)
+            return
+        end
+
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {
+            Position = UDim2.new(0, 0, 0, 0) 
+        }, slideDuration)
+
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {
+            Position = UDim2.new(-1, 0, 0, 0) 
+        }, slideDuration) 
+
+        task.wait(slideDuration)
+        currentImageIndex = nextIndex
+        BackgroundImage1.Image = BackgroundImage2.Image
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0) 
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0) 
+    end
+
+    -- 初始化UI层级
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ResetOnSpawn = false
     ScreenGui.IgnoreGuiInset = false
@@ -2704,29 +2748,18 @@ function Library:Windowxgo(setup)
     MainFrame.BackgroundTransparency = 0.250
     MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     MainFrame.BorderSizePixel = 0
-    MainFrame.ClipsDescendants = true
+    MainFrame.ClipsDescendants = true -- 关键：裁剪Frame外的内容（确保滑出的图不显示）
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
-    BackgroundImage.Parent = MainFrame
-    BackgroundImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    BackgroundImage.BackgroundTransparency = 1
-    BackgroundImage.Size = UDim2.new(1, 0, 1, 1)
-    BackgroundImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
-    BackgroundImage.ScaleType = Enum.ScaleType.Stretch
+    -- 初始化两张背景图
+    initBackgrounds()
 
-    local interval = 10
-    local timeSinceLastChange = 0
---  时间自己设置，自己乘以自己设置的时间就行了 [ 3/10 = 2倍速  2/10 = 1倍速 <5正常率10中等倍率15超快倍率等..> ]
-    game:GetService("RunService").Heartbeat:Connect(function()
-        timeSinceLastChange = timeSinceLastChange + 1
-        if timeSinceLastChange >= interval * 10 then
-            changeImage()
-            timeSinceLastChange = 0
-            currentImageIndex = currentImageIndex + 1
-            if currentImageIndex > #images then
-                currentImageIndex = 1
-            end
+    -- 关键修改4：定时器触发滑动切
+    task.spawn(function()
+        while true do
+            task.wait(interval) -- 先停留指定时间
+            slideToNextImage() -- 再执行滑动切换
         end
     end)
    
