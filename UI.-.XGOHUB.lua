@@ -2658,29 +2658,27 @@ function Library:Windowxgo(setup)
 	local Ico = Instance.new("ImageLabel")
 	
     local images = {
-        "rbxassetid://123698784885744",
-        "rbxassetid://88666635012556",
-	    "rbxassetid://102797584513959",
-	    "rbxassetid://96996396016819",
-        "rbxassetid://128885038925647",
-	    "rbxassetid://86451637909512",
-        "rbxassetid://109948306798374",
-        "rbxassetid://92630758837243",
-        --[[
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://"
-        --]]
+        "rbxassetid://113180426865309",
+        "rbxassetid://131471211520335",
+	    "rbxassetid://109520199976167",
+	    "rbxassetid://122958225353990",
+        "rbxassetid://73164000772284",
+	    "rbxassetid://101305557601423",
+        "rbxassetid://110630445580007",
+        "rbxassetid://108644687915512",
+        "rbxassetid://107018855884545",
+        "rbxassetid://112966984941036",
+        "rbxassetid://108391089326665",
+        "rbxassetid://138013328013091",
+        "rbxassetid://110990525726887",
+--        "rbxassetid://",
+--        "rbxassetid://",
+--        "rbxassetid://",
+--        "rbxassetid://",
+--        "rbxassetid://",
+--        "rbxassetid://",
+--        "rbxassetid://",
+--        "rbxassetid://"
     }
     local currentImageIndex = 1
 
