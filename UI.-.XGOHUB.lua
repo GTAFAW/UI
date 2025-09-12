@@ -4813,190 +4813,226 @@ function Root:ColorPickerButton(setup)
     return api
 end
 ------ // 按钮组件   ----------------------------------------------------------------------------------------
-        function Root:Button(setup)
-            setup = setup or {};
-            setup.Title = setup.Title or "按钮";
-            setup.Content = setup.Content or "";
-            setup.Callback = setup.Callback or function() end;
-            setup.Tip = setup.Tip or nil;
+        -- 假设 Root、Library、WindowLibrary、ScrollingFrame 已在其他代码中定义
+function Root:Button(setup)
+    setup = setup or {};
+    setup.Title = setup.Title or "按钮";
+    setup.Content = setup.Content or "";
+    setup.Callback = setup.Callback or function() end;
+    setup.Tip = setup.Tip or nil;
 
-            local ButtonBlock = Instance.new("Frame")
-            local DropShadow = Instance.new("ImageLabel")
-            local UIStroke = Instance.new("UIStroke")
-            local TextLabel = Instance.new("TextLabel")
-            local Content = Instance.new("TextLabel")
-            local Arrow = Instance.new("ImageLabel")
-            local Button = Instance.new("TextButton")            
+    -- 1. 创建按钮所需的所有UI元素（每个按钮都是全新实例）
+    local ButtonBlock = Instance.new("Frame")
+    local DropShadow = Instance.new("ImageLabel")
+    local UIStroke = Instance.new("UIStroke")
+    local TextLabel = Instance.new("TextLabel")
+    local Content = Instance.new("TextLabel")
+    local Arrow = Instance.new("ImageLabel")
+    local Button = Instance.new("TextButton")            
 
-            ButtonBlock.Name = "ButtonBlock"
-            ButtonBlock.Parent = ScrollingFrame
-            ButtonBlock.BackgroundColor3 = Library.Colors.Default
-            ButtonBlock.BackgroundTransparency = 0.250
-            ButtonBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            ButtonBlock.BorderSizePixel = 0
-            ButtonBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
-            ButtonBlock.ZIndex = 10
+    -- 2. 设置按钮根容器（ButtonBlock）属性
+    ButtonBlock.Name = "ButtonBlock"
+    ButtonBlock.Parent = ScrollingFrame
+    ButtonBlock.BackgroundColor3 = Library.Colors.Default
+    ButtonBlock.BackgroundTransparency = 0.250
+    ButtonBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ButtonBlock.BorderSizePixel = 0
+    ButtonBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+    ButtonBlock.ZIndex = 10
 
-            DropShadow.Name = "DropShadow"
-            DropShadow.Parent = ButtonBlock
-            DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            DropShadow.BackgroundTransparency = 1.000
-            DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-            DropShadow.Position = UDim2.new(0, -5, 0, -5)
-            DropShadow.Size = UDim2.new(1, 10, 1, 10)
-            DropShadow.ZIndex = 9
-            DropShadow.Image = "rbxassetid://297694300"
-            DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-            DropShadow.ImageTransparency = 0.500
-            DropShadow.ScaleType = Enum.ScaleType.Slice
-            DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-            DropShadow.SliceScale = 0.050
+    -- 3. 设置阴影（DropShadow）属性
+    DropShadow.Name = "DropShadow"
+    DropShadow.Parent = ButtonBlock
+    DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    DropShadow.BackgroundTransparency = 1.000
+    DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+    DropShadow.Position = UDim2.new(0, -5, 0, -5)
+    DropShadow.Size = UDim2.new(1, 10, 1, 10)
+    DropShadow.ZIndex = 9
+    DropShadow.Image = "rbxassetid://297694300"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.500
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+    DropShadow.SliceScale = 0.050
 
-            UIStroke.Transparency = 0.850
-            UIStroke.Color = Color3.fromRGB(156, 156, 156)
-            UIStroke.Parent = ButtonBlock
+    -- 4. 设置边框（UIStroke）属性
+    UIStroke.Transparency = 0.850
+    UIStroke.Color = Color3.fromRGB(156, 156, 156)
+    UIStroke.Parent = ButtonBlock
 
-            TextLabel.Parent = ButtonBlock
-            TextLabel.AnchorPoint = Vector2.new(0, 0.5)
-            TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            TextLabel.BackgroundTransparency = 1.000
-            TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            TextLabel.BorderSizePixel = 0
+    -- 5. 设置标题文本（TextLabel）属性
+    TextLabel.Parent = ButtonBlock
+    TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.BackgroundTransparency = 1.000
+    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel.BorderSizePixel = 0
+    TextLabel.Size = UDim2.new(1, 0, 0, 14)
+    TextLabel.ZIndex = 11
+    TextLabel.Font = Enum.Font.Gotham
+    TextLabel.Text = setup.Title
+    TextLabel.TextColor3 = Library.Colors.TextColor
+    TextLabel.TextScaled = true
+    TextLabel.TextSize = 14.000
+    TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+    TextLabel.TextStrokeTransparency = 0.950
+    TextLabel.TextWrapped = true
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TextLabel.RichText = true
+
+    -- 6. 设置内容文本（Content）属性
+    Content.Name = "Content"
+    Content.Parent = ButtonBlock
+    Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Content.BackgroundTransparency = 1.000
+    Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Content.BorderSizePixel = 0
+    Content.Position = UDim2.new(0, 5, 0, 18)
+    Content.Size = UDim2.new(1, 0, 0, 45)
+    Content.Visible = false
+    Content.ZIndex = 11
+    Content.Font = Enum.Font.Gotham
+    Content.Text = setup.Content
+    Content.TextColor3 = Library.Colors.TextColor
+    Content.TextSize = 13.000
+    Content.TextStrokeColor3 = Library.Colors.TextColor
+    Content.TextStrokeTransparency = 0.950
+    Content.TextTransparency = 0.500
+    Content.TextWrapped = true
+    Content.TextXAlignment = Enum.TextXAlignment.Left
+    Content.TextYAlignment = Enum.TextYAlignment.Top
+    Content.RichText = true
+
+    -- 7. 设置箭头图标（Arrow）属性
+    Arrow.Name = "Arrow"
+    Arrow.Parent = ButtonBlock
+    Arrow.AnchorPoint = Vector2.new(1, 0.5)
+    Arrow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Arrow.BackgroundTransparency = 1.000
+    Arrow.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Arrow.BorderSizePixel = 0
+    Arrow.Position = UDim2.new(0.980000019, 0, 0.5, 0)
+    Arrow.Size = UDim2.new(0.400000006, 0, 0.400000006, 0)
+    Arrow.SizeConstraint = Enum.SizeConstraint.RelativeYY
+    Arrow.ZIndex = 11
+    Arrow.Image = "rbxassetid://10709791437"
+    Arrow.ImageTransparency = 0.150
+
+    -- 8. 设置点击按钮（Button）属性（透明点击层）
+    Button.Name = "Button"
+    Button.Parent = ButtonBlock
+    Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Button.BackgroundTransparency = 1.000
+    Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Button.BorderSizePixel = 0
+    Button.Size = UDim2.new(1, 0, 1, 0)
+    Button.ZIndex = 15
+    Button.Font = Enum.Font.SourceSans
+    Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Button.TextSize = 14.000
+    Button.TextTransparency = 1.000
+
+    -- 9. 调用库方法添加悬浮效果（假设Library:MakeDrop已实现）
+    Library:MakeDrop(ButtonBlock, UIStroke, Library.Colors.Hightlight)
+
+    -- 10. 添加 tooltip（提示文本）
+    if setup.Tip then
+        WindowLibrary:AddToolTip(ButtonBlock, tostring(setup.Tip));
+    end;
+
+    -- 11. 按钮按下/抬起的箭头动画
+    Button.MouseButton1Down:Connect(function()
+        Library:Tween(Arrow, Library.TweenLibrary.SmallEffect, {
+            Position = UDim2.new(0.999, 0, 0.5, 0),
+            ImageTransparency = 0.4
+        })
+    end)
+
+    Button.MouseButton1Up:Connect(function()
+        Library:Tween(Arrow, Library.TweenLibrary.SmallEffect, {
+            Position = UDim2.new(0.980000019, 0, 0.5, 0),
+            ImageTransparency = 0.15
+        })
+    end)
+
+    -- 12. 按钮点击回调（触发用户传入的setup.Callback）
+    Button.MouseButton1Click:Connect(function()
+        setup.Callback()
+    end)
+
+    -- 13. 按钮高度更新方法（根据标题/内容自动调整高度）
+    local UpdateBlock = function()
+        local TitleSize = TextLabel.TextSize
+        local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
+        local ContentSize = setup.Content:len() > 0 and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font) or Vector2.new(0, 0)
+
+        local TotalHeight = MainSize.Y + 10
+        if setup.Content:len() > 0 then
+            Content.Visible = true
+            TotalHeight = TotalHeight + ContentSize.Y + 5
+            TextLabel.Position = UDim2.new(0, 5, 0, 12)
             TextLabel.Size = UDim2.new(1, 0, 0, 14)
-            TextLabel.ZIndex = 11
-            TextLabel.Font = Enum.Font.Gotham
-            TextLabel.Text = setup.Title
-            TextLabel.TextColor3 = Library.Colors.TextColor
-            TextLabel.TextScaled = true
-            TextLabel.TextSize = 14.000
-            TextLabel.TextStrokeColor3 = Library.Colors.TextColor
-            TextLabel.TextStrokeTransparency = 0.950
-            TextLabel.TextWrapped = true
-            TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-            TextLabel.RichText = true
-    
-            Content.Name = "Content"
-            Content.Parent = ButtonBlock
-            Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Content.BackgroundTransparency = 1.000
-            Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            Content.BorderSizePixel = 0
-            Content.Position = UDim2.new(0, 5, 0, 18)
-            Content.Size = UDim2.new(1, 0, 0, 45)
+        else
             Content.Visible = false
-            Content.ZIndex = 11
-            Content.Font = Enum.Font.Gotham
-            Content.Text = setup.Content
-            Content.TextColor3 = Library.Colors.TextColor
-            Content.TextSize = 13.000
-            Content.TextStrokeColor3 = Library.Colors.TextColor
-            Content.TextStrokeTransparency = 0.950
-            Content.TextTransparency = 0.500
-            Content.TextWrapped = true
-            Content.TextXAlignment = Enum.TextXAlignment.Left
-            Content.TextYAlignment = Enum.TextYAlignment.Top
-            Content.RichText = true
-    
-            Arrow.Name = "Arrow"
-            Arrow.Parent = ButtonBlock
-            Arrow.AnchorPoint = Vector2.new(1, 0.5)
-            Arrow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Arrow.BackgroundTransparency = 1.000
-            Arrow.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            Arrow.BorderSizePixel = 0
-            Arrow.Position = UDim2.new(0.980000019, 0, 0.5, 0)
-            Arrow.Size = UDim2.new(0.400000006, 0, 0.400000006, 0)
-            Arrow.SizeConstraint = Enum.SizeConstraint.RelativeYY
-            Arrow.ZIndex = 11
-            Arrow.Image = "rbxassetid://10709791437"
-            Arrow.ImageTransparency = 0.150
+            TotalHeight = TotalHeight + 15.20000000000001
+            TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+            TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+        end
 
-            Button.Name = "Button"
-            Button.Parent = ButtonBlock
-            Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Button.BackgroundTransparency = 1.000
-            Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            Button.BorderSizePixel = 0
-            Button.Size = UDim2.new(1, 0, 1, 0)
-            Button.ZIndex = 15
-            Button.Font = Enum.Font.SourceSans
-            Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-            Button.TextSize = 14.000
-            Button.TextTransparency = 1.000
+        ButtonBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+    end
+    UpdateBlock()
 
-            Library:MakeDrop(ButtonBlock, UIStroke, Library.Colors.Hightlight)
+    -- 14. 按钮控制接口（返回给用户，用于控制单个按钮）
+    local RootSkid = {};
 
-            if setup.Tip then
-                WindowLibrary:AddToolTip(ButtonBlock, tostring(setup.Tip));
-            end;
+    -- 接口1：更新按钮内容文本
+    function RootSkid:Content(Setup)
+        Content.Text = Setup
+        UpdateBlock()
+    end;
 
-            Button.MouseButton1Down:Connect(function()
-                Library:Tween(Arrow, Library.TweenLibrary.SmallEffect, {
-                    Position = UDim2.new(0.999, 0, 0.5, 0),
-                    ImageTransparency = 0.4
-                })
-            end)
+    -- 接口2：更新按钮标题（同Title接口，保留兼容性）
+    function RootSkid:Value(Setup)
+        TextLabel.Text = Setup
+        UpdateBlock()
+    end;
 
-            Button.MouseButton1Up:Connect(function()
-                Library:Tween(Arrow, Library.TweenLibrary.SmallEffect, {
-                    Position = UDim2.new(0.980000019, 0, 0.5, 0),
-                    ImageTransparency = 0.15
-                })
-            end)
+    -- 接口3：手动触发按钮回调
+    function RootSkid:Fire(...)
+        return setup.Callback(...);
+    end;
 
-            Button.MouseButton1Click:Connect(function()
-                setup.Callback()
-            end)
-    
-            local UpdateBlock = function()
-                local TitleSize = TextLabel.TextSize
-                local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
-                local ContentSize = setup.Content:len() > 0 and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font) or Vector2.new(0, 0)
-        
-                local TotalHeight = MainSize.Y + 10
-                if setup.Content:len() > 0 then
-                    Content.Visible = true
-                    TotalHeight = TotalHeight + ContentSize.Y + 5
-                    TextLabel.Position = UDim2.new(0, 5, 0, 12)
-                    TextLabel.Size = UDim2.new(1, 0, 0, 14)
-                else
-                    Content.Visible = false
-                    TotalHeight = TotalHeight + 15.20000000000001
-                    TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
-                    TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
-                end
+    -- 接口4：更新按钮标题
+    function RootSkid:Title(title)
+        TextLabel.Text = title;
+        UpdateBlock()
+    end;
 
-                ButtonBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
-            end
-            UpdateBlock()
-    
-            local RootSkid = {};
-    
-            function RootSkid:Content(Setup)
-                Content.Text = Setup
-                UpdateBlock()
-            end;
+    -- 接口5：直接设置按钮可见性（true显示，false隐藏）
+    function RootSkid:Visible(value)
+        ButtonBlock.Visible = value;
+    end;
 
-            function RootSkid:Value(Setup)
-                TextLabel.Text = Setup
-                UpdateBlock()
-            end;
+    -- 接口6：隐藏按钮（简化调用，本质是Visible(false)）
+    function RootSkid:Hide()
+        self:Visible(false)
+    end;
 
-            function RootSkid:Fire(...)
-                return setup.Callback(...);
-            end;
+    -- 接口7：显示按钮（简化调用，本质是Visible(true)）
+    function RootSkid:Show()
+        self:Visible(true)
+    end;
 
-            function RootSkid:Title(title)
-                TextLabel.Text = title;
-                UpdateBlock()
-            end;
+    -- 接口8：实时切换显示/隐藏（核心功能！当前显示则隐藏，反之则显示）
+    function RootSkid:Toggle()
+        self:Visible(not ButtonBlock.Visible)
+    end;
 
-            function RootSkid:Visible(value)
-                ButtonBlock.Visible = value;
-            end;
+    return RootSkid;
+end;
 
-            return RootSkid;
-        end;
 ------ // 切换按钮[原ui]   ----------------------------------------------------------------------------------------
         function Root:Toggle(setup)
 			setup = setup or {};
