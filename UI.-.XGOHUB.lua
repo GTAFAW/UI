@@ -71,7 +71,7 @@ if executionCount == 1 then
        return
 end
 
--- ===================== 【优化部分：多次重启时的UI与事件管理】 =====================
+-- ===================== 【优化：多次重启时的UI与事件管理】 =====================
 -- 1. 先销毁旧UI及关联资源，避免重叠/性能问题
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -90,7 +90,7 @@ if textUpdateConnection then task.cancel(textUpdateConnection) end
 -- 销毁旧UI
 if existingGui then existingGui:Destroy() end
 
--- ===================== 【原UI与功能逻辑】 =====================
+-- ===================== 【UI与功能逻辑】 =====================
 local a = Instance.new("ScreenGui")
 a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
@@ -171,7 +171,7 @@ local function getDeviceType()
     end
 end
 
--- ===================== 修复：帧率真实性（限制上限+精准计算） =====================
+-- ===================== 帧率 =====================
 local currentFps = 0
 -- 先断开旧帧率线程，避免重复
 if fpsConnection then
@@ -179,8 +179,8 @@ if fpsConnection then
 end
 fpsConnection = spawn(function()
     local runService = game:GetService("RunService")
-    -- 1. 检测设备理论最高帧率（避免显示超硬件上限的假帧率）
-    local maxPossibleFps = 60 -- 基础默认值（覆盖多数手机）
+    -- 1. 检测设备理论最高帧率
+    local maxPossibleFps = 60 
     if runService:IsRunning() then
         -- 多次采样估算实际刷新上限，减少误差
         local testStart = tick()
@@ -194,7 +194,7 @@ fpsConnection = spawn(function()
         maxPossibleFps = math.min(estimatedMax, 240)
     end
 
-    -- 2. 实时计算真实帧率（1秒内统计实际渲染次数）
+    -- 2. 实时计算真实帧率
     while task.wait(1) do
         local frameCount = 0
         local startTime = tick()
@@ -259,7 +259,7 @@ local function getFestival(month, day)
     return "\232\132\154\230\156\172\232\174\164\229\135\134\88\71\79\72\85\66\32\124\32"
 end
 
--- ===================== 核心：累计时长持久化（重启不重置） =====================
+-- ===================== 核心：累计时长持久化 =====================
 -- 从全局存储获取首次启动时间（仅记录第一次启动）
 local globalDataStore = game.ReplicatedStorage:FindFirstChild("XGO_GlobalData") 
 if not globalDataStore then
@@ -270,7 +270,7 @@ if not globalDataStore then
 end
 local firstStartTime = globalDataStore.Value -- 固定首次启动时间
 
--- ===================== 文本更新逻辑（真实帧率+累计时长） =====================
+-- ===================== 文本更新逻辑 =====================
 -- 先断开旧文本线程，避免重复
 if textUpdateConnection then
     task.cancel(textUpdateConnection)
@@ -342,7 +342,7 @@ textUpdateConnection = spawn(function()
 end)
 
 _G.XGO_RAW_UI = a 
-_G.XGO_RAW_UI.Enabled = false
+_G.XGO_RAW_UI.Enabled = true
 _G.XGO_TextConn = textUpdateConnection
 _G.XGO_SET_VISIBLE = function(isVisible)
     if _G.XGO_RAW_UI then
