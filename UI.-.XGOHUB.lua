@@ -340,8 +340,15 @@ textUpdateConnection = spawn(function()
         end)
     end
 end)
--- 全局存储文本线程，供下次重启断开
+
+_G.XGO_RAW_UI = a 
+_G.XGO_RAW_UI.Enabled = false
 _G.XGO_TextConn = textUpdateConnection
+_G.XGO_SET_VISIBLE = function(isVisible)
+    if _G.XGO_RAW_UI then
+        _G.XGO_RAW_UI.Enabled = isVisible
+    end
+end
 
 if executionCount == 1 then
    local userInputService = game:GetService("UserInputService")
@@ -2337,6 +2344,7 @@ local offLimits = {}
 
 -- Code from https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/highlight.lua --
 
+--------------------------------语法高亮渲染函数------------------------------------------------------------------------
 function render(source)
 	tableContents = {}
 	offLimits = {}
