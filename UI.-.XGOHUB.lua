@@ -2651,7 +2651,7 @@ function Library:Windowxgo(setup)
 	
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
-    local BackgroundImage1 = Instance.new("ImageLabel") -- 当前显示的图
+    local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
 	local DropShadow = Instance.new("ImageLabel")
 	local Ico = Instance.new("ImageLabel")
@@ -2680,61 +2680,70 @@ function Library:Windowxgo(setup)
 --        "rbxassetid://脚本认准XGOHUB"
     }
     
-    local currentImageIndex = 1 
-    local slideDuration = 1.5 
-    local interval = 5.5 
+    local currentIndex = 1
+    local isForward = true
+    local slideDuration = 1
+    local interval = 10
 
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
-        BackgroundImage1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         BackgroundImage1.BackgroundTransparency = 1
-        BackgroundImage1.Size = UDim2.new(1, 0, 1, 1)
+        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.ImageColor3 = Color3.fromRGB(255, 255, 255)
+        BackgroundImage1.Image = images[currentIndex]
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage1.Image = images[currentImageIndex]
-        BackgroundImage1.ZIndex = 1 
+        BackgroundImage1.ImageTransparency = 0
+        BackgroundImage1.ZIndex = 1
 
         BackgroundImage2.Parent = MainFrame
-        BackgroundImage2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         BackgroundImage2.BackgroundTransparency = 1
-        BackgroundImage2.Size = UDim2.new(1, 0, 1, 1)
-        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0) 
-        BackgroundImage2.ImageColor3 = Color3.fromRGB(255, 255, 255)
+        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
+        BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage2.ZIndex = 2 
+        BackgroundImage2.ZIndex = 2
     end
 
-    local function slideToNextImage()
-       
-        local nextIndex = currentImageIndex + 1
-        if nextIndex > #images then
-            nextIndex = 1
-        end
-
-        if images[nextIndex] then
-            BackgroundImage2.Image = images[nextIndex]
+    local function getNextIndex()
+        if isForward then
+            return currentIndex == #images and #images - 1 or currentIndex + 1
         else
-            warn("Invalid image ID at index " .. nextIndex)
-            return
+            return currentIndex == 1 and 2 or currentIndex - 1
+        end
+    end
+
+    local function slideSwitch()
+        local nextIndex = getNextIndex()
+        local startPos = UDim2.new(0, 0, 0, 0)
+        local endPos = UDim2.new(0, 0, 0, 0)
+        local oldEndPos = UDim2.new(0, 0, 0, 0)
+
+        if isForward then
+            startPos = UDim2.new(1, 0, 0, 0)
+            oldEndPos = UDim2.new(-1, 0, 0, 0)
+        else
+            startPos = UDim2.new(-1, 0, 0, 0)
+            oldEndPos = UDim2.new(1, 0, 0, 0)
         end
 
-        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {
-            Position = UDim2.new(0, 0, 0, 0) 
-        }, slideDuration)
+        BackgroundImage2.Image = images[nextIndex]
+        BackgroundImage2.Position = startPos
 
-        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {
-            Position = UDim2.new(-1, 0, 0, 0) 
-        }, slideDuration) 
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
         task.wait(slideDuration)
-        currentImageIndex = nextIndex
+        currentIndex = nextIndex
+        if currentIndex == #images then
+            isForward = false
+        elseif currentIndex == 1 then
+            isForward = true
+        end
         BackgroundImage1.Image = BackgroundImage2.Image
-        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0) 
-        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0) 
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage2.Position = startPos
     end
 
-    -- 初始化UI层级
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ResetOnSpawn = false
     ScreenGui.IgnoreGuiInset = false
@@ -2746,20 +2755,17 @@ function Library:Windowxgo(setup)
     MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     MainFrame.BackgroundTransparency = 0.250
-    MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     MainFrame.BorderSizePixel = 0
-    MainFrame.ClipsDescendants = true -- 关键：裁剪Frame外的内容（确保滑出的图不显示）
+    MainFrame.ClipsDescendants = true
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
-    -- 初始化两张背景图
     initBackgrounds()
 
-    -- 关键修改4：定时器触发滑动切
     task.spawn(function()
         while true do
-            task.wait(interval) -- 先停留指定时间
-            slideToNextImage() -- 再执行滑动切换
+            task.wait(interval)
+            slideSwitch()
         end
     end)
    
@@ -2767,9 +2773,7 @@ function Library:Windowxgo(setup)
 
 	DropShadow.Name = "DropShadow"
 	DropShadow.Parent = MainFrame
-	DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	DropShadow.BackgroundTransparency = 1.000
-	DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
 	DropShadow.Position = UDim2.new(0, -5, 0, -5)
 	DropShadow.Rotation = 0.010
 	DropShadow.Size = UDim2.new(1, 10, 1, 10)
@@ -2784,9 +2788,7 @@ function Library:Windowxgo(setup)
 	Ico.Name = "Ico"
 	Ico.Parent = MainFrame
 	Ico.AnchorPoint = Vector2.new(0.5, 0.5)
-	Ico.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	Ico.BackgroundTransparency = 1.000
-	Ico.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Ico.BorderSizePixel = 0
 	Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
