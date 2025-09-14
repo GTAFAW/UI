@@ -101,9 +101,11 @@ local Players      = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService   = game:GetService("RunService")
 local Lighting     = game:GetService("Lighting")
+local Debris       = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
+-- 配置参数
 local CFG = {
 	size        = 270,
 	thickness   = 18,
@@ -126,11 +128,15 @@ local CFG = {
 	subtitleColor = Color3.fromRGB(255, 100, 100)
 }
 
+-- 颜色定义
 local RED_LIGHT  = Color3.fromRGB(255, 120, 120)
 local RED_MAIN   = Color3.fromRGB(255, 50, 50)
 local RED_DEEP   = Color3.fromRGB(180, 20, 20)
 local CYAN_SOFT  = Color3.fromRGB(255, 160, 160)
-local BG_COLOR   = Color3.fromRGB(  5,   9,  20)
+local BG_COLOR   = Color3.fromRGB(5, 9, 20)
+
+-- 关键：创建关闭事件（用于通知后续代码）
+local IntroClosedEvent = Instance.new("BindableEvent")
 
 -- 工具函数：HSV转RGB
 local function HSVToRGB(h, s, v)
@@ -150,6 +156,7 @@ local function HSVToRGB(h, s, v)
     return Color3.new(r, g, b)
 end
 
+-- 获取UI父容器（兼容不同注入方式）
 local function getGuiParent()
 	local ok, root = pcall(function() return (gethui and gethui()) end)
 	if ok and root then return root end
@@ -161,6 +168,7 @@ local function getGuiParent()
 	return pg or game:GetService("CoreGui")
 end
 
+-- 停止已有实例（避免重复）
 pcall(function()
 	if _G.ThunderIntro_Stop then _G.ThunderIntro_Stop() end
 end)
@@ -168,11 +176,13 @@ end)
 local parent  = getGuiParent()
 local running = true
 
+-- 创建模糊效果
 local blur = Instance.new("BlurEffect")
 blur.Size = 8
 blur.Name = "ThunderIntroBlur"
 blur.Parent = Lighting
 
+-- 主屏幕Th
 local sg = Instance.new("ScreenGui")
 sg.Name = "ThunderIntroMAX"
 sg.IgnoreGuiInset = true
@@ -180,13 +190,14 @@ sg.ResetOnSpawn = false
 pcall(function() if syn and syn.protect_gui then syn.protect_gui(sg) end end)
 sg.Parent = parent
 
+-- 背景框
 local bg = Instance.new("Frame")
-bg.Size = UDim2.fromScale(1,1)
+bg.Size = UDim2.fromScale(1, 1)
 bg.BackgroundColor3 = BG_COLOR
 bg.BackgroundTransparency = 0.25
 bg.Parent = sg
 
--- 滚动字幕
+-- 滚动字幕容器
 local subtitleContainer = Instance.new("Frame")
 subtitleContainer.Size = UDim2.fromScale(1, 0.08)
 subtitleContainer.Position = UDim2.fromScale(0, CFG.subtitleY)
@@ -195,6 +206,7 @@ subtitleContainer.ClipsDescendants = true
 subtitleContainer.ZIndex = 10
 subtitleContainer.Parent = sg
 
+-- 滚动字幕
 local subtitle = Instance.new("TextLabel")
 subtitle.Text = CFG.subtitleText
 subtitle.TextColor3 = CFG.subtitleColor
@@ -207,14 +219,13 @@ subtitle.TextTransparency = 0
 subtitle.Parent = subtitleContainer
 
 -- 字幕滚动逻辑
-task.wait(0.05)
-local screenWidth = sg.AbsoluteSize.X
-local textWidth = subtitle.TextBounds.X <= 0 and (string.len(CFG.subtitleText) * CFG.subtitleSize * 0.5) or subtitle.TextBounds.X
-local speed = CFG.subtitleSpeed
-local isSubtitleFinished = false
-
 task.spawn(function()
-	while not isSubtitleFinished do
+	local screenWidth = sg.AbsoluteSize.X
+	local textWidth = subtitle.TextBounds.X <= 0 and (string.len(CFG.subtitleText) * CFG.subtitleSize * 0.5) or subtitle.TextBounds.X
+	local speed = CFG.subtitleSpeed
+	local isSubtitleFinished = false
+
+	while running and not isSubtitleFinished do
 		local currentX = subtitle.Position.X.Offset - (speed * RunService.Heartbeat:Wait())
 		if currentX < -textWidth then
 			isSubtitleFinished = true
@@ -225,35 +236,42 @@ task.spawn(function()
 
 	TweenService:Create(subtitle, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
 	task.wait(0.5)
-	subtitle:Destroy()
-	subtitleContainer:Destroy()
+	if subtitle and subtitle.Parent then subtitle:Destroy() end
+	if subtitleContainer and subtitleContainer.Parent then subtitleContainer:Destroy() end
 end)
 
+-- 核心视觉框（主容器）
 local main = Instance.new("Frame")
 main.Size = UDim2.fromOffset(CFG.size, CFG.size)
-main.AnchorPoint = Vector2.new(0.5,0.5)
-main.Position = UDim2.fromScale(0.5,0.5)
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.Position = UDim2.fromScale(0.5, 0.5)
 main.BackgroundTransparency = 1
 main.ZIndex = 5
 main.Parent = sg
 
+-- 外层边框
 local ring = Instance.new("Frame")
-ring.Size = UDim2.fromScale(1,1)
+ring.Size = UDim2.fromScale(1, 1)
 ring.BackgroundTransparency = 1
 ring.Parent = main
-local rCorner = Instance.new("UICorner"); rCorner.CornerRadius = UDim.new(0, CFG.corner); rCorner.Parent = ring
+local rCorner = Instance.new("UICorner")
+rCorner.CornerRadius = UDim.new(0, CFG.corner)
+rCorner.Parent = ring
 local rStroke = Instance.new("UIStroke")
 rStroke.Thickness = CFG.thickness
 rStroke.Color = RED_MAIN
 pcall(function() rStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
 rStroke.Parent = ring
 
+-- 发光边框
 local glowRing = Instance.new("Frame")
-glowRing.Size = UDim2.fromScale(1,1)
+glowRing.Size = UDim2.fromScale(1, 1)
 glowRing.BackgroundTransparency = 1
 glowRing.ZIndex = -1
 glowRing.Parent = main
-local gCorner = Instance.new("UICorner"); gCorner.CornerRadius = UDim.new(0, CFG.corner); gCorner.Parent = glowRing
+local gCorner = Instance.new("UICorner")
+gCorner.CornerRadius = UDim.new(0, CFG.corner)
+gCorner.Parent = glowRing
 local gStroke = Instance.new("UIStroke")
 gStroke.Thickness = CFG.thickness * 1.7
 gStroke.Color = CYAN_SOFT
@@ -261,17 +279,19 @@ gStroke.Transparency = 0.7
 pcall(function() gStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
 gStroke.Parent = glowRing
 
+-- 内层容器（文字载体）
 local inner = Instance.new("Frame")
 inner.Size = UDim2.fromOffset(CFG.size - CFG.thickness*2, CFG.size - CFG.thickness*2)
-inner.AnchorPoint = Vector2.new(0.5,0.5)
-inner.Position = UDim2.fromScale(0.5,0.5)
+inner.AnchorPoint = Vector2.new(0.5, 0.5)
+inner.Position = UDim2.fromScale(0.5, 0.5)
 inner.BackgroundTransparency = 1
 inner.Parent = main
 
+-- 警告标题文字
 local title = Instance.new("TextLabel")
-title.Size = UDim2.fromScale(0.9,0.4)
-title.AnchorPoint = Vector2.new(0.5,0.5)
-title.Position = UDim2.fromScale(0.5,0.40)
+title.Size = UDim2.fromScale(0.9, 0.4)
+title.AnchorPoint = Vector2.new(0.5, 0.5)
+title.Position = UDim2.fromScale(0.5, 0.40)
 title.BackgroundTransparency = 1
 title.Text = ""
 title.TextScaled = true
@@ -281,6 +301,7 @@ title.TextTransparency = 0
 title.ZIndex = 6
 title.Parent = inner
 
+-- 标题渐变
 local grad = Instance.new("UIGradient")
 grad.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0.00, RED_LIGHT),
@@ -290,10 +311,10 @@ grad.Color = ColorSequence.new{
 grad.Rotation = 25
 grad.Parent = title
 
+-- 标题逐字显示
 local longTitleText = "使用脚本请承担风险\n「封号概不负责」"
 local typeDelay = 0.2
 local isTitleTyped = false
-
 task.spawn(function()
     task.wait(0.3)
     for i = 1, #longTitleText do
@@ -304,11 +325,11 @@ task.spawn(function()
     isTitleTyped = true
 end)
 
--- ===================== 核心：XGOHUB 逐字实时彩虹色 =====================
+-- 彩虹色XGO HUB文字
 local sub = Instance.new("TextLabel")
-sub.Size = UDim2.fromScale(0.6,0.2)
-sub.AnchorPoint = Vector2.new(0.5,0.5)
-sub.Position = UDim2.fromScale(0.5,0.65)
+sub.Size = UDim2.fromScale(0.6, 0.2)
+sub.AnchorPoint = Vector2.new(0.5, 0.5)
+sub.Position = UDim2.fromScale(0.5, 0.65)
 sub.BackgroundTransparency = 1
 sub.Text = "XGOHUB"
 sub.TextScaled = true
@@ -317,16 +338,16 @@ sub.TextTransparency = 1
 sub.ZIndex = 6
 sub.Parent = inner
 
--- 原彩虹文字实时更新逻辑中，在循环前新增标记
+-- 彩虹文字实时更新
+local isClosing = false
 task.spawn(function()
     local text = sub.Text 
     local charCount = string.len(text) 
     local hueOffset = 0 
-    local isClosing = false -- 关闭状态标记
 
     task.wait(0.3 + 0.25)
 
-    while running and not isClosing do -- 循环条件增加“未关闭”
+    while running and not isClosing do
         hueOffset = (hueOffset + 0.01) % 1 
         local richText = "" 
         for i = 1, charCount do
@@ -343,69 +364,67 @@ task.spawn(function()
         RunService.Heartbeat:Wait()
     end
 
-    if isClosing then
+    if isClosing and sub then
         sub.Text = ""
     end
 end)
--- ========================脚本认准:XGOHUB================================================
 
-task.spawn(function()
-	while running do
-		grad.Rotation = (grad.Rotation + 1) % 360
-		task.wait(0.02)
-	end
-end)
-
+-- 中心发光圆点
 local orb = Instance.new("Frame")
-orb.AnchorPoint = Vector2.new(0.5,0.5)
-orb.Position = UDim2.fromScale(0.5,0.65)
-orb.Size = UDim2.fromOffset(120,120)
+orb.AnchorPoint = Vector2.new(0.5, 0.5)
+orb.Position = UDim2.fromScale(0.5, 0.65)
+orb.Size = UDim2.fromOffset(120, 120)
 orb.BackgroundColor3 = CYAN_SOFT
 orb.BackgroundTransparency = 0.9
 orb.ZIndex = -1
 orb.Parent = inner
-local orbCorner = Instance.new("UICorner"); orbCorner.CornerRadius = UDim.new(1,0); orbCorner.Parent = orb
+local orbCorner = Instance.new("UICorner")
+orbCorner.CornerRadius = UDim.new(1, 0)
+orbCorner.Parent = orb
 
+-- 火花效果
 local function Spark()
 	local s = Instance.new("Frame")
-	s.Size = UDim2.fromOffset(2,2)
-	s.AnchorPoint = Vector2.new(0.5,0.5)
+	s.Size = UDim2.fromOffset(2, 2)
+	s.AnchorPoint = Vector2.new(0.5, 0.5)
 	s.Position = orb.Position
-	s.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	s.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	s.BackgroundTransparency = 0
 	s.ZIndex = 5
 	s.Parent = inner
 
-	local goalPos = orb.Position + UDim2.fromOffset(math.random(-60,60), math.random(-60,60))
+	local goalPos = orb.Position + UDim2.fromOffset(math.random(-60, 60), math.random(-60, 60))
 	TweenService:Create(s, TweenInfo.new(0.25), {Position = goalPos, BackgroundTransparency = 1}):Play()
-	game:GetService("Debris"):AddItem(s, 0.3)
+	Debris:AddItem(s, 0.3)
 end
+for i = 1, 12 do task.delay(i * 0.01, Spark) end
 
-for i=1,12 do task.delay(i*0.01, Spark) end
-
+-- 相机抖动效果
 local function CameraShake(ui)
 	local orig = ui.Position
 	for i = 1, 4 do
-		ui.Position = orig + UDim2.fromOffset(math.random(-4,4), math.random(-4,4))
+		ui.Position = orig + UDim2.fromOffset(math.random(-4, 4), math.random(-4, 4))
 		task.wait(0.04)
 	end
 	ui.Position = orig
 end
 CameraShake(main)
 
+-- 版权文字
 local credit = Instance.new("TextLabel")
-credit.Size = UDim2.fromOffset(220,20)
-credit.AnchorPoint = Vector2.new(1,1)
-credit.Position = UDim2.fromScale(0.985,0.985)
+credit.Size = UDim2.fromOffset(220, 20)
+credit.AnchorPoint = Vector2.new(1, 1)
+credit.Position = UDim2.fromScale(0.985, 0.985)
 credit.BackgroundTransparency = 1
 credit.Text = CFG.creditText
-credit.TextColor3 = Color3.fromRGB(190,205,235)
+credit.TextColor3 = Color3.fromRGB(190, 205, 235)
 credit.Font = Enum.Font.Gotham
 credit.TextSize = 12
 credit.TextTransparency = 1
 credit.ZIndex = 6
 credit.Parent = sg
 
+-- 跳过按钮
 local skipBtn = Instance.new("TextButton")
 skipBtn.Position = UDim2.fromScale(0.99, 0.985)
 skipBtn.Size = UDim2.fromOffset(60, 20)
@@ -419,6 +438,7 @@ skipBtn.TextTransparency = 1
 skipBtn.ZIndex = 10
 skipBtn.Parent = sg
 
+-- 跳过按钮呼吸动画
 task.spawn(function()
     task.wait(0.55 + 0.6)
     local scaleInfo = TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
@@ -430,11 +450,13 @@ task.spawn(function()
     end
 end)
 
+-- 跳过按钮淡入
 task.spawn(function()
     task.wait(0.55)
     TweenService:Create(skipBtn, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {TextTransparency = 0.2}):Play()
 end)
 
+-- 跳过按钮鼠标悬停
 skipBtn.MouseEnter:Connect(function()
     if running then 
         TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
@@ -442,19 +464,21 @@ skipBtn.MouseEnter:Connect(function()
     end
 end)
 
+-- 跳过按钮鼠标离开
 skipBtn.MouseLeave:Connect(function()
     if running then 
         TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0.2}):Play()
         local currentScale = skipBtn.Size.X.Offset / 60
         TweenService:Create(skipBtn, TweenInfo.new(0.2), {Size = UDim2.fromOffset(60*currentScale, 20*currentScale)}):Play()
-    end
+            end
 end)
 
+-- 扫光效果
 local sweep = Instance.new("Frame")
 sweep.BackgroundTransparency = 1
-sweep.Size = UDim2.fromScale(1.2,1.2)
-sweep.AnchorPoint = Vector2.new(0.5,0.5)
-sweep.Position = UDim2.fromScale(-0.2,0.5)
+sweep.Size = UDim2.fromScale(1.2, 1.2)
+sweep.AnchorPoint = Vector2.new(0.5, 0.5)
+sweep.Position = UDim2.fromScale(-0.2, 0.5)
 sweep.Rotation = -15
 sweep.ZIndex = 8
 sweep.Parent = inner
@@ -473,15 +497,17 @@ sweepGrad.Transparency = NumberSequence.new{
 }
 sweepGrad.Parent = sweep
 
+-- 气泡容器
 local bubbleFolder = Instance.new("Folder")
 bubbleFolder.Name = "Bubbles"
 bubbleFolder.Parent = main
 
+-- 创建气泡
 local function makeBubble()
 	local b = Instance.new("Frame")
-	b.AnchorPoint = Vector2.new(0.5,0.5)
-	b.Position = UDim2.fromScale(0.5,0.5)
-	b.Size = UDim2.fromOffset(1,1)
+	b.AnchorPoint = Vector2.new(0.5, 0.5)
+	b.Position = UDim2.fromScale(0.5, 0.5)
+	b.Size = UDim2.fromOffset(1, 1)
 	b.BackgroundTransparency = 1
 	b.ZIndex = -2
 	b.Parent = bubbleFolder
@@ -490,31 +516,39 @@ local function makeBubble()
 	s.Color = CYAN_SOFT
 	s.Transparency = 0.1
 	s.Parent = b
-	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(1,999); c.Parent = b
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(1, 999)
+	c.Parent = b
 	return b, s
 end
 
-local ringScale = Instance.new("UIScale"); ringScale.Scale = 1; ringScale.Parent = ring
-local mainScale = Instance.new("UIScale"); mainScale.Scale = 1; mainScale.Parent = main
+-- 缩放控制
+local ringScale = Instance.new("UIScale")
+ringScale.Scale = 1
+ringScale.Parent = ring
+local mainScale = Instance.new("UIScale")
+mainScale.Scale = 1
+mainScale.Parent = main
 
-
+-- 关闭动画（核心：执行完后触发事件）
 local function CloseAnimation()
 	if not running then return end
 	running = false 
-
-	-- 清除文字
 	isClosing = true
+
+	-- 清除文字显示
 	title.Text = "" 
 	credit.Text = "" 
 	skipBtn.Text = "" 
 	sub.Text = ""
 
+	-- 文字淡隐
 	TweenService:Create(title,  TweenInfo.new(0.1), {TextTransparency = 1}):Play()
 	TweenService:Create(credit, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
 	TweenService:Create(skipBtn, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
-	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play() -- 同步淡隐
+	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 
-	-- 旋转+放大动画配置
+	-- 旋转+放大动画
 	local initialRotation = main.Rotation
 	local targetRotation = initialRotation + 360
 	local targetScale = 1.8
@@ -535,29 +569,31 @@ local function CloseAnimation()
 	TweenService:Create(rStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
 	TweenService:Create(gStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
 	TweenService:Create(bg,      TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play() -- 彩虹文字随背景一起淡隐
 	expandTween:Play()
 	expandTween.Completed:Wait()
 
-	-- 清理UI
+	-- 清理UI资源
 	if sg and sg.Parent then 
 		for _, child in ipairs(sg:GetChildren()) do
 			if child ~= subtitleContainer then
 				child:Destroy()
 			end
 		end
+		-- 等待字幕容器销毁
 		task.spawn(function()
 			repeat task.wait(0.1) until not subtitleContainer or not subtitleContainer.Parent
 			sg:Destroy()
 		end)
 	end
 	if blur and blur.Parent then blur:Destroy() end
+
+	IntroClosedEvent:Fire()
 end
 
--- 手动关闭触发
+-- 手动关闭
 skipBtn.MouseButton1Click:Connect(CloseAnimation)
 
--- 自动关闭触发
+-- 自动关闭
 if CFG.duration and CFG.duration > 0 then
     task.spawn(function()
         while running and not isTitleTyped do task.wait(0.1) end
@@ -566,8 +602,10 @@ if CFG.duration and CFG.duration > 0 then
     end)
 end
 
+-- 全局停止函数
 _G.ThunderIntro_Stop = CloseAnimation
 
+-- 原始颜色记录
 local ORIG = {
 	rStroke = rStroke.Color,
 	gStroke = gStroke.Color,
@@ -601,13 +639,12 @@ local function RainbowBurst()
 		orb.BackgroundColor3 = HSV(h+0.12, 0.85, 1)
 		RunService.Heartbeat:Wait()
 	end
-
+	
 	rStroke.Color = ORIG.rStroke
 	gStroke.Color = ORIG.gStroke
 	grad.Color    = ORIG.titleGradient
 	orb.BackgroundColor3 = ORIG.orb
 end
-
 task.spawn(RainbowBurst)
 
 task.spawn(function()
@@ -619,7 +656,10 @@ task.spawn(function()
 	flash.Parent = sg
 	local fIn  = TweenService:Create(flash, TweenInfo.new(0.05), {BackgroundTransparency = 0.55})
 	local fOut = TweenService:Create(flash, TweenInfo.new(0.12), {BackgroundTransparency = 1})
-	fIn:Play(); fIn.Completed:Wait(); fOut:Play(); fOut.Completed:Wait()
+	fIn:Play()
+	fIn.Completed:Wait()
+	fOut:Play()
+	fOut.Completed:Wait()
 	flash:Destroy()
 end)
 
@@ -627,7 +667,9 @@ task.spawn(function()
 	while running do
 		local t1 = TweenService:Create(ring,     TweenInfo.new(CFG.spinTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Rotation = ring.Rotation + CFG.spinDeg})
 		local t2 = TweenService:Create(glowRing, TweenInfo.new(CFG.spinTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Rotation = glowRing.Rotation + CFG.spinDeg})
-		t1:Play(); t2:Play(); t1.Completed:Wait()
+		t1:Play()
+		t2:Play()
+		t1.Completed:Wait()
 	end
 end)
 
@@ -644,7 +686,6 @@ task.spawn(function()
 	task.wait(0.3)
 	TweenService:Create(title,  TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
 	task.wait(0.25)
-	-- 彩虹文字的透明度动画触发
 	TweenService:Create(sub,    TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
 	TweenService:Create(credit, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0.2}):Play()
 end)
@@ -653,41 +694,51 @@ task.spawn(function()
 	while running do
 		local up = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8, Size = UDim2.fromOffset(140,140)})
 		local dn = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {BackgroundTransparency = 0.9, Size = UDim2.fromOffset(120,120)})
-		up:Play(); up.Completed:Wait(); dn:Play(); dn.Completed:Wait()
+		up:Play()
+		up.Completed:Wait()
+		dn:Play()
+		dn.Completed:Wait()
 	end
 end)
 
+-- 气泡弹出效果
 local function BubblePop()
 	local baseT = bg.BackgroundTransparency
 	local flashDown = TweenService:Create(bg, TweenInfo.new(0.08, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = math.max(0, baseT - 0.12)})
 	local flashUp   = TweenService:Create(bg, TweenInfo.new(0.18, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {BackgroundTransparency = baseT})
-	flashDown:Play(); flashDown.Completed:Wait(); flashUp:Play()
+	flashDown:Play()
+	flashDown.Completed:Wait()
+	flashUp:Play()
 
 	local oldThick = rStroke.Thickness
 	local oldColor = rStroke.Color
 	local boostA = TweenService:Create(rStroke, TweenInfo.new(0.08, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Thickness = oldThick * 1.35, Color = CYAN_SOFT})
 	local boostB = TweenService:Create(rStroke, TweenInfo.new(0.22, Enum.EasingStyle.Quad,  Enum.EasingDirection.In),  {Thickness = oldThick, Color = oldColor})
-	boostA:Play(); boostA.Completed:Wait(); boostB:Play()
+	boostA:Play()
+	boostA.Completed:Wait()
+	boostB:Play()
 
 	local thumpUp = TweenService:Create(mainScale, TweenInfo.new(0.08, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1.03})
 	local thumpDn = TweenService:Create(mainScale, TweenInfo.new(0.20, Enum.EasingStyle.Quad,  Enum.EasingDirection.In),  {Scale = 1})
-	thumpUp:Play(); thumpUp.Completed:Wait(); thumpDn:Play()
+	thumpUp:Play()
+	thumpUp.Completed:Wait()
+	thumpDn:Play()
 
+	-- 生成气泡
 	for i = 1, CFG.bubbleCount do
 		task.spawn(function()
 			local b, s = makeBubble()
 			local grow = TweenService:Create(b, TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(CFG.size * CFG.bubbleScale, CFG.size * CFG.bubbleScale)})
 			local fade = TweenService:Create(s, TweenInfo.new(0.6, Enum.EasingStyle.Sine,  Enum.EasingDirection.Out), {Transparency = 1})
-			grow:Play(); fade:Play(); grow.Completed:Wait()
+			grow:Play()
+			fade:Play()
+			grow.Completed:Wait()
 			b:Destroy()
 		end)
 		task.wait(CFG.bubbleGap)
 	end
 end
-
-task.spawn(function()
-	BubblePop()
-end)
+task.spawn(BubblePop)
 
 task.spawn(function()
 	task.wait(0.25)
@@ -699,7 +750,10 @@ task.spawn(function()
 	flash.Parent = sg
 	local fIn  = TweenService:Create(flash, TweenInfo.new(0.08, Enum.EasingStyle.Sine,  Enum.EasingDirection.Out), {BackgroundTransparency = 0.6})
 	local fOut = TweenService:Create(flash, TweenInfo.new(0.20, Enum.EasingStyle.Sine,  Enum.EasingDirection.In),  {BackgroundTransparency = 1})
-	fIn:Play(); fIn.Completed:Wait(); fOut:Play(); fOut.Completed:Wait()
+	fIn:Play()
+	fIn.Completed:Wait()
+	fOut:Play()
+	fOut.Completed:Wait()
 	flash:Destroy()
 end)
 
@@ -719,14 +773,15 @@ local function PulseRing()
 		BackgroundTransparency = 1
 	}):Play()
 
-	game:GetService("Debris"):AddItem(ring, 0.6)
+	Debris:AddItem(ring, 0.6)
 end
 
--- 修复未定义变量报错
 local bubbleTween = nil
 local popSound = nil
 if bubbleTween then bubbleTween.Completed:Connect(PulseRing) end
 if popSound then popSound.Ended:Connect(PulseRing) end
+
+IntroClosedEvent.Event:Wait()
 end  -- 闭合“仅首次执行”的判断
 -- ===================== 【优化：多次重启时的UI与事件管理】 =====================
 local player = game.Players.LocalPlayer
