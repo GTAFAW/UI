@@ -121,7 +121,7 @@ local CFG = {
 	creditText  = "-- XGO HUB --",
 	rainbowSeconds = 1.0, 
 	rainbowTurns   = 1.25,
-	subtitleText = "警告：使用第三方脚本可能导致账号封禁，操作前请谨慎!!！！ [免费脚本切勿圈钱]",
+	subtitleText = "警告：使用第三方脚本可能导致账号封禁，操作前请谨慎!!!！ [免费脚本切勿圈钱]",
 	subtitleSpeed = 50,
 	subtitleY = 0.05,
 	subtitleSize = 16,
@@ -183,7 +183,7 @@ blur.Name = "ThunderIntroBlur"
 blur.Parent = Lighting
 
 -- 主屏幕Th
-local sg = Instance.new("ScreenGui")
+local sg = Instance.new("xgoGui:")
 sg.Name = "ThunderIntroMAX"
 sg.IgnoreGuiInset = true
 sg.ResetOnSpawn = false
@@ -801,7 +801,7 @@ if textUpdateConnection then task.cancel(textUpdateConnection) end
 if existingGui then existingGui:Destroy() end
 
 -- ===================== 【UI与功能逻辑】 =====================
-local a = Instance.new("ScreenGui")
+local a = Instance.new("xgoGui:")
 a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
 a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -969,32 +969,29 @@ local function getFestival(month, day)
 end
 
 -- ===================== 核心：累计时长持久化 =====================
--- 从全局存储获取首次启动时间
 local globalDataStore = game.ReplicatedStorage:FindFirstChild("XGO_GlobalData") 
 if not globalDataStore then
     globalDataStore = Instance.new("NumberValue")
     globalDataStore.Name = "XGO_GlobalData"
-    globalDataStore.Value = tick() -- 存储首次启动时间戳（秒）
+    globalDataStore.Value = tick()
     globalDataStore.Parent = game.ReplicatedStorage
 end
-local firstStartTime = globalDataStore.Value -- 固定首次启动时间
+local firstStartTime = globalDataStore.Value 
 
 -- ===================== 文本更新逻辑 =====================
--- 先断开旧文本线程，避免重复
+
 if textUpdateConnection then
     task.cancel(textUpdateConnection)
 end
 textUpdateConnection = spawn(function()
-    while task.wait(0.5) do  -- 每0.5秒更新一次
+    while task.wait(0.5) do
         pcall(function()
-            -- 1. 计算累计脚本时长（当前时间-首次启动时间，不重置）
             local totalElapsed = tick() - firstStartTime
             local hours = math.floor(totalElapsed / 3600)
             local minutes = math.floor((totalElapsed % 3600) / 60)
             local seconds = math.floor(totalElapsed % 60)
             local scriptTime = string.format("%02d:%02d:%02d", hours, minutes, seconds)
 
-            -- 2. 系统时间与星期
             local year = os.date("%Y")
             local month = os.date("%m")
             local day = os.date("%d")
@@ -1002,7 +999,7 @@ textUpdateConnection = spawn(function()
             local weekStr
             if weekNum == "\48" then 
                 weekStr = "\230\151\165\227\128\145"
-            elseif weekNum == "\49" then  -- 修复原"\92"错误
+            elseif weekNum == "\49" then
                 weekStr = "\228\184\128\227\128\145"
             elseif weekNum == "\50" then 
                 weekStr = "\228\186\140\227\128\145"
@@ -1018,7 +1015,6 @@ textUpdateConnection = spawn(function()
             local dateStr = year .. "\229\185\180" .. month .. "\230\156\136" .. day .. "\230\151\165\32\227\128\144\229\145\168" .. weekStr
             local timeStr = os.date("%H:%M:%S")
 
-            -- 3. 季节、节日与时间段提示
             local season = getSeason(tonumber(month), tonumber(day))
             local festival = getFestival(tonumber(month), tonumber(day))
             local hour = tonumber(os.date("%H"))
@@ -3340,7 +3336,7 @@ function Library:Windowxgo(setup)
 		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
 	end
 	
-    local ScreenGui = Instance.new("ScreenGui")
+    local xgoGui: = Instance.new("xgoGui:")
     local MainFrame = Instance.new("Frame")
     local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
@@ -3435,13 +3431,13 @@ function Library:Windowxgo(setup)
         BackgroundImage2.Position = startPos
     end
 
-    ScreenGui.Parent = game.CoreGui
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.IgnoreGuiInset = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    xgoGui:.Parent = game.CoreGui
+    xgoGui:.ResetOnSpawn = false
+    xgoGui:.IgnoreGuiInset = false
+    xgoGui:.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
     MainFrame.Name = "MainFrame"
-    MainFrame.Parent = ScreenGui
+    MainFrame.Parent = xgoGui:
     MainFrame.Active = true
     MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -3743,12 +3739,10 @@ function Library:Windowxgo(setup)
         CloseButton.Text = "X"
         CloseButton.TextSize = 14
         CloseButton.MouseButton1Click:Connect(function()
-            -- 【仅新增】播放音效 + 等待音效播放完成
             CloseSound:Play()  
             Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
             task.wait(0.5)
-            ScreenGui:Destroy()
-            -- 新增：音效播放完后自动删除，避免内存占用
+            xgoGui::Destroy()
             task.spawn(function()
                 while CloseSound.Playing do task.wait(0.05) end
                 CloseSound:Destroy()
@@ -4098,7 +4092,7 @@ function Library:Windowxgo(setup)
 
 		Dropdown.Active = true;
 		Dropdown.Name = "Dropdown"
-		Dropdown.Parent = ScreenGui
+		Dropdown.Parent = xgoGui:
 		Dropdown.AnchorPoint = Vector2.new(0.5, 0.5)
 		Dropdown.BackgroundColor3 = Library.Colors.Default
 		Dropdown.BackgroundTransparency = 0.15
@@ -4375,7 +4369,7 @@ function Library:Windowxgo(setup)
 			local UIListLayout = Instance.new("UIListLayout")
 
 			Watermark.Name = "Watermark"
-			Watermark.Parent = ScreenGui;
+			Watermark.Parent = xgoGui:;
 			Watermark.AnchorPoint = Vector2.new(1, 0)
 			Watermark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			Watermark.BackgroundTransparency = 1.000
@@ -4526,7 +4520,7 @@ function Library:Windowxgo(setup)
 		local Tip = Instance.new("TextLabel")
 
 		Tip.Name = "Tip"
-		Tip.Parent = ScreenGui;
+		Tip.Parent = xgoGui:;
 		Tip.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		Tip.BackgroundTransparency = 1.000
 		Tip.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -5023,9 +5017,9 @@ local function SaveConfiguration()
     if useStudio then
         local parent = script.Parent or game.CoreGui
         if parent:FindFirstChild('configuration') then parent.configuration:Destroy() end
-        local ScreenGui = Instance.new("ScreenGui", parent)
-        ScreenGui.Name = 'configuration'
-        local TextBox = Instance.new("TextBox", ScreenGui)
+        local xgoGui: = Instance.new("xgoGui:", parent)
+        xgoGui:.Name = 'configuration'
+        local TextBox = Instance.new("TextBox", xgoGui:)
         TextBox.Size = UDim2.new(0, 800, 0, 50)
         TextBox.AnchorPoint = Vector2.new(0.5, 0)
         TextBox.Position = UDim2.new(0.5, 0, 0, 30)
@@ -8176,7 +8170,7 @@ end;
 	end;
 
 	function WindowLibrary:Destroy()
-		ScreenGui:Destroy();
+		xgoGui::Destroy();
 		BlurEle.Destroy();
 		return true;
 	end;
@@ -8348,7 +8342,7 @@ end;
 	local UIListLayout = Instance.new("UIListLayout")
 
 	NotificationBar.Name = "NotificationBar"
-	NotificationBar.Parent = ScreenGui
+	NotificationBar.Parent = xgoGui:
 	NotificationBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	NotificationBar.BackgroundTransparency = 1.000
 	NotificationBar.BorderColor3 = Color3.fromRGB(27, 42, 53)
