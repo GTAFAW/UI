@@ -2544,10 +2544,10 @@ function render(source)
 end
 
 --------------------------------------------------------------------------------------------------------
--- ===================== Library 工具库 =====================
-local Library = Library or {}
+-- ===================== 第一部分：Library 工具库 =====================
+local Library = Library or {} -- 确保 Library 表存在
 local TextService = game:GetService("TextService")
-Library.TweenService = game:GetService("TweenService")
+Library.TweenService = game:GetService("TweenService") -- 为 Library 挂载 TweenService
 local tableContents = {};
 local offLimits = {}
 local lines = {}
@@ -2614,7 +2614,7 @@ function Library:Tween(Frame :GuiObject , TweenInfo: TweenInfo , Properties : {}
 	return Instance
 end;
 
--- ===================== 第二部分：XGOHUB 启动界面逻辑 =====================
+-- ===================== 第二部分：XGOHUB 启动界面逻辑（确保动画完再执行后续） =====================
 repeat task.wait() until game:IsLoaded()
 
 local Players      = game:GetService("Players")
@@ -2687,11 +2687,51 @@ end)
 
 local parent  = getGuiParent()
 local running = true
-local isClosing = false -- 新增：控制彩虹文字关闭的标记
+local isClosing = false -- 控制彩虹文字关闭的标记
+local animationDoneSignal = Instance.new("BindableEvent") -- 动画完成信号
 
+-- ===================== 核心：动画完成后触发的后续逻辑（在这里写下一部分代码） =====================
+local function AfterAnimationDone()
+	print("启动界面动画已完全执行完毕，开始执行下一部分逻辑！")
+	
+	-- -------------- 替换为你的下一部分代码 --------------
+	-- 示例1：创建一个提示框
+	local tipGui = Instance.new("ScreenGui")
+	tipGui.Name = "NextStepTip"
+	tipGui.IgnoreGuiInset = true
+	tipGui.Parent = parent
+	
+	local tipFrame = Instance.new("Frame")
+	tipFrame.Size = UDim2.fromOffset(300, 100)
+	tipFrame.Position = UDim2.fromScale(0.5, 0.5)
+	tipFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	tipFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	tipFrame.BackgroundTransparency = 0.2
+	tipFrame.Parent = tipGui
+	
+	local tipLabel = Instance.new("TextLabel")
+	tipLabel.Size = UDim2.fromScale(0.9, 0.8)
+	tipLabel.Position = UDim2.fromScale(0.5, 0.5)
+	tipLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	tipLabel.BackgroundTransparency = 1
+	tipLabel.Text = "下一部分逻辑已启动！"
+	tipLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	tipLabel.TextScaled = true
+	tipLabel.Font = Enum.Font.GothamBold
+	tipLabel.Parent = tipFrame
+	
+	-- 示例2：执行其他函数（如果有的话）
+	-- YourNextFunction() -- 替换为你的函数名
+	-- ---------------------------------------------------
+end
+
+-- 监听动画完成信号，触发后续逻辑
+animationDoneSignal.Event:Connect(AfterAnimationDone)
+
+-- ===================== 启动界面UI创建 =====================
 local blur = Instance.new("BlurEffect")
 blur.Size = 8
-blur.Name = "ThunderIntroBlur"
+blur.Name = "UIunderIntroBlur"
 blur.Parent = Lighting
 
 local sg = Instance.new("ScreenGui")
@@ -2867,8 +2907,8 @@ task.spawn(function()
         sub.Text = ""
     end
 end)
--- ========================脚本认准:XGOHUB================================================
 
+-- ===================== 动画控制逻辑（关键：关闭动画完触发信号） =====================
 task.spawn(function()
 	while running do
 		grad.Rotation = (grad.Rotation + 1) % 360
@@ -3018,6 +3058,7 @@ local ringScale = Instance.new("UIScale"); ringScale.Scale = 1; ringScale.Parent
 local mainScale = Instance.new("UIScale"); mainScale.Scale = 1; mainScale.Parent = main
 
 
+-- 关键修改：关闭动画完全结束后，发送"动画完成"信号
 local function CloseAnimation()
 	if not running then return end
 	running = false 
@@ -3034,7 +3075,7 @@ local function CloseAnimation()
 	TweenService:Create(skipBtn, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
 	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play() -- 同步淡隐
 
-	-- 旋转+放大动画配置
+	-- 旋转+放大动画（等待完成）
 	local initialRotation = main.Rotation
 	local targetRotation = initialRotation + 360
 	local targetScale = 1.8
@@ -3044,9 +3085,9 @@ local function CloseAnimation()
 		{Rotation = targetRotation, Size = UDim2.fromOffset(CFG.size * targetScale, CFG.size * targetScale)}
 	)
 	rotateScaleTween:Play()
-	rotateScaleTween.Completed:Wait()
+	rotateScaleTween.Completed:Wait() -- 等待该动画结束
 
-	-- 方框展开+边框/背景淡化
+	-- 方框展开+边框/背景淡化（等待完成）
 	local expandTween = TweenService:Create(
 		main,
 		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -3055,32 +3096,36 @@ local function CloseAnimation()
 	TweenService:Create(rStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
 	TweenService:Create(gStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
 	TweenService:Create(bg,      TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
-	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play() -- 彩虹文字随背景一起淡隐
+	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 	expandTween:Play()
-	expandTween.Completed:Wait()
+	expandTween.Completed:Wait() -- 等待该动画结束
 
-	-- 清理UI
+	-- 清理UI（等待字幕容器销毁）
 	if sg and sg.Parent then 
 		for _, child in ipairs(sg:GetChildren()) do
 			if child ~= subtitleContainer then
 				child:Destroy()
 			end
 		end
-		task.spawn(function()
-			repeat task.wait(0.1) until not subtitleContainer or not subtitleContainer.Parent
-			sg:Destroy()
-		end)
+		-- 等待字幕容器完全销毁
+		repeat task.wait(0.1) until not subtitleContainer or not subtitleContainer.Parent
+		sg:Destroy()
 	end
 	if blur and blur.Parent then blur:Destroy() end
+
+	-- 所有动画和清理完成，触发后续逻辑
+	animationDoneSignal:Fire()
 end
 
--- 手动关闭触发
+-- 手动关闭触发（点击跳过按钮）
 skipBtn.MouseButton1Click:Connect(CloseAnimation)
 
--- 自动关闭触发
+-- 自动关闭触发（等待标题打字动画完成后，再等2秒）
 if CFG.duration and CFG.duration > 0 then
     task.spawn(function()
+        -- 等待标题打字完成
         while running and not isTitleTyped do task.wait(0.1) end
+        -- 再等待2秒（与原逻辑一致）
         task.wait(2)
         CloseAnimation()
     end)
@@ -3242,11 +3287,19 @@ local function PulseRing()
 	game:GetService("Debris"):AddItem(ring, 0.6)
 end
 
--- 修复未定义变量报错
+-- 修复未定义变量报错（保留原逻辑，避免空引用）
 local bubbleTween = nil
 local popSound = nil
 if bubbleTween then bubbleTween.Completed:Connect(PulseRing) end
 if popSound then popSound.Ended:Connect(PulseRing) end
+
+-- 防止动画完成信号重复触发，额外加一层销毁检测
+task.spawn(function()
+	repeat task.wait(0.5) until not sg or not sg.Parent
+	if animationDoneSignal and animationDoneSignal.Parent then
+		animationDoneSignal:Destroy()
+	end
+end)
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
 	setup = setup or {};
