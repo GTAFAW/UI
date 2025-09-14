@@ -183,7 +183,7 @@ blur.Name = "ThunderIntroBlur"
 blur.Parent = Lighting
 
 -- 主屏幕Th
-local sg = Instance.new("xgoGui")
+local sg = Instance.new("ScreenGui")
 sg.Name = "ThunderIntroMAX"
 sg.IgnoreGuiInset = true
 sg.ResetOnSpawn = false
@@ -801,7 +801,7 @@ if textUpdateConnection then task.cancel(textUpdateConnection) end
 if existingGui then existingGui:Destroy() end
 
 -- ===================== 【UI与功能逻辑】 =====================
-local a = Instance.new("xgoGui")
+local a = Instance.new("ScreenGui")
 a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
 a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -3336,7 +3336,7 @@ function Library:Windowxgo(setup)
 		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
 	end
 	
-    local xgoGui = Instance.new("xgoGui")
+    local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
@@ -3431,13 +3431,13 @@ function Library:Windowxgo(setup)
         BackgroundImage2.Position = startPos
     end
 
-    xgoGui.Parent = game.CoreGui
-    xgoGui.ResetOnSpawn = false
-    xgoGui.IgnoreGuiInset = false
-    xgoGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.IgnoreGuiInset = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
     MainFrame.Name = "MainFrame"
-    MainFrame.Parent = xgoGui
+    MainFrame.Parent = ScreenGui
     MainFrame.Active = true
     MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -3742,7 +3742,7 @@ function Library:Windowxgo(setup)
             CloseSound:Play()  
             Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
             task.wait(0.5)
-            xgoGui:Destroy()
+            ScreenGui:Destroy()
             task.spawn(function()
                 while CloseSound.Playing do task.wait(0.05) end
                 CloseSound:Destroy()
@@ -4092,7 +4092,7 @@ function Library:Windowxgo(setup)
 
 		Dropdown.Active = true;
 		Dropdown.Name = "Dropdown"
-		Dropdown.Parent = xgoGui
+		Dropdown.Parent = ScreenGui
 		Dropdown.AnchorPoint = Vector2.new(0.5, 0.5)
 		Dropdown.BackgroundColor3 = Library.Colors.Default
 		Dropdown.BackgroundTransparency = 0.15
@@ -4369,7 +4369,7 @@ function Library:Windowxgo(setup)
 			local UIListLayout = Instance.new("UIListLayout")
 
 			Watermark.Name = "Watermark"
-			Watermark.Parent = xgoGui;
+			Watermark.Parent = ScreenGui;
 			Watermark.AnchorPoint = Vector2.new(1, 0)
 			Watermark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			Watermark.BackgroundTransparency = 1.000
@@ -4520,7 +4520,7 @@ function Library:Windowxgo(setup)
 		local Tip = Instance.new("TextLabel")
 
 		Tip.Name = "Tip"
-		Tip.Parent = xgoGui;
+		Tip.Parent = ScreenGui;
 		Tip.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		Tip.BackgroundTransparency = 1.000
 		Tip.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -5017,9 +5017,9 @@ local function SaveConfiguration()
     if useStudio then
         local parent = script.Parent or game.CoreGui
         if parent:FindFirstChild('configuration') then parent.configuration:Destroy() end
-        local xgoGui = Instance.new("xgoGui", parent)
-        xgoGui.Name = 'configuration'
-        local TextBox = Instance.new("TextBox", xgoGui)
+        local ScreenGui = Instance.new("ScreenGui", parent)
+        ScreenGui.Name = 'configuration'
+        local TextBox = Instance.new("TextBox", ScreenGui)
         TextBox.Size = UDim2.new(0, 800, 0, 50)
         TextBox.AnchorPoint = Vector2.new(0.5, 0)
         TextBox.Position = UDim2.new(0.5, 0, 0, 30)
@@ -8170,7 +8170,7 @@ end;
 	end;
 
 	function WindowLibrary:Destroy()
-		xgoGui:Destroy();
+		ScreenGui:Destroy();
 		BlurEle.Destroy();
 		return true;
 	end;
@@ -8342,7 +8342,7 @@ end;
 	local UIListLayout = Instance.new("UIListLayout")
 
 	NotificationBar.Name = "NotificationBar"
-	NotificationBar.Parent = xgoGui
+	NotificationBar.Parent = ScreenGui
 	NotificationBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	NotificationBar.BackgroundTransparency = 1.000
 	NotificationBar.BorderColor3 = Color3.fromRGB(27, 42, 53)
