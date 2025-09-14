@@ -2542,103 +2542,639 @@ function render(source)
 
 	return stack
 end
-
 --------------------------------------------------------------------------------------------------------
+repeat task.wait() until game:IsLoaded()
 
-local tableContents = {};
-local offLimits = {}
-local lines = {}
+local Players      = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService   = game:GetService("RunService")
+local Lighting     = game:GetService("Lighting")
 
-function Library:GetTextSize(text,fontSize,font,custom_w)
-	return TextService:GetTextSize(text,fontSize,font,Vector2.new(custom_w or math.huge,math.huge))	
-end;
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
-function Library:HightlightSource(source)
+local CFG = {
+	size        = 270,
+	thickness   = 18,
+	corner      = 24,
+	duration    = 7,    
+	spinDeg     = 95,
+	spinTime    = 0.85,
+	breathMin   = 0.985,
+	breathMax   = 1.02,
+	bubbleCount = 4,
+	bubbleScale = 2.7,
+	bubbleGap   = 0.12,
+	creditText  = "-- XGO HUB --",
+	rainbowSeconds = 1.0, 
+	rainbowTurns   = 1.25,
+	subtitleText = "警告：使用第三方脚本可能导致账号封禁，操作前请谨慎!!！！ [免费脚本切勿圈钱]",
+	subtitleSpeed = 50,
+	subtitleY = 0.05,
+	subtitleSize = 16,
+	subtitleColor = Color3.fromRGB(255, 100, 100)
+}
 
-	return table.concat(render(source),'\n')
-end;
+local RED_LIGHT  = Color3.fromRGB(255, 120, 120)
+local RED_MAIN   = Color3.fromRGB(255, 50, 50)
+local RED_DEEP   = Color3.fromRGB(180, 20, 20)
+local CYAN_SOFT  = Color3.fromRGB(255, 160, 160)
+local BG_COLOR   = Color3.fromRGB(  5,   9,  20)
 
-function Library:InputButton(Frame :Frame)
-	local Button = Instance.new("TextButton")
+-- 工具函数：HSV转RGB
+local function HSVToRGB(h, s, v)
+    local r, g, b
+    local i = math.floor(h * 6)
+    local f = h * 6 - i
+    local p = v * (1 - s)
+    local q = v * (1 - f * s)
+    local t = v * (1 - (1 - f) * s)
+    i = i % 6
+    if i == 0 then r, g, b = v, t, p
+    elseif i == 1 then r, g, b = q, v, p
+    elseif i == 2 then r, g, b = p, v, t
+    elseif i == 3 then r, g, b = p, q, v
+    elseif i == 4 then r, g, b = t, p, v
+    else r, g, b = v, p, q end
+    return Color3.new(r, g, b)
+end
 
-	Button.Name = "Button"
-	Button.Parent = Frame
-	Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Button.BackgroundTransparency = 1.000
-	Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Button.BorderSizePixel = 0
-	Button.Size = UDim2.new(1, 0, 1, 0)
-	Button.ZIndex = 12
-	Button.Font = Enum.Font.SourceSans
-	Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-	Button.TextSize = 14.000
-	Button.TextTransparency = 1.000	
+local function getGuiParent()
+	local ok, root = pcall(function() return (gethui and gethui()) end)
+	if ok and root then return root end
+	ok, root = pcall(function() return (get_hidden_gui and get_hidden_gui()) end)
+	if ok and root then return root end
+	ok, root = pcall(function() return (gethiddengui and gethiddengui()) end)
+	if ok and root then return root end
+	local pg = LocalPlayer:FindFirstChildOfClass("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 5)
+	return pg or game:GetService("CoreGui")
+end
 
-	return Button;
-end;
+pcall(function()
+	if _G.ThunderIntro_Stop then _G.ThunderIntro_Stop() end
+end)
 
-function Library:MakeDrop(Frame :Frame , Hover :UIStroke, Color :Color3)
-	local CloneColor = Hover.Color;
+local parent  = getGuiParent()
+local running = true
 
-	Frame.MouseEnter:Connect(function()
-		Library.TweenService:Create(Hover , TweenInfo.new(0.1), {
-			Color = Color,
-		}):Play();
-	end);
+local blur = Instance.new("BlurEffect")
+blur.Size = 8
+blur.Name = "ThunderIntroBlur"
+blur.Parent = Lighting
 
-	Frame.MouseLeave:Connect(function()
-		Library.TweenService:Create(Hover , TweenInfo.new(0.1), {
-			Color = CloneColor,
-		}):Play();
-	end)
-end;
+local sg = Instance.new("ScreenGui")
+sg.Name = "ThunderIntroMAX"
+sg.IgnoreGuiInset = true
+sg.ResetOnSpawn = false
+pcall(function() if syn and syn.protect_gui then syn.protect_gui(sg) end end)
+sg.Parent = parent
 
-function Library:DelayTween(belay :number , Frame: GuiObject , Info: TweenInfo, Prop : {any})
-	local Instance = Library.TweenService.Create(Library.TweenService , Frame , Info ,Prop);
-	return task.delay(belay ,Instance.Play,Instance);
-end;
+local bg = Instance.new("Frame")
+bg.Size = UDim2.fromScale(1,1)
+bg.BackgroundColor3 = BG_COLOR
+bg.BackgroundTransparency = 0.25
+bg.Parent = sg
 
-function Library:Tween(Frame :GuiObject , TweenInfo: TweenInfo , Properties : {})
-	if Library.PerformanceMode then
-		table.foreach(Properties,function(name,value)
-			Frame[name] = value;
+-- 滚动字幕
+local subtitleContainer = Instance.new("Frame")
+subtitleContainer.Size = UDim2.fromScale(1, 0.08)
+subtitleContainer.Position = UDim2.fromScale(0, CFG.subtitleY)
+subtitleContainer.BackgroundTransparency = 1
+subtitleContainer.ClipsDescendants = true
+subtitleContainer.ZIndex = 10
+subtitleContainer.Parent = sg
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Text = CFG.subtitleText
+subtitle.TextColor3 = CFG.subtitleColor
+subtitle.Font = Enum.Font.GothamBold
+subtitle.TextSize = CFG.subtitleSize
+subtitle.BackgroundTransparency = 1
+subtitle.AnchorPoint = Vector2.new(0, 0.5)
+subtitle.Position = UDim2.new(0, sg.AbsoluteSize.X, 0.5, 0)
+subtitle.TextTransparency = 0
+subtitle.Parent = subtitleContainer
+
+-- 字幕滚动逻辑
+task.wait(0.05)
+local screenWidth = sg.AbsoluteSize.X
+local textWidth = subtitle.TextBounds.X <= 0 and (string.len(CFG.subtitleText) * CFG.subtitleSize * 0.5) or subtitle.TextBounds.X
+local speed = CFG.subtitleSpeed
+local isSubtitleFinished = false
+
+task.spawn(function()
+	while not isSubtitleFinished do
+		local currentX = subtitle.Position.X.Offset - (speed * RunService.Heartbeat:Wait())
+		if currentX < -textWidth then
+			isSubtitleFinished = true
+			break
+		end
+		subtitle.Position = UDim2.new(0, currentX, 0.5, 0)
+	end
+
+	TweenService:Create(subtitle, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+	task.wait(0.5)
+	subtitle:Destroy()
+	subtitleContainer:Destroy()
+end)
+
+local main = Instance.new("Frame")
+main.Size = UDim2.fromOffset(CFG.size, CFG.size)
+main.AnchorPoint = Vector2.new(0.5,0.5)
+main.Position = UDim2.fromScale(0.5,0.5)
+main.BackgroundTransparency = 1
+main.ZIndex = 5
+main.Parent = sg
+
+local ring = Instance.new("Frame")
+ring.Size = UDim2.fromScale(1,1)
+ring.BackgroundTransparency = 1
+ring.Parent = main
+local rCorner = Instance.new("UICorner"); rCorner.CornerRadius = UDim.new(0, CFG.corner); rCorner.Parent = ring
+local rStroke = Instance.new("UIStroke")
+rStroke.Thickness = CFG.thickness
+rStroke.Color = RED_MAIN
+pcall(function() rStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
+rStroke.Parent = ring
+
+local glowRing = Instance.new("Frame")
+glowRing.Size = UDim2.fromScale(1,1)
+glowRing.BackgroundTransparency = 1
+glowRing.ZIndex = -1
+glowRing.Parent = main
+local gCorner = Instance.new("UICorner"); gCorner.CornerRadius = UDim.new(0, CFG.corner); gCorner.Parent = glowRing
+local gStroke = Instance.new("UIStroke")
+gStroke.Thickness = CFG.thickness * 1.7
+gStroke.Color = CYAN_SOFT
+gStroke.Transparency = 0.7
+pcall(function() gStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
+gStroke.Parent = glowRing
+
+local inner = Instance.new("Frame")
+inner.Size = UDim2.fromOffset(CFG.size - CFG.thickness*2, CFG.size - CFG.thickness*2)
+inner.AnchorPoint = Vector2.new(0.5,0.5)
+inner.Position = UDim2.fromScale(0.5,0.5)
+inner.BackgroundTransparency = 1
+inner.Parent = main
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.fromScale(0.9,0.4)
+title.AnchorPoint = Vector2.new(0.5,0.5)
+title.Position = UDim2.fromScale(0.5,0.40)
+title.BackgroundTransparency = 1
+title.Text = ""
+title.TextScaled = true
+title.Font = Enum.Font.GothamBlack
+title.TextColor3 = RED_MAIN
+title.TextTransparency = 0
+title.ZIndex = 6
+title.Parent = inner
+
+local grad = Instance.new("UIGradient")
+grad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.00, RED_LIGHT),
+    ColorSequenceKeypoint.new(0.50, RED_MAIN),
+    ColorSequenceKeypoint.new(1.00, RED_DEEP)
+}
+grad.Rotation = 25
+grad.Parent = title
+
+local longTitleText = "使用脚本请承担风险\n「封号概不负责」"
+local typeDelay = 0.2
+local isTitleTyped = false
+
+task.spawn(function()
+    task.wait(0.3)
+    for i = 1, #longTitleText do
+        if not running then break end
+        title.Text = string.sub(longTitleText, 1, i)
+        task.wait(typeDelay)
+    end
+    isTitleTyped = true
+end)
+
+-- ===================== 核心：XGOHUB 逐字实时彩虹色 =====================
+local sub = Instance.new("TextLabel")
+sub.Size = UDim2.fromScale(0.6,0.2)
+sub.AnchorPoint = Vector2.new(0.5,0.5)
+sub.Position = UDim2.fromScale(0.5,0.65)
+sub.BackgroundTransparency = 1
+sub.Text = "XGOHUB"
+sub.TextScaled = true
+sub.Font = Enum.Font.GothamMedium
+sub.TextTransparency = 1 
+sub.ZIndex = 6
+sub.Parent = inner
+
+-- 原彩虹文字实时更新逻辑中，在循环前新增标记
+task.spawn(function()
+    local text = sub.Text 
+    local charCount = string.len(text) 
+    local hueOffset = 0 
+    local isClosing = false -- 关闭状态标记
+
+    task.wait(0.3 + 0.25)
+
+    while running and not isClosing do -- 循环条件增加“未关闭”
+        hueOffset = (hueOffset + 0.01) % 1 
+        local richText = "" 
+        for i = 1, charCount do
+            local charHue = (hueOffset + (i - 1) / charCount) % 1
+            local charColor = HSVToRGB(charHue, 1, 1) 
+            local r = math.floor(charColor.R * 255)
+            local g = math.floor(charColor.G * 255)
+            local b = math.floor(charColor.B * 255)
+            local hexColor = string.format("#%02X%02X%02X", r, g, b)
+            richText = richText .. string.format('<font color="%s">%s</font>', hexColor, string.sub(text, i, i))
+        end
+        sub.RichText = true 
+        sub.Text = richText
+        RunService.Heartbeat:Wait()
+    end
+
+    if isClosing then
+        sub.Text = ""
+    end
+end)
+-- ========================脚本认准:XGOHUB================================================
+task.spawn(function()
+	while running do
+		grad.Rotation = (grad.Rotation + 1) % 360
+		task.wait(0.02)
+	end
+end)
+
+local orb = Instance.new("Frame")
+orb.AnchorPoint = Vector2.new(0.5,0.5)
+orb.Position = UDim2.fromScale(0.5,0.65)
+orb.Size = UDim2.fromOffset(120,120)
+orb.BackgroundColor3 = CYAN_SOFT
+orb.BackgroundTransparency = 0.9
+orb.ZIndex = -1
+orb.Parent = inner
+local orbCorner = Instance.new("UICorner"); orbCorner.CornerRadius = UDim.new(1,0); orbCorner.Parent = orb
+
+local function Spark()
+	local s = Instance.new("Frame")
+	s.Size = UDim2.fromOffset(2,2)
+	s.AnchorPoint = Vector2.new(0.5,0.5)
+	s.Position = orb.Position
+	s.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	s.BackgroundTransparency = 0
+	s.ZIndex = 5
+	s.Parent = inner
+
+	local goalPos = orb.Position + UDim2.fromOffset(math.random(-60,60), math.random(-60,60))
+	TweenService:Create(s, TweenInfo.new(0.25), {Position = goalPos, BackgroundTransparency = 1}):Play()
+	game:GetService("Debris"):AddItem(s, 0.3)
+end
+
+for i=1,12 do task.delay(i*0.01, Spark) end
+
+local function CameraShake(ui)
+	local orig = ui.Position
+	for i = 1, 4 do
+		ui.Position = orig + UDim2.fromOffset(math.random(-4,4), math.random(-4,4))
+		task.wait(0.04)
+	end
+	ui.Position = orig
+end
+CameraShake(main)
+
+local credit = Instance.new("TextLabel")
+credit.Size = UDim2.fromOffset(220,20)
+credit.AnchorPoint = Vector2.new(1,1)
+credit.Position = UDim2.fromScale(0.985,0.985)
+credit.BackgroundTransparency = 1
+credit.Text = CFG.creditText
+credit.TextColor3 = Color3.fromRGB(190,205,235)
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 12
+credit.TextTransparency = 1
+credit.ZIndex = 6
+credit.Parent = sg
+
+local skipBtn = Instance.new("TextButton")
+skipBtn.Position = UDim2.fromScale(0.99, 0.985)
+skipBtn.Size = UDim2.fromOffset(60, 20)
+skipBtn.AnchorPoint = Vector2.new(1, 1)
+skipBtn.BackgroundTransparency = 1
+skipBtn.Text = "「点击此处跳过」"
+skipBtn.TextColor3 = Color3.new(1, 1, 1)
+skipBtn.Font = Enum.Font.Gotham
+skipBtn.TextSize = 12
+skipBtn.TextTransparency = 1
+skipBtn.ZIndex = 10
+skipBtn.Parent = sg
+
+task.spawn(function()
+    task.wait(0.55 + 0.6)
+    local scaleInfo = TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+    while running do
+        TweenService:Create(skipBtn, scaleInfo, {Size = UDim2.fromOffset(60*1.2, 20*1.2)}):Play()
+        task.wait(1.2)
+        TweenService:Create(skipBtn, scaleInfo, {Size = UDim2.fromOffset(60, 20)}):Play()
+        task.wait(1.2)
+    end
+end)
+
+task.spawn(function()
+    task.wait(0.55)
+    TweenService:Create(skipBtn, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {TextTransparency = 0.2}):Play()
+end)
+
+skipBtn.MouseEnter:Connect(function()
+    if running then 
+        TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+        TweenService:Create(skipBtn, TweenInfo.new(0.2), {Size = UDim2.fromOffset(60*1.3, 20*1.3)}):Play()
+    end
+end)
+
+skipBtn.MouseLeave:Connect(function()
+    if running then 
+        TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0.2}):Play()
+        local currentScale = skipBtn.Size.X.Offset / 60
+        TweenService:Create(skipBtn, TweenInfo.new(0.2), {Size = UDim2.fromOffset(60*currentScale, 20*currentScale)}):Play()
+    end
+end)
+
+local sweep = Instance.new("Frame")
+sweep.BackgroundTransparency = 1
+sweep.Size = UDim2.fromScale(1.2,1.2)
+sweep.AnchorPoint = Vector2.new(0.5,0.5)
+sweep.Position = UDim2.fromScale(-0.2,0.5)
+sweep.Rotation = -15
+sweep.ZIndex = 8
+sweep.Parent = inner
+local sweepGrad = Instance.new("UIGradient")
+sweepGrad.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0.00, Color3.new(1,1,1)),
+	ColorSequenceKeypoint.new(0.50, Color3.new(1,1,1)),
+	ColorSequenceKeypoint.new(1.00, Color3.new(1,1,1)),
+}
+sweepGrad.Transparency = NumberSequence.new{
+	NumberSequenceKeypoint.new(0.00,1.0),
+	NumberSequenceKeypoint.new(0.48,0.25),
+	NumberSequenceKeypoint.new(0.52,0.00),
+	NumberSequenceKeypoint.new(0.56,0.25),
+	NumberSequenceKeypoint.new(1.00,1.0),
+}
+sweepGrad.Parent = sweep
+
+local bubbleFolder = Instance.new("Folder")
+bubbleFolder.Name = "Bubbles"
+bubbleFolder.Parent = main
+
+local function makeBubble()
+	local b = Instance.new("Frame")
+	b.AnchorPoint = Vector2.new(0.5,0.5)
+	b.Position = UDim2.fromScale(0.5,0.5)
+	b.Size = UDim2.fromOffset(1,1)
+	b.BackgroundTransparency = 1
+	b.ZIndex = -2
+	b.Parent = bubbleFolder
+	local s = Instance.new("UIStroke")
+	s.Thickness = 3
+	s.Color = CYAN_SOFT
+	s.Transparency = 0.1
+	s.Parent = b
+	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(1,999); c.Parent = b
+	return b, s
+end
+
+local ringScale = Instance.new("UIScale"); ringScale.Scale = 1; ringScale.Parent = ring
+local mainScale = Instance.new("UIScale"); mainScale.Scale = 1; mainScale.Parent = main
+
+
+local function CloseAnimation()
+	if not running then return end
+	running = false 
+
+	-- 清除文字
+	isClosing = true
+	title.Text = "" 
+	credit.Text = "" 
+	skipBtn.Text = "" 
+	sub.Text = ""
+
+	TweenService:Create(title,  TweenInfo.new(0.1), {TextTransparency = 1}):Play()
+	TweenService:Create(credit, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
+	TweenService:Create(skipBtn, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
+	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play() -- 同步淡隐
+
+	-- 旋转+放大动画配置
+	local initialRotation = main.Rotation
+	local targetRotation = initialRotation + 360
+	local targetScale = 1.8
+	local rotateScaleTween = TweenService:Create(
+		main,
+		TweenInfo.new(1.0, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{Rotation = targetRotation, Size = UDim2.fromOffset(CFG.size * targetScale, CFG.size * targetScale)}
+	)
+	rotateScaleTween:Play()
+	rotateScaleTween.Completed:Wait()
+
+	-- 方框展开+边框/背景淡化
+	local expandTween = TweenService:Create(
+		main,
+		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{Size = UDim2.fromScale(2, 2)}
+	)
+	TweenService:Create(rStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
+	TweenService:Create(gStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
+	TweenService:Create(bg,      TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
+	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play() -- 彩虹文字随背景一起淡隐
+	expandTween:Play()
+	expandTween.Completed:Wait()
+
+	-- 清理UI
+	if sg and sg.Parent then 
+		for _, child in ipairs(sg:GetChildren()) do
+			if child ~= subtitleContainer then
+				child:Destroy()
+			end
+		end
+		task.spawn(function()
+			repeat task.wait(0.1) until not subtitleContainer or not subtitleContainer.Parent
+			sg:Destroy()
 		end)
+	end
+	if blur and blur.Parent then blur:Destroy() end
+end
 
-		return;
-	end;
+-- 手动关闭触发
+skipBtn.MouseButton1Click:Connect(CloseAnimation)
 
-	local Instance = Library.TweenService:Create(Frame,TweenInfo,Properties);
-	Instance:Play();
-	return Instance
-end;
-    local blurEffect = Instance.new((function()
-        local a={895,1441,1558,1519,934,1363,1363,1350,1324,1545};
-        local b='';
-        for i=1,#a do 
-            b=b..string.char((a[i]-37)/13);
-        end;
-        return b;
-    end)())
-    local TweenService = game:GetService((function()
-        local a={1129,1584,1350,1350,1467,1116,1350,1519,1571,1402,1324,1350};
-        local b='';
-        for i=1,#a do 
-            b=b..string.char((a[i]-37)/13);
-        end;
-        return b;
-    end)())
-    blurEffect.Parent = game.Lighting
-    blurEffect.Size = 60
+-- 自动关闭触发
+if CFG.duration and CFG.duration > 0 then
+    task.spawn(function()
+        while running and not isTitleTyped do task.wait(0.1) end
+        task.wait(2)
+        CloseAnimation()
+    end)
+end
 
-    local blurTweenInfo = TweenInfo.new(4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local blurTween = TweenService:Create(blurEffect, blurTweenInfo, {Size = 0})
-    
-    blurTween:Play()
+_G.ThunderIntro_Stop = CloseAnimation
 
-    coroutine.resume(coroutine.create(function()
-        wait(2.5)
-        blurEffect:Destroy()
-    end))
+local ORIG = {
+	rStroke = rStroke.Color,
+	gStroke = gStroke.Color,
+	titleGradient = grad.Color,
+	sub = sub.TextColor3,
+	orb = orb.BackgroundColor3
+}
+
+local function HSV(h, s, v) return Color3.fromHSV(h % 1, s, v) end
+
+local function setTitleGradientFromHue(h)
+	grad.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0.00, HSV(h,     1,1)),
+		ColorSequenceKeypoint.new(0.50, HSV(h+0.15,1,1)),
+		ColorSequenceKeypoint.new(1.00, HSV(h+0.30,1,1))
+	}
+end
+
+local function RainbowBurst()
+	local dur  = math.max(0.099, CFG.rainbowSeconds)
+	local turns = CFG.rainbowTurns
+	local start = os.clock()
+	while running do
+		local t = os.clock() - start
+		if t > dur then break end
+		local u = t / dur
+		local h = u * turns
+		rStroke.Color = HSV(h, 1, 1)
+		gStroke.Color = HSV(h+0.08, 1, 1)
+		setTitleGradientFromHue(h)
+		orb.BackgroundColor3 = HSV(h+0.12, 0.85, 1)
+		RunService.Heartbeat:Wait()
+	end
+
+	rStroke.Color = ORIG.rStroke
+	gStroke.Color = ORIG.gStroke
+	grad.Color    = ORIG.titleGradient
+	orb.BackgroundColor3 = ORIG.orb
+end
+
+task.spawn(RainbowBurst)
+
+task.spawn(function()
+	local flash = Instance.new("Frame")
+	flash.Size = UDim2.fromScale(1,1)
+	flash.BackgroundColor3 = Color3.new(1,1,1)
+	flash.BackgroundTransparency = 1
+	flash.ZIndex = 999
+	flash.Parent = sg
+	local fIn  = TweenService:Create(flash, TweenInfo.new(0.05), {BackgroundTransparency = 0.55})
+	local fOut = TweenService:Create(flash, TweenInfo.new(0.12), {BackgroundTransparency = 1})
+	fIn:Play(); fIn.Completed:Wait(); fOut:Play(); fOut.Completed:Wait()
+	flash:Destroy()
+end)
+
+task.spawn(function()
+	while running do
+		local t1 = TweenService:Create(ring,     TweenInfo.new(CFG.spinTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Rotation = ring.Rotation + CFG.spinDeg})
+		local t2 = TweenService:Create(glowRing, TweenInfo.new(CFG.spinTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Rotation = glowRing.Rotation + CFG.spinDeg})
+		t1:Play(); t2:Play(); t1.Completed:Wait()
+	end
+end)
+
+task.spawn(function()
+	while running do
+		TweenService:Create(ringScale, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Scale = CFG.breathMax}):Play()
+		task.wait(1.2)
+		TweenService:Create(ringScale, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {Scale = CFG.breathMin}):Play()
+		task.wait(1.2)
+	end
+end)
+
+task.spawn(function()
+	task.wait(0.3)
+	TweenService:Create(title,  TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+	task.wait(0.25)
+	-- 彩虹文字的透明度动画触发
+	TweenService:Create(sub,    TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+	TweenService:Create(credit, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0.2}):Play()
+end)
+
+task.spawn(function()
+	while running do
+		local up = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8, Size = UDim2.fromOffset(140,140)})
+		local dn = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {BackgroundTransparency = 0.9, Size = UDim2.fromOffset(120,120)})
+		up:Play(); up.Completed:Wait(); dn:Play(); dn.Completed:Wait()
+	end
+end)
+
+local function BubblePop()
+	local baseT = bg.BackgroundTransparency
+	local flashDown = TweenService:Create(bg, TweenInfo.new(0.08, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = math.max(0, baseT - 0.12)})
+	local flashUp   = TweenService:Create(bg, TweenInfo.new(0.18, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {BackgroundTransparency = baseT})
+	flashDown:Play(); flashDown.Completed:Wait(); flashUp:Play()
+
+	local oldThick = rStroke.Thickness
+	local oldColor = rStroke.Color
+	local boostA = TweenService:Create(rStroke, TweenInfo.new(0.08, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Thickness = oldThick * 1.35, Color = CYAN_SOFT})
+	local boostB = TweenService:Create(rStroke, TweenInfo.new(0.22, Enum.EasingStyle.Quad,  Enum.EasingDirection.In),  {Thickness = oldThick, Color = oldColor})
+	boostA:Play(); boostA.Completed:Wait(); boostB:Play()
+
+	local thumpUp = TweenService:Create(mainScale, TweenInfo.new(0.08, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1.03})
+	local thumpDn = TweenService:Create(mainScale, TweenInfo.new(0.20, Enum.EasingStyle.Quad,  Enum.EasingDirection.In),  {Scale = 1})
+	thumpUp:Play(); thumpUp.Completed:Wait(); thumpDn:Play()
+
+	for i = 1, CFG.bubbleCount do
+		task.spawn(function()
+			local b, s = makeBubble()
+			local grow = TweenService:Create(b, TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(CFG.size * CFG.bubbleScale, CFG.size * CFG.bubbleScale)})
+			local fade = TweenService:Create(s, TweenInfo.new(0.6, Enum.EasingStyle.Sine,  Enum.EasingDirection.Out), {Transparency = 1})
+			grow:Play(); fade:Play(); grow.Completed:Wait()
+			b:Destroy()
+		end)
+		task.wait(CFG.bubbleGap)
+	end
+end
+
+task.spawn(function()
+	BubblePop()
+end)
+
+task.spawn(function()
+	task.wait(0.25)
+	local flash = Instance.new("Frame")
+	flash.Size = UDim2.fromScale(1,1)
+	flash.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	flash.BackgroundTransparency = 1
+	flash.ZIndex = -5
+	flash.Parent = sg
+	local fIn  = TweenService:Create(flash, TweenInfo.new(0.08, Enum.EasingStyle.Sine,  Enum.EasingDirection.Out), {BackgroundTransparency = 0.6})
+	local fOut = TweenService:Create(flash, TweenInfo.new(0.20, Enum.EasingStyle.Sine,  Enum.EasingDirection.In),  {BackgroundTransparency = 1})
+	fIn:Play(); fIn.Completed:Wait(); fOut:Play(); fOut.Completed:Wait()
+	flash:Destroy()
+end)
+
+task.spawn(function()
+	task.wait(0.55)
+	TweenService:Create(sweep, TweenInfo.new(1.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(1.2, 0.5)}):Play()
+end)
+
+local function PulseRing()
+	local ring = main:Clone()
+	ring.Size = UDim2.fromOffset(0, 0)
+	ring.BackgroundTransparency = 0.5
+	ring.Parent = inner
+
+	TweenService:Create(ring, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {
+		Size = UDim2.fromOffset(300, 300),
+		BackgroundTransparency = 1
+	}):Play()
+
+	game:GetService("Debris"):AddItem(ring, 0.6)
+end
+
+-- 修复未定义变量报错
+local bubbleTween = nil
+local popSound = nil
+if bubbleTween then bubbleTween.Completed:Connect(PulseRing) end
+if popSound then popSound.Ended:Connect(PulseRing) end
+
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
 	setup = setup or {};
