@@ -2542,7 +2542,79 @@ function render(source)
 
 	return stack
 end
+
 --------------------------------------------------------------------------------------------------------
+-- ===================== Library 工具库 =====================
+local Library = Library or {}
+local TextService = game:GetService("TextService")
+Library.TweenService = game:GetService("TweenService")
+local tableContents = {};
+local offLimits = {}
+local lines = {}
+
+function Library:GetTextSize(text,fontSize,font,custom_w)
+	return TextService:GetTextSize(text,fontSize,font,Vector2.new(custom_w or math.huge,math.huge))	
+end;
+
+function Library:HightlightSource(source)
+	return table.concat(render(source),'\n')
+end;
+
+function Library:InputButton(Frame :Frame)
+	local Button = Instance.new("TextButton")
+
+	Button.Name = "Button"
+	Button.Parent = Frame
+	Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Button.BackgroundTransparency = 1.000
+	Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Button.BorderSizePixel = 0
+	Button.Size = UDim2.new(1, 0, 1, 0)
+	Button.ZIndex = 12
+	Button.Font = Enum.Font.SourceSans
+	Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+	Button.TextSize = 14.000
+	Button.TextTransparency = 1.000	
+
+	return Button;
+end;
+
+function Library:MakeDrop(Frame :Frame , Hover :UIStroke, Color :Color3)
+	local CloneColor = Hover.Color;
+
+	Frame.MouseEnter:Connect(function()
+		Library.TweenService:Create(Hover , TweenInfo.new(0.1), {
+			Color = Color,
+		}):Play();
+	end);
+
+	Frame.MouseLeave:Connect(function()
+		Library.TweenService:Create(Hover , TweenInfo.new(0.1), {
+			Color = CloneColor,
+		}):Play();
+	end)
+end;
+
+function Library:DelayTween(belay :number , Frame: GuiObject , Info: TweenInfo, Prop : {any})
+	local Instance = Library.TweenService.Create(Library.TweenService , Frame , Info ,Prop);
+	return task.delay(belay ,Instance.Play,Instance);
+end;
+
+function Library:Tween(Frame :GuiObject , TweenInfo: TweenInfo , Properties : {})
+	if Library.PerformanceMode then
+		table.foreach(Properties,function(name,value)
+			Frame[name] = value;
+		end)
+
+		return;
+	end;
+
+	local Instance = Library.TweenService:Create(Frame,TweenInfo,Properties);
+	Instance:Play();
+	return Instance
+end;
+
+-- ===================== 第二部分：XGOHUB 启动界面逻辑 =====================
 repeat task.wait() until game:IsLoaded()
 
 local Players      = game:GetService("Players")
@@ -2615,6 +2687,7 @@ end)
 
 local parent  = getGuiParent()
 local running = true
+local isClosing = false -- 新增：控制彩虹文字关闭的标记
 
 local blur = Instance.new("BlurEffect")
 blur.Size = 8
@@ -2765,16 +2838,15 @@ sub.TextTransparency = 1
 sub.ZIndex = 6
 sub.Parent = inner
 
--- 原彩虹文字实时更新逻辑中，在循环前新增标记
+-- 彩虹文字实时更新逻辑
 task.spawn(function()
     local text = sub.Text 
     local charCount = string.len(text) 
     local hueOffset = 0 
-    local isClosing = false -- 关闭状态标记
 
     task.wait(0.3 + 0.25)
 
-    while running and not isClosing do -- 循环条件增加“未关闭”
+    while running and not isClosing do -- 加入 isClosing 控制关闭
         hueOffset = (hueOffset + 0.01) % 1 
         local richText = "" 
         for i = 1, charCount do
@@ -2796,6 +2868,7 @@ task.spawn(function()
     end
 end)
 -- ========================脚本认准:XGOHUB================================================
+
 task.spawn(function()
 	while running do
 		grad.Rotation = (grad.Rotation + 1) % 360
@@ -2948,9 +3021,9 @@ local mainScale = Instance.new("UIScale"); mainScale.Scale = 1; mainScale.Parent
 local function CloseAnimation()
 	if not running then return end
 	running = false 
+	isClosing = true -- 触发彩虹文字关闭逻辑
 
 	-- 清除文字
-	isClosing = true
 	title.Text = "" 
 	credit.Text = "" 
 	skipBtn.Text = "" 
@@ -3174,7 +3247,6 @@ local bubbleTween = nil
 local popSound = nil
 if bubbleTween then bubbleTween.Completed:Connect(PulseRing) end
 if popSound then popSound.Ended:Connect(PulseRing) end
-
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
 	setup = setup or {};
