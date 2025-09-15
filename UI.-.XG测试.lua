@@ -2444,503 +2444,6 @@ function Library:Windowxgo(setup)
 		task.wait(1);       
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
--- 卡密系统设置 - 整合完整视觉效果
-local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
-local HttpService = game:GetService("HttpService")
-
--- 假设 Library 已提前定义（含 TweenLibrary、Colors、MakeDrop 等方法）
--- 若需单独使用，需确保 Library 相关方法已实现
-
--- 1. 核心元素创建（保留原结构，新增视觉效果相关配置）
-local AuthFunction = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-local TextBox = Instance.new("TextBox")
-local DropShadow = Instance.new("ImageLabel")
-local UIStroke = Instance.new("UIStroke") -- 边框
-local UIStroke_2 = Instance.new("UIStroke")
-local GetButton = Instance.new("Frame")
-local DropShadow_2 = Instance.new("ImageLabel")
-local UIStroke_3 = Instance.new("UIStroke")
-local GTitle = Instance.new("TextLabel")
-local GButton = Instance.new("TextButton")
-local LoginButton = Instance.new("Frame")
-local DropShadow_3 = Instance.new("ImageLabel")
-local UIStroke_4 = Instance.new("UIStroke")
-local LTitle = Instance.new("TextLabel")
-local LButton = Instance.new("TextButton")
-local CloseButton = Instance.new("TextButton")
-local CloseSound = Instance.new("Sound")
--- 新增粒子特效（淡出时增强视觉）
-local ParticleEmitter = Instance.new("ParticleEmitter")
-
--- 2. 元素基础属性配置（保留原配置，补充视觉相关参数）
-AuthFunction.Name = "AuthFunction"
-AuthFunction.Parent = MainFrame
-AuthFunction.Active = true
-AuthFunction.AnchorPoint = Vector2.new(0.5, 0.5)
-AuthFunction.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-AuthFunction.BackgroundTransparency = 1.000
-AuthFunction.BorderColor3 = Color3.fromRGB(0, 0, 0)
-AuthFunction.BorderSizePixel = 0
-AuthFunction.Position = UDim2.new(0.5, 0, -1.5, 0)
-AuthFunction.Size = UDim2.new(1, 0, 1, 0)
-
--- 标题文本（新增淡入动画延迟，让过渡更有层次）
-Title.Name = "Title"
-Title.Parent = AuthFunction
-Title.AnchorPoint = Vector2.new(0.5, 0.5)
-Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundTransparency = 1.000
-Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Title.BorderSizePixel = 0
-Title.Position = UDim2.new(0.5, 0, 0.100000001, 0)
-Title.Size = UDim2.new(0.899999976, 0, 0.100000001, 0)
-Title.Font = Enum.Font.Gotham
-Title.Text = setup.KeySystemInfo.Title
-Title.TextColor3 = Library.Colors.TextColor
-Title.TextScaled = true
-Title.TextSize = 14.000
-Title.TextStrokeColor3 = Library.Colors.TextColor
-Title.TextStrokeTransparency = 0.950
-Title.TextWrapped = true
-Title.RichText = true
-Title.TextTransparency = 1 -- 初始透明，后续淡入
-
--- 输入框（新增输入时边框高亮动画）
-TextBox.Parent = AuthFunction
-TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
-TextBox.BackgroundColor3 = Library.Colors.Default
-TextBox.BackgroundTransparency = 0.250
-TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TextBox.BorderSizePixel = 0
-TextBox.Position = UDim2.new(0.5, 0, 0.349999994, 0)
-TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
-TextBox.ZIndex = 5
-TextBox.ClearTextOnFocus = false
-TextBox.Font = Enum.Font.SourceSans
-TextBox.PlaceholderText = "请输入卡密"
-TextBox.Text = ""
-TextBox.TextColor3 = Library.Colors.TextColor
-TextBox.TextSize = 13.000
-TextBox.TextStrokeColor3 = Library.Colors.TextColor
-TextBox.TextStrokeTransparency = 0.950
-TextBox.TextTransparency = 0.250
-TextBox.TextWrapped = true
-TextBox.TextTransparency = 1 -- 初始透明，后续淡入
-
--- 输入框阴影（保留原配置）
-DropShadow.Name = "DropShadow"
-DropShadow.Parent = TextBox
-DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-DropShadow.BackgroundTransparency = 1.000
-DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-DropShadow.Position = UDim2.new(0, -5, 0, -5)
-DropShadow.Size = UDim2.new(1, 10, 1, 10)
-DropShadow.ZIndex = 4
-DropShadow.Image = "rbxassetid://297694300"
-DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-DropShadow.ImageTransparency = 0.500
-DropShadow.ScaleType = Enum.ScaleType.Slice
-DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-DropShadow.SliceScale = 0.050
-DropShadow.ImageTransparency = 1 -- 初始透明，后续淡入
-
--- 输入框边框（新增高亮过渡）
-UIStroke.Transparency = 0.850
-UIStroke.Color = Color3.fromRGB(156, 156, 156)
-UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-UIStroke.Parent = TextBox
-UIStroke.Transparency = 1 -- 初始透明，后续淡入
-
-UIStroke_2.Transparency = 0.850
-UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
-UIStroke_2.Parent = AuthFunction
-UIStroke_2.Transparency = 1 -- 初始透明，后续淡入
-
--- “链接”按钮容器（保留原配置，新增hover缩放）
-GetButton.Name = "GetButton"
-GetButton.Parent = AuthFunction
-GetButton.AnchorPoint = Vector2.new(0.5, 0.5)
-GetButton.BackgroundColor3 = Library.Colors.Default
-GetButton.BackgroundTransparency = 0.250
-GetButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-GetButton.BorderSizePixel = 0
-GetButton.Position = UDim2.new(0.25, 0, 0.649999976, 0)
-GetButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
-GetButton.ZIndex = 5
-GetButton.BackgroundTransparency = 1 -- 初始透明，后续淡入
-
--- “链接”按钮阴影
-DropShadow_2.Name = "DropShadow"
-DropShadow_2.Parent = GetButton
-DropShadow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-DropShadow_2.BackgroundTransparency = 1.000
-DropShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
-DropShadow_2.Position = UDim2.new(0, -5, 0, -5)
-DropShadow_2.Size = UDim2.new(1, 10, 1, 10)
-DropShadow_2.ZIndex = 4
-DropShadow_2.Image = "rbxassetid://297694300"
-DropShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
-DropShadow_2.ImageTransparency = 0.500
-DropShadow_2.ScaleType = Enum.ScaleType.Slice
-DropShadow_2.SliceCenter = Rect.new(95, 103, 894, 902)
-DropShadow_2.SliceScale = 0.050
-DropShadow_2.ImageTransparency = 1 -- 初始透明，后续淡入
-
--- “链接”按钮边框
-UIStroke_3.Transparency = 0.850
-UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
-UIStroke_3.Parent = GetButton
-UIStroke_3.Transparency = 1 -- 初始透明，后续淡入
-
--- “链接”按钮文本
-GTitle.Name = "GTitle"
-GTitle.Parent = GetButton
-GTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-GTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-GTitle.BackgroundTransparency = 1.000
-GTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-GTitle.BorderSizePixel = 0
-GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
-GTitle.ZIndex = 6
-GTitle.Font = Enum.Font.Gotham
-GTitle.Text = "链接"
-GTitle.TextColor3 = Library.Colors.TextColor
-GTitle.TextScaled = true
-GTitle.TextSize = 14.000
-GTitle.TextStrokeColor3 = Library.Colors.TextColor
-GTitle.TextStrokeTransparency = 0.950
-GTitle.TextWrapped = true
-GTitle.TextTransparency = 1 -- 初始透明，后续淡入
-
--- “链接”功能按钮
-GButton.Name = "GButton"
-GButton.Parent = GetButton
-GButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-GButton.BackgroundTransparency = 1.000
-GButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-GButton.BorderSizePixel = 0
-GButton.Size = UDim2.new(1, 0, 1, 0)
-GButton.ZIndex = 15
-GButton.Font = Enum.Font.SourceSans
-GButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-GButton.TextSize = 14.000
-GButton.TextTransparency = 1.000
-
--- “确认”按钮容器（同“链接”按钮，新增hover缩放）
-LoginButton.Name = "LoginButton"
-LoginButton.Parent = AuthFunction
-LoginButton.AnchorPoint = Vector2.new(0.5, 0.5)
-LoginButton.BackgroundColor3 = Library.Colors.Default
-LoginButton.BackgroundTransparency = 0.250
-LoginButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-LoginButton.BorderSizePixel = 0
-LoginButton.Position = UDim2.new(0.75, 0, 0.649999976, 0)
-LoginButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
-LoginButton.ZIndex = 5
-LoginButton.BackgroundTransparency = 1 -- 初始透明，后续淡入
-
--- “确认”按钮阴影
-DropShadow_3.Name = "DropShadow"
-DropShadow_3.Parent = LoginButton
-DropShadow_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-DropShadow_3.BackgroundTransparency = 1.000
-DropShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
-DropShadow_3.Position = UDim2.new(0, -5, 0, -5)
-DropShadow_3.Size = UDim2.new(1, 10, 1, 10)
-DropShadow_3.ZIndex = 4
-DropShadow_3.Image = "rbxassetid://297694300"
-DropShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
-DropShadow_3.ImageTransparency = 0.500
-DropShadow_3.ScaleType = Enum.ScaleType.Slice
-DropShadow_3.SliceCenter = Rect.new(95, 103, 894, 902)
-DropShadow_3.SliceScale = 0.050
-DropShadow_3.ImageTransparency = 1 -- 初始透明，后续淡入
-
--- “确认”按钮边框
-UIStroke_4.Transparency = 0.850
-UIStroke_4.Color = Color3.fromRGB(156, 156, 156)
-UIStroke_4.Parent = LoginButton
-UIStroke_4.Transparency = 1 -- 初始透明，后续淡入
-
--- “确认”按钮文本
-LTitle.Name = "LTitle"
-LTitle.Parent = LoginButton
-LTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-LTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-LTitle.BackgroundTransparency = 1.000
-LTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-LTitle.BorderSizePixel = 0
-LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
-LTitle.ZIndex = 6
-LTitle.Font = Enum.Font.Gotham
-LTitle.Text = "确认"
-LTitle.TextColor3 = Library.Colors.TextColor
-LTitle.TextScaled = true
-LTitle.TextSize = 14.000
-LTitle.TextStrokeColor3 = Library.Colors.TextColor
-LTitle.TextStrokeTransparency = 0.950
-LTitle.TextWrapped = true
-LTitle.TextTransparency = 1 -- 初始透明，后续淡入
-
--- “确认”功能按钮
-LButton.Name = "LButton"
-LButton.Parent = LoginButton
-LButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-LButton.BackgroundTransparency = 1.000
-LButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-LButton.BorderSizePixel = 0
-LButton.Size = UDim2.new(1, 0, 1, 0)
-LButton.ZIndex = 15
-LButton.Font = Enum.Font.SourceSans
-LButton.Text = "确认"
-LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-LButton.TextSize = 14.000
-LButton.TextTransparency = 1.000
-
--- 关闭音效（优化播放逻辑，避免残留）
-CloseSound.Name = "CloseSound"
-CloseSound.SoundId = "rbxassetid://104269922408932" -- 若ID无效，需替换为有效音频ID
-CloseSound.Volume = 0.8 -- 降低音量，避免刺耳
-CloseSound.PlayOnRemove = false
-CloseSound.Parent = Workspace
-
--- 关闭按钮（新增hover颜色变化、点击缩放反馈）
-CloseButton.Name = "CloseButton"
-CloseButton.Parent = AuthFunction
-CloseButton.BackgroundColor3 = Color3.new(0, 0, 0)
-CloseButton.BackgroundTransparency = 1
-CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
-CloseButton.Font = Enum.Font.GothamSemibold
-CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.Text = "X"
-CloseButton.TextSize = 14
-CloseButton.TextTransparency = 1 -- 初始透明，后续淡入
--- 关闭按钮hover效果
-CloseButton.MouseEnter:Connect(function()
-    TweenService:Create(CloseButton, TweenInfo.new(0.2), {
-        TextColor3 = Color3.fromRGB(255, 100, 100), -- hover变红
-        Scale = Vector2.new(1.1, 1.1) -- 轻微放大
-    }):Play()
-end)
-CloseButton.MouseLeave:Connect(function()
-    TweenService:Create(CloseButton, TweenInfo.new(0.2), {
-        TextColor3 = Color3.fromRGB(255, 255, 255), -- 恢复白色
-        Scale = Vector2.new(1, 1) -- 恢复原尺寸
-    }):Play
-    end)
--- 关闭按钮点击反馈（缩放+音效+淡出）
-CloseButton.MouseButton1Click:Connect(function()
-    -- 点击瞬间缩小，增强反馈
-    TweenService:Create(CloseButton, TweenInfo.new(0.1), {Scale = Vector2.new(0.9, 0.9)}):Play()
-    task.wait(0.1)
-    -- 播放关闭音效
-    CloseSound:Play()  
-    -- 1. 卡密系统容器先向下淡出
-    TweenService:Create(AuthFunction, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-        Position = UDim2.new(0.5, 0, 1.5, 0),
-        BackgroundTransparency = 1
-    }):Play()
-    -- 2. 主窗口缩小并淡出
-    TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Size = UDim2.fromScale(0, 0),
-        BackgroundTransparency = 1
-    }):Play()
-    -- 3. 所有子元素同步淡隐
-    local fadeElements = {Title, TextBox, DropShadow, UIStroke, UIStroke_2, GetButton, DropShadow_2, UIStroke_3, GTitle, LoginButton, DropShadow_3, UIStroke_4, LTitle}
-    for _, elem in ipairs(fadeElements) do
-        if elem:IsA("TextLabel") or elem:IsA("TextBox") then
-            TweenService:Create(elem, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
-        elseif elem:IsA("ImageLabel") then
-            TweenService:Create(elem, TweenInfo.new(0.4), {ImageTransparency = 1}):Play()
-        elseif elem:IsA("UIStroke") then
-            TweenService:Create(elem, TweenInfo.new(0.4), {Transparency = 1}):Play()
-        elseif elem:IsA("Frame") then
-            TweenService:Create(elem, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
-        end
-    end
-    -- 等待动画结束后销毁元素
-    task.wait(0.5)
-    if ScreenGui then ScreenGui:Destroy() end
-    -- 音效播放完后销毁，避免内存残留
-    task.spawn(function()
-        while CloseSound.Playing do task.wait(0.05) end
-        CloseSound:Destroy()
-    end)
-end)
-
--- 新增粒子特效（淡出时触发，增强视觉冲击）
-ParticleEmitter.Name = "FadeParticles"
-ParticleEmitter.Texture = "rbxassetid://241650934" -- 白色光点纹理
-ParticleEmitter.Lifetime = NumberRange.new(0.2, 0.8)
-ParticleEmitter.Rate = 0 -- 初始关闭
-ParticleEmitter.Speed = NumberRange.new(5, 12)
-ParticleEmitter.SpreadAngle = Vector2.new(360, 360)
-ParticleEmitter.LightEmission = 0.6
-ParticleEmitter.Parent = AuthFunction
-
--- 按钮hover交互效果（缩放+边框高亮）
-local function addButtonHover(btnFrame, btnStroke, textLabel)
-    -- 鼠标进入：放大+边框高亮
-    btnFrame.MouseEnter:Connect(function()
-        TweenService:Create(btnFrame, TweenInfo.new(0.2), {
-            Scale = Vector2.new(1.05, 1.05),
-            BackgroundTransparency = 0.1
-        }):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {
-            Color = Library.Colors.Hightlight,
-            Transparency = 0.3
-        }):Play()
-        if textLabel then
-            TweenService:Create(textLabel, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
-        end
-    end)
-    -- 鼠标离开：恢复原状态
-    btnFrame.MouseLeave:Connect(function()
-        TweenService:Create(btnFrame, TweenInfo.new(0.2), {
-            Scale = Vector2.new(1, 1),
-            BackgroundTransparency = 0.25
-        }):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {
-            Color = Color3.fromRGB(156, 156, 156),
-            Transparency = 0.85
-        }):Play()
-        if textLabel then
-            TweenService:Create(textLabel, TweenInfo.new(0.2), {TextTransparency = 0.1}):Play()
-        end
-    end)
-    -- 鼠标点击：缩小反馈
-    btnFrame.MouseButton1Down:Connect(function()
-        TweenService:Create(btnFrame, TweenInfo.new(0.1), {Scale = Vector2.new(0.98, 0.98)}):Play()
-    end)
-    btnFrame.MouseButton1Up:Connect(function()
-        TweenService:Create(btnFrame, TweenInfo.new(0.1), {Scale = Vector2.new(1.05, 1.05)}):Play()
-    end)
-end
-
--- 为“链接”“确认”按钮添加hover效果
-addButtonHover(GetButton, UIStroke_3, GTitle)
-addButtonHover(LoginButton, UIStroke_4, LTitle)
--- 输入框focus效果（边框变色）
-TextBox.Focused:Connect(function()
-    TweenService:Create(UIStroke, TweenInfo.new(0.2), {
-        Color = Library.Colors.Hightlight,
-        Transparency = 0.3
-    }):Play()
-end)
-TextBox.FocusLost:Connect(function()
-    TweenService:Create(UIStroke, TweenInfo.new(0.2), {
-        Color = Color3.fromRGB(156, 156, 156),
-        Transparency = 0.85
-    }):Play()
-end)
-
--- 保留原Library相关功能（下拉高亮、防重复点击）
-Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
-Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
-Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
-setup.KeySystemInfo.CodeId = HttpService:GenerateGUID(false);
-setup.KeySystemInfo.AntiSpam = false;
-
--- 确认按钮逻辑（保留原功能，新增点击动画）
-LButton.MouseButton1Click:Connect(function()
-    if setup.KeySystemInfo.AntiSpam then return end;
-    setup.KeySystemInfo.AntiSpam = true;
-    
-    -- 点击瞬间动画反馈
-    TweenService:Create(LoginButton, TweenInfo.new(0.1), {Scale = Vector2.new(0.98, 0.98)}):Play()
-    task.wait(0.1)
-    TweenService:Create(LoginButton, TweenInfo.new(0.1), {Scale = Vector2.new(1, 1)}):Play()
-
-    if TextBox.Text == "" then
-        -- 空输入提示：占位文本闪烁
-        local originalPlaceholder = TextBox.PlaceholderText
-        TextBox.PlaceholderText = "你没有填入卡密"
-        for i = 1, 2 do
-            TweenService:Create(TextBox, TweenInfo.new(0.2), {TextTransparency = 0.8}):Play()
-            task.wait(0.2)
-            TweenService:Create(TextBox, TweenInfo.new(0.2), {TextTransparency = 0.25}):Play()
-            task.wait(0.2)
-        end
-        task.wait(1.5)
-        TextBox.PlaceholderText = originalPlaceholder
-    else
-        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
-        if verify then
-            -- 验证成功：触发淡出动画，隐藏关闭按钮
-            CloseButton.Visible = false;
-            ParticleEmitter.Rate = 50 -- 激活粒子特效
-            TweenService:Create(AuthFunction, TweenInfo.new(0.5), {Position = UDim2.new(0.5, 0, 1.5, 0)}):Play()
-            task.wait(0.5)
-            setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-            return TextBox.Text;
-        else
-            -- 验证失败：输入框抖动+文本清空
-            TweenService:Create(TextBox, TweenInfo.new(0.08), {Position = UDim2.new(0.52, 0, 0.349999994, 0)}):Play()
-            task.wait(0.08)
-            TweenService:Create(TextBox, TweenInfo.new(0.08), {Position = UDim2.new(0.48, 0, 0.349999994, 0)}):Play()
-            task.wait(0.08)
-            TweenService:Create(TextBox, TweenInfo.new(0.08), {Position = UDim2.new(0.5, 0, 0.349999994, 0)}):Play()
-            
-            task.wait(0.1)
-            TextBox.Text = ""
-            TextBox.PlaceholderText = "你输入的卡密错误"
-            -- 错误提示闪烁
-            for i = 1, 2 do
-                TweenService:Create(TextBox, TweenInfo.new(0.2), {TextTransparency = 0.8}):Play()
-                task.wait(0.2)
-                TweenService:Create(TextBox, TweenInfo.new(0.2), {TextTransparency = 0.25}):Play()
-                task.wait(0.2)
-            end
-            task.wait(1.5)
-            TextBox.PlaceholderText = "请重新输入卡密"
-        end;
-    end;
-    setup.KeySystemInfo.AntiSpam = false;
-end)
-
--- 链接按钮逻辑（保留原功能，新增点击反馈）
-GButton.MouseButton1Click:Connect(function()
-    -- 点击动画
-    TweenService:Create(GetButton, TweenInfo.new(0.1), {Scale = Vector2.new(0.98, 0.98)}):Play()
-    task.wait(0.1)
-    TweenService:Create(GetButton, TweenInfo.new(0.1), {Scale = Vector2.new(1, 1)}):Play()
-    setup.KeySystemInfo.OnGetKey()
-end)
-
--- 取消登录逻辑（新增淡出动画）
-function setup:CancelLogin()
-    ParticleEmitter.Rate = 50 -- 激活粒子
-    TweenService:Create(AuthFunction, TweenInfo.new(0.5), {Position = UDim2.new(0.5, 0, 1.5, 0)}):Play()
-    task.wait(0.5)
-    setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-end;
-
--- 等待登录完成后执行淡出
-while true do 
-    local this = setup.KeySystemInfo.Finished.Event:Wait();
-    if this == setup.KeySystemInfo.CodeId then
-        break;
-    end;
-end;
-
--- 登录完成后禁用输入框，同步淡隐
-TextBox.TextEditable = false;
-TweenService:Create(TextBox, TweenInfo.new(0.4), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
-TweenService:Create(AuthFunction , TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Position = UDim2.new(0.5, 0, 1.5, 0)});
-
-task.wait(0.5)
--- 主窗口最终调整动画
-Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
-Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
--- 销毁粒子特效
-ParticleEmitter:Destroy()
-
---[[
 		local AuthFunction = Instance.new("Frame")
 		local Title = Instance.new("TextLabel")
 		local TextBox = Instance.new("TextBox")
@@ -3167,7 +2670,7 @@ ParticleEmitter:Destroy()
         CloseSound.Volume = 1.0
         CloseSound.PlayOnRemove = false
         CloseSound.Parent = Workspace
-		   
+--[[
         CloseButton.Name = "CloseButton"
         CloseButton.Parent = AuthFunction
         CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
@@ -3188,7 +2691,54 @@ ParticleEmitter:Destroy()
                 CloseSound:Destroy()
             end)
         end)
-        
+--]]
+
+-- 假设你已定义 CloseButton、CloseSound、MainFrame、ScreenGui 等变量
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = AuthFunction
+CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
+CloseButton.BackgroundTransparency = 1 
+CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+CloseButton.Font = Enum.Font.GothamSemibold
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Text = "X"
+CloseButton.TextSize = 14
+
+-- 退场动画核心逻辑（绑定到关闭按钮点击事件）
+CloseButton.MouseButton1Click:Connect(function()
+    -- 1. 播放关闭音效
+    CloseSound:Play()  
+
+    -- 2. 执行主窗口退场动画：先缩小+透明，再销毁
+    -- 若使用 Library.Tween，优化动画参数（时长0.6秒，缓动效果更自然）
+    Library:Tween(MainFrame, Library.TweenLibrary.Normal, 
+        {
+            Size = UDim2.fromScale(0, 0),  -- 窗口缩小至消失
+            BackgroundTransparency = 1,    -- 窗口透明化
+            Position = UDim2.new(0.5, 0, 0.5, 0)  -- 缩小过程中保持居中
+        }, 
+        0.6  -- 动画时长（秒），可根据需求调整
+    )
+
+    -- 3. 等待动画结束后销毁UI
+    task.wait(0.6)  -- 等待时间与动画时长一致，确保动画完成
+    if ScreenGui and ScreenGui.Parent then
+        ScreenGui:Destroy()  -- 销毁整个UI界面
+    end
+
+    -- 4. 音效播放完毕后销毁音效对象
+    task.spawn(function()
+        while CloseSound and CloseSound.Playing do
+            task.wait(0.05)
+        end
+        if CloseSound then
+            CloseSound:Destroy()
+        end
+    end)
+end)
+
+
         Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
 		Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
 		Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
@@ -3247,7 +2797,7 @@ ParticleEmitter:Destroy()
 	Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
 	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
 	
---]]
+
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
 	local OpenDelay = tick();
