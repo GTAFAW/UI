@@ -11,6 +11,15 @@ local Library = {
 	xpcall = xpcall,
 };
 
+local function playSound(audioId)
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. audioId
+    sound.Volume = 3
+    sound.Pitch = 1
+    sound.Parent = game.Workspace
+    sound:Play()
+end
+
 Library.Icons = { -- 图片/常用图片
     ["手"] = "rbxassetid://7733955740",     ["家"] = "rbxassetid://7733960981",
     ["锚"] = "rbxassetid://7733911490",      ["票"] = "rbxassetid://7734086558",
@@ -7119,46 +7128,28 @@ end;
 	end;
 	
 	CloseButton.MouseButton1Click:Connect(function()
-     WindowLibrary:Dialog({
-         Title = "-- 你要关闭脚本吗 --",
-         Content = "关闭后不会隐藏\n请选择",
-         Buttons = {
-             {
-                 Title = '执意关闭',
-                 Callback = function()
-                     Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {
-                         Size = UDim2.fromScale(0, 0),
-                         Position = UDim2.fromScale(0.5, 0.5)
-                     }).Completed:Connect(function()
-                         task.wait()
-
-                         local function playSound(audioId)
-                             local sound = Instance.new("Sound")
-                             sound.SoundId = "rbxassetid://" .. audioId
-                             sound.Volume = 3
-                             sound.Pitch = 1
-                             sound.Parent = game.Workspace
-                             sound:Play()
-
-                             sound.Ended:Connect(function()
-                                 sound:Destroy()
-                             end)
-                         end
-
-                         WindowLibrary:Destroy()	
-
-                         playSound(104269922408932)					
-                     end)
-                 end,
-             },
-             {
-                 Title = '稍后再来',
-                -- 可选：若“稍后再来”需要触发逻辑，可在此处添加 Callback 函数
-                -- Callback = function() print("取消关闭") end
-             }
-         }
-      })
-    end)
+		WindowLibrary:Dialog({
+			Title = "-- 你要关闭脚本吗 --",
+			Content = "关闭后不会隐藏\n请选择",
+			Buttons = {
+				{
+					Title = '执意关闭',
+					Callback = function()
+						Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{
+							Size = UDim2.fromScale(0,0),
+							Position = UDim2.fromScale(0.5,0.5)
+						}).Completed:Connect(function()
+							task.wait()
+							WindowLibrary:Destroy()	
+							playSound(104269922408932)					
+						end)
+					end,
+				},{
+					Title = '稍后再来',
+				}
+			}
+		})
+	end)
 	
 	
 	local ToggleButton = Library:InputButton(Ico);
