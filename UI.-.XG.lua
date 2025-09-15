@@ -2670,7 +2670,7 @@ function Library:Windowxgo(setup)
         CloseSound.Volume = 1.0
         CloseSound.PlayOnRemove = false
         CloseSound.Parent = Workspace
-		   
+
         CloseButton.Name = "CloseButton"
         CloseButton.Parent = AuthFunction
         CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
@@ -2691,7 +2691,7 @@ function Library:Windowxgo(setup)
                 CloseSound:Destroy()
             end)
         end)
-        
+
         Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
 		Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
 		Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
@@ -7132,7 +7132,15 @@ end;
 						}).Completed:Connect(function()
 							task.wait()
 							WindowLibrary:Destroy()	
-							playSound(104269922408932)					
+							local function playSound(audioId)
+                            local sound = Instance.new("Sound")
+                                  sound.SoundId = "rbxassetid://" .. audioId
+                                  sound.Volume = 3
+                                  sound.Pitch = 1
+                                  sound.Parent = game.Workspace
+                                  sound:Play()
+                              end    
+                              playSound(104269922408932)					
 						end)
 					end,
 				},{
