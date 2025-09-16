@@ -3376,59 +3376,22 @@ function Library:Windowxgo(setup)
         "rbxassetid://89768207500333",
         "rbxassetid://136363102949077",      
         "rbxassetid://74648780628027",
-        "rbxassetid://103232778626018"
+        "rbxassetid://103232778626018",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB"
     }
     
     local currentIndex = 1
     local isForward = true
     local slideDuration = 1
     local interval = 10
-    local loadedImages = {} -- 存储已加载图片ID
-    local isPreloadDone = false -- 标记预加载状态
 
-    -- 修复：单张图片加载（带超时处理，避免阻塞）
-    local function loadSingleImage(imgId)
-        local tempImg = Instance.new("ImageLabel")
-        tempImg.Image = imgId
-        tempImg.Visible = false -- 确保临时图片不显示
-        tempImg.Parent = ScreenGui -- 必须挂载到界面才能触发Loaded
-        
-        -- 用超时控制，避免因单张图片失效导致卡住
-        local success = false
-        local loadConn = tempImg.Loaded:Connect(function()
-            success = true
-            table.insert(loadedImages, imgId)
-            loadConn:Disconnect()
-        end)
-        
-        -- 5秒超时，超时则放弃该图片
-        task.wait(5)
-        loadConn:Disconnect()
-        tempImg:Destroy()
-        return success
-    end
-
-    -- 修复：并行预加载（不阻塞，加载一张就可用一张）
-    local function preloadImages()
-        for _, imgId in ipairs(images) do
-            task.spawn(function() -- 每张图片单独开线程加载
-                loadSingleImage(imgId)
-            end)
-        end
-        -- 等待至少1张图片加载完成（避免轮播无图可用）
-        while #loadedImages == 0 do
-            task.wait(0.5)
-        end
-        isPreloadDone = true
-    end
-
-    -- 初始化背景图（兼容预加载中状态）
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = loadedImages[currentIndex] or setup.Logo -- 无图时用Logo兜底
+        BackgroundImage1.Image = images[currentIndex]
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3437,24 +3400,20 @@ function Library:Windowxgo(setup)
         BackgroundImage2.BackgroundTransparency = 1
         BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = loadedImages[currentIndex + 1] or loadedImages[1] -- 容错处理
-        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ImageTransparency = 0
+        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ZIndex = 2
     end
 
-    -- 修复：轮播索引计算（兼容已加载图片数量）
     local function getNextIndex()
-        if #loadedImages <= 1 then return 1 end -- 只有1张图时不切换
         if isForward then
-            return currentIndex == #loadedImages and 1 or currentIndex + 1 -- 循环切换，而非反向
+            return currentIndex == #images and #images - 1 or currentIndex + 1
         else
-            return currentIndex == 1 and #loadedImages or currentIndex - 1
+            return currentIndex == 1 and 2 or currentIndex - 1
         end
     end
 
     local function slideSwitch()
-        if #loadedImages < 1 then return end -- 无图则不切换
         local nextIndex = getNextIndex()
         local startPos = UDim2.new(0, 0, 0, 0)
         local endPos = UDim2.new(0, 0, 0, 0)
@@ -3468,23 +3427,15 @@ function Library:Windowxgo(setup)
             oldEndPos = UDim2.new(1, 0, 0, 0)
         end
 
-        BackgroundImage2.Image = loadedImages[nextIndex]
+        BackgroundImage2.Image = images[nextIndex]
         BackgroundImage2.Position = startPos
 
-        -- 确保Tween函数存在（容错）
-        if Library.Tween then
-            Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
-            Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
-        else
-            -- 无Tween时直接赋值（避免功能失效）
-            BackgroundImage2.Position = endPos
-            BackgroundImage1.Position = oldEndPos
-        end
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
         task.wait(slideDuration)
         currentIndex = nextIndex
-        -- 取消反向逻辑，改为循环切换（更稳定）
-        if currentIndex == #loadedImages then
+        if currentIndex == #images then
             isForward = false
         elseif currentIndex == 1 then
             isForward = true
@@ -3494,7 +3445,6 @@ function Library:Windowxgo(setup)
         BackgroundImage2.Position = startPos
     end
 
-    -- 界面基础初始化（优先执行）
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ResetOnSpawn = false
     ScreenGui.IgnoreGuiInset = false
@@ -3510,6 +3460,17 @@ function Library:Windowxgo(setup)
     MainFrame.ClipsDescendants = true
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
+
+    initBackgrounds()
+
+    task.spawn(function()
+        while true do
+            task.wait(interval)
+            slideSwitch()
+        end
+    end)
+   
+	local BlurEle = Library.UIBlur.new(MainFrame,true);
 
 	DropShadow.Name = "DropShadow"
 	DropShadow.Parent = MainFrame
@@ -3536,25 +3497,8 @@ function Library:Windowxgo(setup)
 	Ico.Image = setup.Logo
 	Ico.ImageTransparency = 1.000
 
-	-- 窗口动画（优先执行，不依赖图片加载）
-	if Library.Tween then
-		Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{Size = Library.SizeLibrary.Loading})
-		Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 0.25})
-	else
-		MainFrame.Size = Library.SizeLibrary.Loading
-		Ico.ImageTransparency = 0.25
-	end
-
-    -- 启动预加载，加载完成后初始化轮播
-    task.spawn(function()
-        preloadImages()
-        initBackgrounds()
-        -- 预加载完成后启动轮播循环
-        while true do
-            task.wait(interval)
-            slideSwitch()
-        end
-    end)
+	Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{Size = Library.SizeLibrary.Loading})
+	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 0.25})
 
 	if setup.KeySystem then
 		setup.KeySystemInfo.Enabled = true;
@@ -3563,21 +3507,12 @@ function Library:Windowxgo(setup)
 		task.wait(1)
 
 		task.delay(0.1,function()
-			if Library.Tween then
-				Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
-			else
-				Ico.ImageTransparency = 1
-			end
+			Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
 		end)
 
-		if Library.Tween then
-			Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
-		else
-			MainFrame.Size = Library.SizeLibrary.Auth
-		end
+		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
 
 		task.wait(1);       
-
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
