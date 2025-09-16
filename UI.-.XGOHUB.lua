@@ -3377,20 +3377,39 @@ function Library:Windowxgo(setup)
         "rbxassetid://136363102949077",      
         "rbxassetid://74648780628027",
         "rbxassetid://103232778626018",
---        "rbxassetid://脚本认准XGOHUB"
     }
     
     local currentIndex = 1
     local isForward = true
     local slideDuration = 1
     local interval = 10
+    local loadedImages = {}
+
+    local function preloadImages()
+        for _, imgId in ipairs(images) do
+            local tempImg = Instance.new("ImageLabel")
+            tempImg.Image = imgId
+            tempImg.Loaded:Wait()
+            table.insert(loadedImages, imgId)
+            tempImg:Destroy()
+        end
+    end
+
+    task.spawn(function()
+        preloadImages()
+        initBackgrounds()
+        while true do
+            task.wait(interval)
+            slideSwitch()
+        end
+    end)
 
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = images[currentIndex]
+        BackgroundImage1.Image = loadedImages[currentIndex] 
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3406,7 +3425,7 @@ function Library:Windowxgo(setup)
 
     local function getNextIndex()
         if isForward then
-            return currentIndex == #images and #images - 1 or currentIndex + 1
+            return currentIndex == #loadedImages and #loadedImages - 1 or currentIndex + 1
         else
             return currentIndex == 1 and 2 or currentIndex - 1
         end
@@ -3426,7 +3445,7 @@ function Library:Windowxgo(setup)
             oldEndPos = UDim2.new(1, 0, 0, 0)
         end
 
-        BackgroundImage2.Image = images[nextIndex]
+        BackgroundImage2.Image = loadedImages[nextIndex]
         BackgroundImage2.Position = startPos
 
         Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
@@ -3434,7 +3453,7 @@ function Library:Windowxgo(setup)
 
         task.wait(slideDuration)
         currentIndex = nextIndex
-        if currentIndex == #images then
+        if currentIndex == #loadedImages then
             isForward = false
         elseif currentIndex == 1 then
             isForward = true
@@ -3459,17 +3478,6 @@ function Library:Windowxgo(setup)
     MainFrame.ClipsDescendants = true
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
-
-    initBackgrounds()
-
-    task.spawn(function()
-        while true do
-            task.wait(interval)
-            slideSwitch()
-        end
-    end)
-   
-	local BlurEle = Library.UIBlur.new(MainFrame,true);
 
 	DropShadow.Name = "DropShadow"
 	DropShadow.Parent = MainFrame
