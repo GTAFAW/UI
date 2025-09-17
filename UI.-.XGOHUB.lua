@@ -2,25 +2,18 @@
 
 -- 此源码不加密 | 也尽量保持更新 | UI.XGO修改更新 | 以内置独家水印 --
 -- UI版本: v2
---[[1. 更新：延迟修复与主题更新 | 主要添加次副标 --
-   2. 边框v1.125 | 修复切换按钮图层
-   3. 
-   4. 修复 下拉菜单隐藏失效
-                                                ]]--
 
 -- 
--- 
+--  懒得更
 
 local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
 executionCountDataStore.Name = "ExecutionCount"
 executionCountDataStore.Parent = game.ReplicatedStorage
 
--- 增加执行次数，值从0开始
 local executionCount = executionCountDataStore.Value or 0
 executionCount = executionCount + 1
 executionCountDataStore.Value = executionCount
 
--- 通知函数
 local function sendNotification(text)
     game.StarterGui:SetCore("SendNotification", {
         Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
@@ -30,7 +23,6 @@ local function sendNotification(text)
     })
 end
 
--- 播放声音的函数
 local function playSound(audioId)
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://" .. audioId
@@ -40,32 +32,26 @@ local function playSound(audioId)
     sound:Play()
 end
 
--- 检查执行次数并给出反馈
 if executionCount == 1 then
    
     elseif executionCount == 2 then
     
         sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
         playSound(3398620867)
-       return  -- 终止脚本执行
+       return
     elseif executionCount == 3 then
-    -- 第三次执行，提醒再点击两次将重启脚本
         sendNotification("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")
         playSound(3398620867)
-       return  -- 终止脚本执行
+       return
     elseif executionCount == 4 then
         sendNotification("\229\134\141\231\130\185\229\135\187\228\184\128\230\172\161\239\188\140\233\135\141\230\150\176\229\144\175\229\138\168\232\132\154\230\156\172\46")
         playSound(3398620867)
-       return  -- 终止脚本执行
+       return
     elseif executionCount == 5 then
-    -- 第五次执行，提醒脚本将重新启动，并继续执行脚本
         sendNotification("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")
         playSound(3398620867)
-    -- 重置计数器
         executionCountDataStore.Value = 1
-    -- 这里可以继续执行脚本的其他部分
     else
-    -- 第六次及以后执行，执行第二次执行时的逻辑
         sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
         playSound(3398620867)
        return
@@ -105,7 +91,6 @@ local Debris       = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
--- 配置参数
 local CFG = {
 	size        = 270,
 	thickness   = 18,
@@ -128,17 +113,14 @@ local CFG = {
 	subtitleColor = Color3.fromRGB(255, 100, 100)
 }
 
--- 颜色定义
 local RED_LIGHT  = Color3.fromRGB(255, 120, 120)
 local RED_MAIN   = Color3.fromRGB(255, 50, 50)
 local RED_DEEP   = Color3.fromRGB(180, 20, 20)
 local CYAN_SOFT  = Color3.fromRGB(255, 160, 160)
 local BG_COLOR   = Color3.fromRGB(5, 9, 20)
 
--- 关键：创建关闭事件（用于通知后续代码）
 local IntroClosedEvent = Instance.new("BindableEvent")
 
--- 工具函数：HSV转RGB
 local function HSVToRGB(h, s, v)
     local r, g, b
     local i = math.floor(h * 6)
@@ -156,7 +138,6 @@ local function HSVToRGB(h, s, v)
     return Color3.new(r, g, b)
 end
 
--- 获取UI父容器（兼容不同注入方式）
 local function getGuiParent()
 	local ok, root = pcall(function() return (gethui and gethui()) end)
 	if ok and root then return root end
@@ -168,7 +149,6 @@ local function getGuiParent()
 	return pg or game:GetService("CoreGui")
 end
 
--- 停止已有实例（避免重复）
 pcall(function()
 	if _G.ThunderIntro_Stop then _G.ThunderIntro_Stop() end
 end)
@@ -176,13 +156,11 @@ end)
 local parent  = getGuiParent()
 local running = true
 
--- 创建模糊效果
 local blur = Instance.new("BlurEffect")
 blur.Size = 8
 blur.Name = "ThunderIntroBlur"
 blur.Parent = Lighting
 
--- 主屏幕Th
 local sg = Instance.new("ScreenGui")
 sg.Name = "ThunderIntroMAX"
 sg.IgnoreGuiInset = true
@@ -190,14 +168,12 @@ sg.ResetOnSpawn = false
 pcall(function() if syn and syn.protect_gui then syn.protect_gui(sg) end end)
 sg.Parent = parent
 
--- 背景框
 local bg = Instance.new("Frame")
 bg.Size = UDim2.fromScale(1, 1)
 bg.BackgroundColor3 = BG_COLOR
 bg.BackgroundTransparency = 0.25
 bg.Parent = sg
 
--- 滚动字幕容器
 local subtitleContainer = Instance.new("Frame")
 subtitleContainer.Size = UDim2.fromScale(1, 0.08)
 subtitleContainer.Position = UDim2.fromScale(0, CFG.subtitleY)
@@ -206,7 +182,6 @@ subtitleContainer.ClipsDescendants = true
 subtitleContainer.ZIndex = 10
 subtitleContainer.Parent = sg
 
--- 滚动字幕
 local subtitle = Instance.new("TextLabel")
 subtitle.Text = CFG.subtitleText
 subtitle.TextColor3 = CFG.subtitleColor
@@ -218,7 +193,6 @@ subtitle.Position = UDim2.new(0, sg.AbsoluteSize.X, 0.5, 0)
 subtitle.TextTransparency = 0
 subtitle.Parent = subtitleContainer
 
--- 字幕滚动逻辑
 task.spawn(function()
 	local screenWidth = sg.AbsoluteSize.X
 	local textWidth = subtitle.TextBounds.X <= 0 and (string.len(CFG.subtitleText) * CFG.subtitleSize * 0.5) or subtitle.TextBounds.X
@@ -240,7 +214,6 @@ task.spawn(function()
 	if subtitleContainer and subtitleContainer.Parent then subtitleContainer:Destroy() end
 end)
 
--- 核心视觉框（主容器）
 local main = Instance.new("Frame")
 main.Size = UDim2.fromOffset(CFG.size, CFG.size)
 main.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -249,7 +222,6 @@ main.BackgroundTransparency = 1
 main.ZIndex = 5
 main.Parent = sg
 
--- 外层边框
 local ring = Instance.new("Frame")
 ring.Size = UDim2.fromScale(1, 1)
 ring.BackgroundTransparency = 1
@@ -263,7 +235,6 @@ rStroke.Color = RED_MAIN
 pcall(function() rStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
 rStroke.Parent = ring
 
--- 发光边框
 local glowRing = Instance.new("Frame")
 glowRing.Size = UDim2.fromScale(1, 1)
 glowRing.BackgroundTransparency = 1
@@ -279,7 +250,6 @@ gStroke.Transparency = 0.7
 pcall(function() gStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
 gStroke.Parent = glowRing
 
--- 内层容器（文字载体）
 local inner = Instance.new("Frame")
 inner.Size = UDim2.fromOffset(CFG.size - CFG.thickness*2, CFG.size - CFG.thickness*2)
 inner.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -287,7 +257,6 @@ inner.Position = UDim2.fromScale(0.5, 0.5)
 inner.BackgroundTransparency = 1
 inner.Parent = main
 
--- 警告标题文字
 local title = Instance.new("TextLabel")
 title.Size = UDim2.fromScale(0.9, 0.4)
 title.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -301,7 +270,6 @@ title.TextTransparency = 0
 title.ZIndex = 6
 title.Parent = inner
 
--- 标题渐变
 local grad = Instance.new("UIGradient")
 grad.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0.00, RED_LIGHT),
@@ -311,7 +279,6 @@ grad.Color = ColorSequence.new{
 grad.Rotation = 25
 grad.Parent = title
 
--- 标题逐字显示
 local longTitleText = "使用脚本请承担风险\n「封号概不负责」"
 local typeDelay = 0.2
 local isTitleTyped = false
@@ -325,7 +292,6 @@ task.spawn(function()
     isTitleTyped = true
 end)
 
--- 彩虹色XGO HUB文字
 local sub = Instance.new("TextLabel")
 sub.Size = UDim2.fromScale(0.6, 0.2)
 sub.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -338,7 +304,6 @@ sub.TextTransparency = 1
 sub.ZIndex = 6
 sub.Parent = inner
 
--- 彩虹文字实时更新
 local isClosing = false
 task.spawn(function()
     local text = sub.Text 
@@ -369,7 +334,6 @@ task.spawn(function()
     end
 end)
 
--- 中心发光圆点
 local orb = Instance.new("Frame")
 orb.AnchorPoint = Vector2.new(0.5, 0.5)
 orb.Position = UDim2.fromScale(0.5, 0.65)
@@ -382,7 +346,6 @@ local orbCorner = Instance.new("UICorner")
 orbCorner.CornerRadius = UDim.new(1, 0)
 orbCorner.Parent = orb
 
--- 火花效果
 local function Spark()
 	local s = Instance.new("Frame")
 	s.Size = UDim2.fromOffset(2, 2)
@@ -399,7 +362,6 @@ local function Spark()
 end
 for i = 1, 12 do task.delay(i * 0.01, Spark) end
 
--- 相机抖动效果
 local function CameraShake(ui)
 	local orig = ui.Position
 	for i = 1, 4 do
@@ -410,7 +372,6 @@ local function CameraShake(ui)
 end
 CameraShake(main)
 
--- 版权文字
 local credit = Instance.new("TextLabel")
 credit.Size = UDim2.fromOffset(220, 20)
 credit.AnchorPoint = Vector2.new(1, 1)
@@ -424,7 +385,6 @@ credit.TextTransparency = 1
 credit.ZIndex = 6
 credit.Parent = sg
 
--- 跳过按钮
 local skipBtn = Instance.new("TextButton")
 skipBtn.Position = UDim2.fromScale(0.99, 0.985)
 skipBtn.Size = UDim2.fromOffset(60, 20)
@@ -438,7 +398,6 @@ skipBtn.TextTransparency = 1
 skipBtn.ZIndex = 10
 skipBtn.Parent = sg
 
--- 跳过按钮呼吸动画
 task.spawn(function()
     task.wait(0.55 + 0.6)
     local scaleInfo = TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
@@ -450,13 +409,11 @@ task.spawn(function()
     end
 end)
 
--- 跳过按钮淡入
 task.spawn(function()
     task.wait(0.55)
     TweenService:Create(skipBtn, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {TextTransparency = 0.2}):Play()
 end)
 
--- 跳过按钮鼠标悬停
 skipBtn.MouseEnter:Connect(function()
     if running then 
         TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
@@ -464,7 +421,6 @@ skipBtn.MouseEnter:Connect(function()
     end
 end)
 
--- 跳过按钮鼠标离开
 skipBtn.MouseLeave:Connect(function()
     if running then 
         TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0.2}):Play()
@@ -473,7 +429,6 @@ skipBtn.MouseLeave:Connect(function()
             end
 end)
 
--- 扫光效果
 local sweep = Instance.new("Frame")
 sweep.BackgroundTransparency = 1
 sweep.Size = UDim2.fromScale(1.2, 1.2)
@@ -497,12 +452,10 @@ sweepGrad.Transparency = NumberSequence.new{
 }
 sweepGrad.Parent = sweep
 
--- 气泡容器
 local bubbleFolder = Instance.new("Folder")
 bubbleFolder.Name = "Bubbles"
 bubbleFolder.Parent = main
 
--- 创建气泡
 local function makeBubble()
 	local b = Instance.new("Frame")
 	b.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -522,7 +475,6 @@ local function makeBubble()
 	return b, s
 end
 
--- 缩放控制
 local ringScale = Instance.new("UIScale")
 ringScale.Scale = 1
 ringScale.Parent = ring
@@ -530,25 +482,21 @@ local mainScale = Instance.new("UIScale")
 mainScale.Scale = 1
 mainScale.Parent = main
 
--- 关闭动画（核心：执行完后触发事件）
 local function CloseAnimation()
 	if not running then return end
 	running = false 
 	isClosing = true
 
-	-- 清除文字显示
 	title.Text = "" 
 	credit.Text = "" 
 	skipBtn.Text = "" 
 	sub.Text = ""
 
-	-- 文字淡隐
 	TweenService:Create(title,  TweenInfo.new(0.1), {TextTransparency = 1}):Play()
 	TweenService:Create(credit, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
 	TweenService:Create(skipBtn, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
 	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 
-	-- 旋转+放大动画
 	local initialRotation = main.Rotation
 	local targetRotation = initialRotation + 360
 	local targetScale = 1.8
@@ -560,7 +508,6 @@ local function CloseAnimation()
 	rotateScaleTween:Play()
 	rotateScaleTween.Completed:Wait()
 
-	-- 方框展开+边框/背景淡化
 	local expandTween = TweenService:Create(
 		main,
 		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -572,14 +519,12 @@ local function CloseAnimation()
 	expandTween:Play()
 	expandTween.Completed:Wait()
 
-	-- 清理UI资源
 	if sg and sg.Parent then 
 		for _, child in ipairs(sg:GetChildren()) do
 			if child ~= subtitleContainer then
 				child:Destroy()
 			end
 		end
-		-- 等待字幕容器销毁
 		task.spawn(function()
 			repeat task.wait(0.1) until not subtitleContainer or not subtitleContainer.Parent
 			sg:Destroy()
@@ -590,10 +535,8 @@ local function CloseAnimation()
 	IntroClosedEvent:Fire()
 end
 
--- 手动关闭
 skipBtn.MouseButton1Click:Connect(CloseAnimation)
 
--- 自动关闭
 if CFG.duration and CFG.duration > 0 then
     task.spawn(function()
         while running and not isTitleTyped do task.wait(0.1) end
@@ -602,10 +545,8 @@ if CFG.duration and CFG.duration > 0 then
     end)
 end
 
--- 全局停止函数
 _G.ThunderIntro_Stop = CloseAnimation
 
--- 原始颜色记录
 local ORIG = {
 	rStroke = rStroke.Color,
 	gStroke = gStroke.Color,
@@ -701,7 +642,6 @@ task.spawn(function()
 	end
 end)
 
--- 气泡弹出效果
 local function BubblePop()
 	local baseT = bg.BackgroundTransparency
 	local flashDown = TweenService:Create(bg, TweenInfo.new(0.08, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = math.max(0, baseT - 0.12)})
@@ -723,8 +663,7 @@ local function BubblePop()
 	thumpUp:Play()
 	thumpUp.Completed:Wait()
 	thumpDn:Play()
-
-	-- 生成气泡
+	
 	for i = 1, CFG.bubbleCount do
 		task.spawn(function()
 			local b, s = makeBubble()
@@ -782,8 +721,7 @@ if bubbleTween then bubbleTween.Completed:Connect(PulseRing) end
 if popSound then popSound.Ended:Connect(PulseRing) end
 
 IntroClosedEvent.Event:Wait()
-end  -- 闭合“仅首次执行”的判断
--- ===================== 【优化：多次重启时的UI与事件管理】 =====================
+end
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local existingGui = playerGui:FindFirstChild("\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79")
@@ -792,22 +730,19 @@ local positionConnection = _G.XGO_PositionConn
 local fpsConnection = _G.XGO_FpsConn
 local textUpdateConnection = _G.XGO_TextConn
 
--- 断开旧事件连接
 if gradientConnection then gradientConnection:Disconnect() end
 if positionConnection then positionConnection:Disconnect() end
 if fpsConnection then task.cancel(fpsConnection) end
 if textUpdateConnection then task.cancel(textUpdateConnection) end
--- 销毁旧UI
+
 if existingGui then existingGui:Destroy() end
 
--- ===================== 【UI与功能逻辑】 =====================
 local a = Instance.new("ScreenGui")
 a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
 a.Parent = playerGui
 a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-a.ResetOnSpawn = false -- 防止UI在角色重生时消失
+a.ResetOnSpawn = false
 
--- 创建文本标签
 local b = Instance.new("TextLabel")
 b.Parent = a
 b.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -823,17 +758,16 @@ b.TextWrapped = true
 b.TextXAlignment = Enum.TextXAlignment.Center
 b.Text = "\120\103\111\32\72\117\98\32\84\73\77\69\n\229\166\130\230\158\156\229\141\161\229\156\168\232\191\153\228\184\170\233\161\181\233\157\162\44\232\175\183\233\135\141\230\150\176\229\144\175\229\138\168\46"
 
--- 旋转螺旋彩虹动态效果
 local c = Instance.new("UIGradient")
 c.Parent = b
 local gradientAngle = 45
 local rainbowColors = {
-    Color3.fromRGB(255, 0, 0),    -- 红
-    Color3.fromRGB(255, 165, 0),  -- 橙
-    Color3.fromRGB(255, 255, 0),  -- 黄
-    Color3.fromRGB(0, 255, 0),    -- 绿
-    Color3.fromRGB(0, 0, 255),    -- 蓝
-    Color3.fromRGB(128, 0, 128)   -- 紫
+    Color3.fromRGB(255, 0, 0), 
+    Color3.fromRGB(255, 165, 0), 
+    Color3.fromRGB(255, 255, 0), 
+    Color3.fromRGB(0, 255, 0),    
+    Color3.fromRGB(0, 0, 255),  
+    Color3.fromRGB(128, 0, 128)  
 }
 local function updateRainbowGradient()
     gradientAngle = (gradientAngle + 1) % 360
@@ -847,19 +781,16 @@ local function updateRainbowGradient()
     table.insert(colorPoints, ColorSequenceKeypoint.new(1, rainbowColors[1]))
     c.Color = ColorSequence.new(colorPoints)
 end
--- 绑定新事件并全局存储
+
 gradientConnection = game:GetService("RunService").RenderStepped:Connect(updateRainbowGradient)
 _G.XGO_GradientConn = gradientConnection
 
--- 圆角效果
 local d = Instance.new("UICorner")
 d.Parent = b
 d.CornerRadius = UDim.new(0, 8)
 
--- 获取当前游戏名称
 local NG = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
--- 屏幕尺寸自适应
 local function updateUIPosition()
     local screenWidth = game:GetService("GuiService"):GetScreenResolution().X
     local uiYPos = -60
@@ -867,11 +798,10 @@ local function updateUIPosition()
     b.Position = UDim2.new(0, uiXPos, 0, uiYPos)
 end
 updateUIPosition()
--- 绑定新事件并全局存储
+
 positionConnection = game:GetService("RunService").Heartbeat:Connect(updateUIPosition)
 _G.XGO_PositionConn = positionConnection
 
--- 设备类型判断函数
 local function getDeviceType()
     local UIS = game:GetService("UserInputService")
     if UIS.TouchEnabled and not UIS.KeyboardEnabled then
@@ -881,15 +811,13 @@ local function getDeviceType()
     end
 end
 
--- ===================== 帧率 =====================
 local currentFps = 0
--- 先断开旧帧率线程，避免重复
+
 if fpsConnection then
     task.cancel(fpsConnection)
 end
 fpsConnection = spawn(function()
     local runService = game:GetService("RunService")
-    -- 1. 检测设备理论最高帧率
     local maxPossibleFps = 60 
     if runService:IsRunning() then
         local testStart = tick()
@@ -899,26 +827,21 @@ fpsConnection = spawn(function()
         end
         local avgFrameTime = (tick() - testStart) / sampleCount
         local estimatedMax = math.floor(1 / avgFrameTime)
-        -- 最终上限：取估算值和240（主流设备最高帧）的较小值
         maxPossibleFps = math.min(estimatedMax, 240)
     end
 
-    -- 2. 实时计算真实帧率
     while task.wait(1) do
         local frameCount = 0
         local startTime = tick()
-        -- 1秒内持续统计RenderStepped触发次数（真实渲染帧）
         while tick() - startTime < 1 do
             runService.RenderStepped:Wait()
             frameCount = frameCount + 1
         end
-        -- 限制帧率不超过设备上限
         currentFps = math.min(frameCount, maxPossibleFps)
     end
 end)
 _G.XGO_FpsConn = fpsConnection
 
--- 季节判断函数
 local function getSeason(month, day)
     if (month == 3 and day >= 21) or (month == 4) or (month == 5) or (month == 6 and day < 22) then
         return "\227\128\144\230\152\165\229\173\163\227\128\145"
@@ -931,7 +854,6 @@ local function getSeason(month, day)
     end
 end
 
--- 节日判断函数
 local function getFestival(month, day)
     local festivals = {
         {1, 1, "\229\133\131\230\151\166"},
@@ -968,7 +890,6 @@ local function getFestival(month, day)
     return "\232\132\154\230\156\172\232\174\164\229\135\134\88\71\79\72\85\66\32\124\32"
 end
 
--- ===================== 核心：累计时长持久化 =====================
 local globalDataStore = game.ReplicatedStorage:FindFirstChild("XGO_GlobalData") 
 if not globalDataStore then
     globalDataStore = Instance.new("NumberValue")
@@ -978,7 +899,6 @@ if not globalDataStore then
 end
 local firstStartTime = globalDataStore.Value 
 
--- ===================== 文本更新逻辑 =====================
 
 if textUpdateConnection then
     task.cancel(textUpdateConnection)
@@ -995,7 +915,7 @@ textUpdateConnection = spawn(function()
             local year = os.date("%Y")
             local month = os.date("%m")
             local day = os.date("%d")
-            local weekNum = os.date("%w") -- 0=周日，1=周一...6=周六
+            local weekNum = os.date("%w")
             local weekStr
             if weekNum == "\48" then 
                 weekStr = "\230\151\165\227\128\145"
@@ -1031,14 +951,12 @@ textUpdateConnection = spawn(function()
                 timeOfDay = "\229\183\178\231\187\143\60\230\153\154\228\184\138\62\228\186\134\229\145\128\44\230\151\169\231\130\185\231\157\161"
             end
 
-            -- 4. PING值获取
             local ping = "未知"
             local stats = game:GetService("Stats")
             if stats and stats.Network and stats.Network.ServerStatsItem["Data Ping"] then
                 ping = stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
             end
 
-            -- 5. 最终更新UI文本
             b.Text = "\232\132\154\230\156\172\230\151\182\233\149\191\58\32" .. scriptTime .. "\32\124\32\232\174\190\229\164\135\58\32" .. getDeviceType() .. "\32\124\32\229\184\167\231\142\135\58\32" .. currentFps .. "\32\32\124\32\80\73\78\71\58\32" .. ping ..
                 "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
                 "\230\173\163\229\156\168\231\142\169\58\32" .. NG .. " | " .. timeOfDay
@@ -3377,6 +3295,11 @@ function Library:Windowxgo(setup)
         "rbxassetid://136363102949077",      
         "rbxassetid://74648780628027",
         "rbxassetid://103232778626018",
+        "rbxassetid://76127155963189",
+        "rbxassetid://118305240093538",
+        "rbxassetid://112630176374798",
+        "rbxassetid://74804451529535",
+        "rbxassetid://115691043156297",
 --        "rbxassetid://脚本认准XGOHUB",
 --        "rbxassetid://脚本认准XGOHUB"
     }
