@@ -2412,22 +2412,22 @@ function Library:Windowxgo(setup)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
     initBackgrounds()
-
-    local function startSlideLoop()
-        task.spawn(function()
-            while true do
-                local t0 = tick()
-                local conn = loopEvent.Event:Connect(function() end)
-                repeat
-                    task.wait(0.05)
-                until (not isPlaying) or (tick() - t0 >= interval)
-                conn:Disconnect()
-                if not isPlaying then break end
-                slideSwitch()
-            end
-        end)
-    end
-    startSlideLoop()
+    
+local function startLoop()
+    task.spawn(function()
+        while isPlaying do
+            local t0 = tick()
+            local conn = loopEvent.Event:Connect(function() end)
+            repeat task.wait(0.05) until not isPlaying or tick()-t0 >= interval
+            conn:Disconnect()
+            if not isPlaying then break end
+            slideSwitch()
+        end
+    end)
+end
+startLoop()   
+_G.stopBG = function() isPlaying = false; loopEvent:Fire() end
+_G.runBG  = function() if not isPlaying then isPlaying = true; startLoop() end end
 
     local BlurEle = Library.UIBlur.new(MainFrame, true)
 
