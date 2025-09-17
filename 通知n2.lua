@@ -1,6 +1,12 @@
 local Nofitication = {}
 
 local GUI = game:GetService("CoreGui"):FindFirstChild("XGO_Nofitication")
+-- 新增：彩虹颜色循环函数（按时间更新HSV色相）
+local function getRainbowColor()
+    local hue = tick() % 1 -- 色相每1秒循环一次（0-1范围）
+    return Color3.fromHSV(hue, 0.7, 0.9) -- 饱和度0.7、明度0.9，保证颜色鲜艳不刺眼
+end
+
 function Nofitication:Notify(nofdebug, middledebug, all)
     local SelectedType = string.lower(tostring(middledebug.Type))
     local ambientShadow = Instance.new("ImageLabel")
@@ -22,25 +28,25 @@ function Nofitication:Notify(nofdebug, middledebug, all)
     ambientShadow.ScaleType = Enum.ScaleType.Slice
     ambientShadow.SliceCenter = Rect.new(10, 10, 118, 118)
     
-    -- 改1：窗口背景设为全透
+    -- 改1：窗口背景全透
     Window.Name = "Window"
     Window.Parent = ambientShadow
     Window.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Window.BackgroundTransparency = 1.000 -- 1实现完全透明
-    Window.BorderSizePixel = 0 -- 边框
+    Window.BackgroundTransparency = 1.000
+    Window.BorderSizePixel = 0
     Window.Position = UDim2.new(0, 3, 0, 3)
-    Window.Size = UDim2.new(0, 160, 0, 55) -- 沿用之前缩小后的尺寸
+    Window.Size = UDim2.new(0, 160, 0, 55)
     Window.ZIndex = 2
     
     Outline_A.Name = "Outline_A"
     Outline_A.Parent = Window
-    Outline_A.BackgroundColor3 = middledebug.OutlineColor -- 轮廓颜色
+    Outline_A.BackgroundColor3 = getRainbowColor() -- 初始彩虹色
     Outline_A.BorderSizePixel = 0
     Outline_A.Position = UDim2.new(0, 0, 0, 18)
     Outline_A.Size = UDim2.new(0, 160, 0, 2)
     Outline_A.ZIndex = 5
     
-    -- 改2：文字颜色微调
+    -- 改2：文字初始设为彩虹色
     WindowTitle.Name = "WindowTitle"
     WindowTitle.Parent = Window
     WindowTitle.BackgroundTransparency = 1.000
@@ -50,7 +56,7 @@ function Nofitication:Notify(nofdebug, middledebug, all)
     WindowTitle.ZIndex = 4
     WindowTitle.Font = Enum.Font.GothamSemibold
     WindowTitle.Text = nofdebug.Title
-    WindowTitle.TextColor3 = Color3.fromRGB(255, 255, 255) -- 纯白色
+    WindowTitle.TextColor3 = getRainbowColor() -- 彩虹色标题
     WindowTitle.TextSize = 10.000
     WindowTitle.TextXAlignment = Enum.TextXAlignment.Left
     
@@ -63,7 +69,7 @@ function Nofitication:Notify(nofdebug, middledebug, all)
     WindowDescription.ZIndex = 4
     WindowDescription.Font = Enum.Font.GothamSemibold
     WindowDescription.Text = nofdebug.Description
-    WindowDescription.TextColor3 = Color3.fromRGB(240, 240, 240) -- 浅灰色
+    WindowDescription.TextColor3 = getRainbowColor() -- 彩虹色描述
     WindowDescription.TextSize = 9.000
     WindowDescription.TextWrapped = true
     WindowDescription.TextXAlignment = Enum.TextXAlignment.Left
@@ -72,54 +78,75 @@ function Nofitication:Notify(nofdebug, middledebug, all)
     if SelectedType == "default" then
         local function ORBHB_fake_script()
             local script = Instance.new('LocalScript', ambientShadow)
+            -- 尺寸动画：展开
             ambientShadow:TweenSize(UDim2.new(0, 166, 0, 61), "Out", "Linear", 0.2)
             Window.Size = UDim2.new(0, 160, 0, 55)
             Outline_A:TweenSize(UDim2.new(0, 0, 0, 2), "Out", "Linear", middledebug.Time)
-    
+            
+            -- 新增：彩虹颜色循环（通知显示期间持续更新）
+            local connection
+            connection = game:GetService("RunService").Heartbeat:Connect(function()
+                local rainbow = getRainbowColor()
+                WindowTitle.TextColor3 = rainbow
+                WindowDescription.TextColor3 = rainbow
+                Outline_A.BackgroundColor3 = rainbow
+            end)
+        
             wait(middledebug.Time)
         
+            -- 尺寸动画：收起
             ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+            connection:Disconnect() -- 停止颜色循环
             
             wait(0.2)
             ambientShadow:Destroy()
         end
         coroutine.wrap(ORBHB_fake_script)()
     elseif SelectedType == "image" then
-        ambientShadow:TweenSize(UDim2.new(0, 166, 0, 61), "Out", "Linear", 0.2)
-        Window.Size = UDim2.new(0, 160, 0, 55)
-        WindowTitle.Position = UDim2.new(0, 20, 0, 2)
-        
-        -- 改3：图片按钮背景设为透明
+        -- 新增：图片按钮初始彩虹色（若需要）
         local ImageButton = Instance.new("ImageButton")
         ImageButton.Parent = Window
         ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        ImageButton.BackgroundTransparency = 1.000 -- 确保图片按钮无背景
+        ImageButton.BackgroundTransparency = 1.000
         ImageButton.BorderSizePixel = 0
         ImageButton.Position = UDim2.new(0, 3, 0, 3)
         ImageButton.Size = UDim2.new(0, 14, 0, 14)
         ImageButton.ZIndex = 5
         ImageButton.AutoButtonColor = false
         ImageButton.Image = all.Image
-        ImageButton.ImageColor3 = all.ImageColor -- 可根据透明背景调整图片颜色
-
+        ImageButton.ImageColor3 = getRainbowColor() -- 图片彩虹色
+        
+        -- 尺寸动画：展开
+        ambientShadow:TweenSize(UDim2.new(0, 166, 0, 61), "Out", "Linear", 0.2)
+        Window.Size = UDim2.new(0, 160, 0, 55)
+        WindowTitle.Position = UDim2.new(0, 20, 0, 2)
+        
         local function ORBHB_fake_script()
             local script = Instance.new('LocalScript', ambientShadow)
+            -- 新增：彩虹颜色循环
+            local connection
+            connection = game:GetService("RunService").Heartbeat:Connect(function()
+                local rainbow = getRainbowColor()
+                WindowTitle.TextColor3 = rainbow
+                WindowDescription.TextColor3 = rainbow
+                Outline_A.BackgroundColor3 = rainbow
+                ImageButton.ImageColor3 = rainbow -- 同步图片颜色
+            end)
         
             Outline_A:TweenSize(UDim2.new(0, 0, 0, 2), "Out", "Linear", middledebug.Time)
 
             wait(middledebug.Time)
         
+            -- 尺寸动画：收起
             ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+            connection:Disconnect()
             
             wait(0.2)
             ambientShadow:Destroy()
         end
         coroutine.wrap(ORBHB_fake_script)()
     elseif SelectedType == "option" then
-        ambientShadow:TweenSize(UDim2.new(0, 166, 0, 75), "Out", "Linear", 0.2)
-        Window.Size = UDim2.new(0, 160, 0, 70)
-        
-        -- 改4：选项按钮保持透明背景一
+        -- 新增：选项按钮初始彩虹色
         local Uncheck = Instance.new("ImageButton")
         local Check = Instance.new("ImageButton")
         
@@ -133,7 +160,7 @@ function Nofitication:Notify(nofdebug, middledebug, all)
         Uncheck.ZIndex = 5
         Uncheck.AutoButtonColor = false
         Uncheck.Image = "http://www.roblox.com/asset/?id=6031094678"
-        Uncheck.ImageColor3 = Color3.fromRGB(255, 84, 84) -- 红色按钮
+        Uncheck.ImageColor3 = getRainbowColor() -- 取消按钮彩虹色
         
         Check.Name = "Check"
         Check.Parent = Window
@@ -145,17 +172,33 @@ function Nofitication:Notify(nofdebug, middledebug, all)
         Check.ZIndex = 5
         Check.AutoButtonColor = false
         Check.Image = "http://www.roblox.com/asset/?id=6031094667"
-        Check.ImageColor3 = Color3.fromRGB(83, 230, 50) -- 绿色按钮
+        Check.ImageColor3 = getRainbowColor() -- 确认按钮彩虹色
 
+        -- 尺寸动画：展开
+        ambientShadow:TweenSize(UDim2.new(0, 166, 0, 75), "Out", "Linear", 0.2)
+        Window.Size = UDim2.new(0, 160, 0, 70)
+        
         local function ORBHB_fake_script()
             local script = Instance.new('LocalScript', ambientShadow)
-        
             local Stilthere = true
+            
+            -- 新增：彩虹颜色循环
+            local connection
+            connection = game:GetService("RunService").Heartbeat:Connect(function()
+                local rainbow = getRainbowColor()
+                WindowTitle.TextColor3 = rainbow
+                WindowDescription.TextColor3 = rainbow
+                Outline_A.BackgroundColor3 = rainbow
+                Uncheck.ImageColor3 = rainbow
+                Check.ImageColor3 = rainbow
+            end)
+        
             local function Unchecked()
                 pcall(function()
                     all.Callback(false)
                 end)
                 ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+                connection:Disconnect()
                 
                 wait(0.2)
                 ambientShadow:Destroy()
@@ -166,6 +209,7 @@ function Nofitication:Notify(nofdebug, middledebug, all)
                     all.Callback(true)
                 end)
                 ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+                connection:Disconnect()
                 
                 wait(0.2)
                 ambientShadow:Destroy()
@@ -179,8 +223,8 @@ function Nofitication:Notify(nofdebug, middledebug, all)
             wait(middledebug.Time)
 
             if Stilthere == true then
-        
                 ambientShadow:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Linear", 0.2)
+                connection:Disconnect()
                 
                 wait(0.2)
                 ambientShadow:Destroy()
