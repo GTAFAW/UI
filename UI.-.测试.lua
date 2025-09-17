@@ -2335,7 +2335,6 @@ function Library:Windowxgo(setup)
     local slideDuration = 1
     local interval = 10
 
-    --新增：播放开关与事件
     local isPlaying = true
     local playEvent = Instance.new('BindableEvent')
 
@@ -2416,16 +2415,29 @@ function Library:Windowxgo(setup)
 
     initBackgrounds()
 
-    local function startSlideLoop()
-        task.spawn(function()
-            while isPlaying do
-                task.wait(interval)
-                if not isPlaying then break end
-                slideSwitch()
-            end
-        end)
-    end
-    startSlideLoop() 
+--================ 修改1 =================
+local isPlaying   = true
+local loopEvent   = Instance.new('BindableEvent')   -- 用来打断 task.wait
+
+-- 唯一循环入口
+local function startSlideLoop()
+    task.spawn(function()
+        while isPlaying do
+            -- 用 loopEvent 来实时中断等待
+            local t0 = tick()
+            local conn; conn = loopEvent.Event:Connect(function() end)
+            local ok = false
+            repeat
+                ok = task.wait(interval - (tick() - t0))
+            until not ok or not isPlaying or (tick() - t0 >= interval)
+            conn:Disconnect()
+
+            if not isPlaying then break end  
+            slideSwitch()
+        end
+    end)
+end
+startSlideLoop()   -- 首次启动
 
 	local BlurEle = Library.UIBlur.new(MainFrame,true);
 
