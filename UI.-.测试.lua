@@ -2272,36 +2272,35 @@ end;
     end))
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
-	setup = setup or {};
+    setup = setup or {};
+    setup.Title = setup.Title or "Window";
+    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
+    setup.Size = setup.Size or Library.SizeLibrary.Default;
+    setup.KeySystem = setup.KeySystem or false;
+    setup.Logo = setup.Logo or "rbxassetid://7733920644";
+    setup.ToggleMethod = setup.ToggleMethod or "Application";
 
-	setup.Title = setup.Title or "Window";
-	setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
-	setup.Size = setup.Size or Library.SizeLibrary.Default;
-	setup.KeySystem = setup.KeySystem or false;
-	setup.Logo = setup.Logo or "rbxassetid://7733920644";
-	setup.ToggleMethod = setup.ToggleMethod or "Application";
-	
-	if setup.KeySystem then
-		setup.KeySystemInfo = setup.KeySystemInfo or {};
-		setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
-		setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
-	end
+    if setup.KeySystem then
+        setup.KeySystemInfo = setup.KeySystemInfo or {};
+        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
+        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
+        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
+    end
 
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
-	local DropShadow = Instance.new("ImageLabel")
-	local Ico = Instance.new("ImageLabel")
-	
+    local DropShadow = Instance.new("ImageLabel")
+    local Ico = Instance.new("ImageLabel")
+
     local images = {
         "rbxassetid://113180426865309",
         "rbxassetid://131471211520335",
-	    "rbxassetid://109520199976167",
-	    "rbxassetid://122958225353990",
+        "rbxassetid://109520199976167",
+        "rbxassetid://122958225353990",
         "rbxassetid://73164000772284",
-	    "rbxassetid://101305557601423",
+        "rbxassetid://101305557601423",
         "rbxassetid://110630445580007",
         "rbxassetid://108644687915512",
         "rbxassetid://107018855884545",
@@ -2320,7 +2319,7 @@ function Library:Windowxgo(setup)
         "rbxassetid://129410104830757",
         "rbxassetid://117937637678090",
         "rbxassetid://89768207500333",
-        "rbxassetid://136363102949077",      
+        "rbxassetid://136363102949077",
         "rbxassetid://74648780628027",
         "rbxassetid://103232778626018",
         "rbxassetid://76127155963189",
@@ -2329,14 +2328,13 @@ function Library:Windowxgo(setup)
         "rbxassetid://74804451529535",
         "rbxassetid://115691043156297",
     }
-    
+
     local currentIndex = 1
     local isForward = true
     local slideDuration = 1
     local interval = 10
-
     local isPlaying = true
-    local playEvent = Instance.new('BindableEvent')
+    local loopEvent = Instance.new('BindableEvent')
 
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
@@ -2415,73 +2413,66 @@ function Library:Windowxgo(setup)
 
     initBackgrounds()
 
---================ 修改1 =================
-local isPlaying   = true
-local loopEvent   = Instance.new('BindableEvent')   -- 用来打断 task.wait
+    local function startSlideLoop()
+        task.spawn(function()
+            while true do
+                local t0 = tick()
+                local conn = loopEvent.Event:Connect(function() end)
+                repeat
+                    task.wait(0.05)
+                until (not isPlaying) or (tick() - t0 >= interval)
+                conn:Disconnect()
+                if not isPlaying then break end
+                slideSwitch()
+            end
+        end)
+    end
+    startSlideLoop()
 
--- 唯一循环入口
-local function startSlideLoop()
-    task.spawn(function()
-        while isPlaying do
-            -- 用 loopEvent 来实时中断等待
-            local t0 = tick()
-            local conn; conn = loopEvent.Event:Connect(function() end)
-            local ok = false
-            repeat
-                ok = task.wait(interval - (tick() - t0))
-            until not ok or not isPlaying or (tick() - t0 >= interval)
-            conn:Disconnect()
+    local BlurEle = Library.UIBlur.new(MainFrame, true)
 
-            if not isPlaying then break end  
-            slideSwitch()
-        end
-    end)
-end
-startSlideLoop()   -- 首次启动
+    DropShadow.Name = "DropShadow"
+    DropShadow.Parent = MainFrame
+    DropShadow.BackgroundTransparency = 1.000
+    DropShadow.Position = UDim2.new(0, -5, 0, -5)
+    DropShadow.Rotation = 0.010
+    DropShadow.Size = UDim2.new(1, 10, 1, 10)
+    DropShadow.ZIndex = -5
+    DropShadow.Image = "rbxassetid://297694300"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.500
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+    DropShadow.SliceScale = 0.050
 
-	local BlurEle = Library.UIBlur.new(MainFrame,true);
+    Ico.Name = "Ico"
+    Ico.Parent = MainFrame
+    Ico.AnchorPoint = Vector2.new(0.5, 0.5)
+    Ico.BackgroundTransparency = 1.000
+    Ico.BorderSizePixel = 0
+    Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
+    Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
+    Ico.Image = setup.Logo
+    Ico.ImageTransparency = 1.000
 
-	DropShadow.Name = "DropShadow"
-	DropShadow.Parent = MainFrame
-	DropShadow.BackgroundTransparency = 1.000
-	DropShadow.Position = UDim2.new(0, -5, 0, -5)
-	DropShadow.Rotation = 0.010
-	DropShadow.Size = UDim2.new(1, 10, 1, 10)
-	DropShadow.ZIndex = -5
-	DropShadow.Image = "rbxassetid://297694300"
-	DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-	DropShadow.ImageTransparency = 0.500
-	DropShadow.ScaleType = Enum.ScaleType.Slice
-	DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-	DropShadow.SliceScale = 0.050
+    Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
+    Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
 
-	Ico.Name = "Ico"
-	Ico.Parent = MainFrame
-	Ico.AnchorPoint = Vector2.new(0.5, 0.5)
-	Ico.BackgroundTransparency = 1.000
-	Ico.BorderSizePixel = 0
-	Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
-	Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
-	Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	Ico.Image = setup.Logo
-	Ico.ImageTransparency = 1.000
+    if setup.KeySystem then
+        setup.KeySystemInfo.Enabled = true
+        setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
 
-	Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{Size = Library.SizeLibrary.Loading})
-	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 0.25})
+        task.wait(1)
 
-	if setup.KeySystem then
-		setup.KeySystemInfo.Enabled = true;
-		setup.KeySystemInfo.Finished = Instance.new('BindableEvent');
+        task.delay(0.1, function()
+            Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1})
+        end)
 
-		task.wait(1)
+        Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
 
-		task.delay(0.1,function()
-			Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
-		end)
+        task.wait(1)
 
-		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
-
-		task.wait(1);
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
