@@ -6490,8 +6490,6 @@ function Root:Slider(setup)
     local UIStroke_3 = Instance.new("UIStroke")
     local ValueText = Instance.new("TextLabel")
     local InputBox = Instance.new("TextBox")
-    local EnableAutoBtn = Instance.new("TextButton")
-    local DisableAutoBtn = Instance.new("TextButton")
 
     SliderBlock.Name = "SliderBlock"
     SliderBlock.Parent = ScrollingFrame
@@ -6647,36 +6645,8 @@ function Root:Slider(setup)
 
     local IsHold = false
     local RoundNum = setup.Round;
-    local IsAutoSync = true
+    local IsAutoSync = true  
     local ExternalValue = setup.Default
-
-    EnableAutoBtn.Name = "EnableAutoBtn"
-    EnableAutoBtn.Parent = SliderBlock
-    EnableAutoBtn.BackgroundColor3 = Color3.fromRGB(50, 180, 50)
-    EnableAutoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    EnableAutoBtn.BorderSizePixel = 0
-    EnableAutoBtn.Position = UDim2.new(0.5, 10, 0.4, 0)
-    EnableAutoBtn.Size = UDim2.new(0.15, 0, 0.4, 0)
-    EnableAutoBtn.ZIndex = 11
-    EnableAutoBtn.Font = Enum.Font.Gotham
-    EnableAutoBtn.Text = "开启自动同步"
-    EnableAutoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    EnableAutoBtn.TextScaled = true
-    EnableAutoBtn.TextSize = 12.000
-
-    DisableAutoBtn.Name = "DisableAutoBtn"
-    DisableAutoBtn.Parent = SliderBlock
-    DisableAutoBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
-    DisableAutoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    DisableAutoBtn.BorderSizePixel = 0
-    DisableAutoBtn.Position = UDim2.new(0.72, 10, 0.4, 0)
-    DisableAutoBtn.Size = UDim2.new(0.15, 0, 0.4, 0)
-    DisableAutoBtn.ZIndex = 11
-    DisableAutoBtn.Font = Enum.Font.Gotham
-    DisableAutoBtn.Text = "关闭自动同步"
-    DisableAutoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    DisableAutoBtn.TextScaled = true
-    DisableAutoBtn.TextSize = 12.000
 
     Library:MakeDrop(SliderBlock , UIStroke , Library.Colors.Hightlight)
 
@@ -6722,7 +6692,7 @@ function Root:Slider(setup)
     Block.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             IsHold = true
-            IsAutoSync = false
+            IsAutoSync = false 
             update(Input)
         end
     end)
@@ -6730,7 +6700,7 @@ function Root:Slider(setup)
     Block.InputEnded:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             IsHold = false
-            IsAutoSync = true
+            IsAutoSync = true  
         end
     end)
 
@@ -6774,8 +6744,8 @@ function Root:Slider(setup)
 
         SliderBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
     end
-        UpdateBlock()
-
+    UpdateBlock()
+    
     function RootSkid:SyncExternalValue(newValue)
         if IsAutoSync and not IsHold then
             local validValue = math.clamp(newValue, setup.Min, setup.Max)
@@ -6785,21 +6755,12 @@ function Root:Slider(setup)
             Library:Tween(Move, Library.TweenLibrary.FastEffect, {
                 Position = UDim2.new(normalizedPos, 0, 0.5, 0)
             });
-            
+           
             ValueText.Text = tostring(validValue)
             InputBox.Text = tostring(validValue)
             setup.Callback(validValue)
         end
     end
-
-    EnableAutoBtn.MouseButton1Click:Connect(function()
-        IsAutoSync = true
-        RootSkid:SyncExternalValue(ExternalValue)
-    end)
-
-    DisableAutoBtn.MouseButton1Click:Connect(function()
-        IsAutoSync = false
-    end)
 
     local RootSkid = {};
 
@@ -6810,10 +6771,11 @@ function Root:Slider(setup)
 
     function RootSkid:Value(Setup)
         setup.Default = Setup;
-        ExternalValue = Setup  -- 新增：更新外部值记录
+        ExternalValue = Setup
+        local normalizedPos = (setup.Default - setup.Min) / (setup.Max - setup.Min)
         
         Library:Tween(Move , Library.TweenLibrary.FastEffect,{
-            Position = UDim2.new((setup.Default - setup.Min) / (setup.Max - setup.Min), 0, 0.5, 0)
+            Position = UDim2.new(normalizedPos, 0, 0.5, 0)
         });
 
         ValueText.Text = tostring(setup.Default)
@@ -6822,10 +6784,9 @@ function Root:Slider(setup)
     end;
 
     function RootSkid:Visible(value)
-        SliderBlock.Visible = value;	
+        SliderBlock.Visible = value;
     end;
-
-    -- 新增：暴露自动同步状态的控制接口
+    
     function RootSkid:SetAutoSync(enabled)
         IsAutoSync = enabled
     end
