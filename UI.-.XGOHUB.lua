@@ -3244,19 +3244,19 @@ end;
     end))
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
-    setup = setup or {};
-    setup.Title = setup.Title or "Window";
-    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
-    setup.Size = setup.Size or Library.SizeLibrary.Default;
-    setup.KeySystem = setup.KeySystem or false;
-    setup.Logo = setup.Logo or "rbxassetid://7733920644";
-    setup.ToggleMethod = setup.ToggleMethod or "Application";
+    setup = setup or {}
+    setup.Title = setup.Title or "Window"
+    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl
+    setup.Size = setup.Size or Library.SizeLibrary.Default
+    setup.KeySystem = setup.KeySystem or false
+    setup.Logo = setup.Logo or "rbxassetid://7733920644"
+    setup.ToggleMethod = setup.ToggleMethod or "Application"
 
     if setup.KeySystem then
-        setup.KeySystemInfo = setup.KeySystemInfo or {};
-        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
-        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
+        setup.KeySystemInfo = setup.KeySystemInfo or {}
+        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System"
+        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end
+        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end
     end
 
     local ScreenGui = Instance.new("ScreenGui")
@@ -3349,6 +3349,8 @@ function Library:Windowxgo(setup)
     local isForward = true
     local slideDuration = 1.5
     local interval = 13.5
+    local paused = false 
+    local switchRequested = false
 
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
@@ -3451,8 +3453,14 @@ function Library:Windowxgo(setup)
 
     task.spawn(function()
         while true do
-            task.wait(interval)
-            slideSwitch()
+            if not paused and not switchRequested then
+                task.wait(interval)
+                if not paused and not switchRequested then
+                    slideSwitch()
+                end
+            else
+                task.wait()
+            end
         end
     end)
 
@@ -3501,6 +3509,27 @@ function Library:Windowxgo(setup)
         Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
 
         task.wait(1);
+    end
+    
+    Library.Windowxgo = {}
+
+    function Library.Windowxgo.PauseToggle()
+        paused = not paused
+    end
+
+    function Library.Windowxgo.PrevImage()
+        switchRequested = true
+        isForward = false
+        slideSwitch()
+        switchRequested = false
+    end
+
+    function Library.Windowxgo.NextImage()
+        switchRequested = true
+        isForward = true
+        slideSwitch()
+        switchRequested = false
+    end
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
