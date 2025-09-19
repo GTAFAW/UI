@@ -3317,7 +3317,17 @@ function Library:Windowxgo(setup)
     local currentIndex = 1
     local isForward = true
     local slideDuration = 1
-    local interval = 10
+    local interval = 15
+
+    local function preloadNextImage()
+        local nextIndex = getNextIndex()
+        local nextImageId = images[nextIndex]
+        local tempLoader = Instance.new("ImageLabel")
+        tempLoader.Image = nextImageId
+        task.delay(1, function()
+            tempLoader:Destroy()
+        end)
+    end
 
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
@@ -3397,9 +3407,11 @@ function Library:Windowxgo(setup)
     initBackgrounds()
 
     task.spawn(function()
+        preloadNextImage()
         while true do
             task.wait(interval)
             slideSwitch()
+            preloadNextImage()
         end
     end)
    
@@ -3445,7 +3457,7 @@ function Library:Windowxgo(setup)
 
 		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
 
-		task.wait(1);       
+		task.wait(1);
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
