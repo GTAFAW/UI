@@ -3350,17 +3350,24 @@ function Library:Windowxgo(setup)
     local slideDuration = 1.5
     local interval = 13.5
 
+    local readyToLoad = Instance.new("BindableEvent")
+    local nextToPreload = 2
+
+    task.spawn(function()
+        game:GetService("ContentProvider"):PreloadAsync(images)
+    end)
+
     local preloader = Instance.new("ImageLabel")
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
     local function initBackgrounds()
-        local firstImage = images[currentIndex]
+        local first = images[currentIndex]
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = firstImage
+        BackgroundImage1.Image = first
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3369,44 +3376,44 @@ function Library:Windowxgo(setup)
         BackgroundImage2.BackgroundTransparency = 1
         BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = firstImage
+        BackgroundImage2.Image = first
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ZIndex = 2
     end
 
-    local function getNextIndex()
-        if isForward then
-            return currentIndex == #images and #images - 1 or currentIndex + 1
+    local function getNextIndex(idx, fwd)
+        if fwd then
+            return idx == #images and #images - 1 or idx + 1
         else
-            return currentIndex == 1 and 2 or currentIndex - 1
+            return idx == 1 and 2 or idx - 1
         end
     end
-
-    local function prefetch(assetId)
-        preloader.Image = assetId
-        task.wait(0.8)
-    end
+    
+    task.spawn(function()
+        while true do
+            readyToLoad.Event:Wait()
+            local target = getNextIndex(currentIndex, isForward)
+            if (isForward and currentIndex == #images) or (not isForward and currentIndex == 1) then
+                isForward = not isForward
+                target = getNextIndex(currentIndex, isForward)
+            end
+            preloader.Image = images[target]
+            readyToLoad:Fire()
+            task.wait()
+        end
+    end)
 
     local function slideSwitch()
-        local nextIndex = getNextIndex()
-        task.spawn(function()
-            prefetch(images[nextIndex])
-        end)
-        task.wait(1)
-
+        local nextIndex = getNextIndex(currentIndex, isForward)
         BackgroundImage2.Image = images[nextIndex]
 
-        local startPos = UDim2.new(0, 0, 0, 0)
+        local startPos = UDim2.new(1, 0, 0, 0)
         local endPos   = UDim2.new(0, 0, 0, 0)
-        local oldEndPos= UDim2.new(0, 0, 0, 0)
-
-        if isForward then
-            startPos  = UDim2.new(1, 0, 0, 0)
-            oldEndPos = UDim2.new(-1, 0, 0, 0)
-        else
-            startPos  = UDim2.new(-1, 0, 0, 0)
-            oldEndPos = UDim2.new(1, 0, 0, 0)
+        local oldEndPos= UDim2.new(-1, 0, 0, 0)
+        if not isForward then
+            startPos = UDim2.new(-1, 0, 0, 0)
+            oldEndPos= UDim2.new(1, 0, 0, 0)
         end
 
         BackgroundImage2.Position = startPos
@@ -3417,17 +3424,11 @@ function Library:Windowxgo(setup)
         task.wait(slideDuration)
 
         currentIndex = nextIndex
-        if currentIndex == #images then
-            isForward = false
-        elseif currentIndex == 1 then
-            isForward = true
-        end
-
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage2.Position = startPos
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
 
-        preloader.Image = ""
+        readyToLoad:Fire()
     end
 
     ScreenGui.Parent = game.CoreGui
@@ -3454,6 +3455,8 @@ function Library:Windowxgo(setup)
             slideSwitch()
         end
     end)
+
+    readyToLoad:Fire()
 
     local BlurEle = Library.UIBlur.new(MainFrame, true)
 
