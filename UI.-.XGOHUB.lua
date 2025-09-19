@@ -4930,13 +4930,11 @@ function Library:Windowxgo(setup)
 
 			return RootSkid;
 		end;
------- // 颜色选择器   ----------------------------------------------------------------------------------------
--- 补充颜色打包工具函数（适配配置保存）
+------ // 颜色选择器   ----------------------------------------------------------------------------------------------
 local function PackColor(color)
     return {R = color.R * 255, G = color.G * 255, B = color.B * 255}
 end
 
--- 配置保存函数（适配原UI库）
 local function SaveConfiguration()
     if not CEnabled then return end
     local HttpService = game:GetService("HttpService")
@@ -4975,7 +4973,6 @@ local function SaveConfiguration()
     end
 end
 
--- 修复版：按钮触发式颜色选择器（确保颜色可选择）
 function Root:ColorPickerButton(setup)
     setup = setup or {}
     local cfg = {
@@ -4986,7 +4983,6 @@ function Root:ColorPickerButton(setup)
         FrameSize = setup.FrameSize or UDim2.new(0, 300, 0, 220)
     }
 
-    -- ===================== 1. 颜色选择按钮（基础组件） =====================
     local ColorBtn = Instance.new("Frame")
     ColorBtn.Name = "ColorPickerButton"
     ColorBtn.Parent = ScrollingFrame
@@ -5035,7 +5031,6 @@ function Root:ColorPickerButton(setup)
     BtnClick.TextTransparency = 1
     BtnClick.ZIndex = 15
 
-    -- ===================== 2. 颜色选择框架（修复交互核心） =====================
     local ColorFrame = Instance.new("Frame")
     ColorFrame.Name = "ColorPickerFrame"
     ColorFrame.Parent = ScrollingFrame
@@ -5046,7 +5041,6 @@ function Root:ColorPickerButton(setup)
     ColorFrame.ZIndex = 15
     ColorFrame.Visible = false
     ColorFrame.ClipsDescendants = true
-    -- 关键修复：确保框架可交互
     ColorFrame.Active = true
 
     local FrameShadow = Instance.new("ImageLabel")
@@ -5080,7 +5074,6 @@ function Root:ColorPickerButton(setup)
     FrameTitle.TextStrokeColor3 = Library.Colors.TextColor
     FrameTitle.TextStrokeTransparency = 0.95
 
-    -- ===================== 3. 颜色选择核心（修复拖动和坐标） =====================
     local TweenService = game:GetService("TweenService")
     local UserInputService = game:GetService("UserInputService")
     local RunService = game:GetService("RunService")
@@ -5088,21 +5081,18 @@ function Root:ColorPickerButton(setup)
     local LocalPlayer = Players.LocalPlayer
     local mouse = LocalPlayer:GetMouse()
 
-    -- 3.1 颜色预览区
     local Preview = Instance.new("Frame")
     Preview.Parent = ColorFrame
     Preview.Position = UDim2.new(0.02, 0, 0, 40)
     Preview.Size = UDim2.new(0.96, 0, 0, 30)
     Preview.BackgroundColor3 = cfg.DefaultColor
     Preview.BorderSizePixel = 0
-    -- 增加预览区边框，让颜色更明显
     local PreviewStroke = Instance.new("UIStroke")
     PreviewStroke.Parent = Preview
     PreviewStroke.Color = Color3.fromRGB(255,255,255)
     PreviewStroke.Transparency = 0.5
     PreviewStroke.Thickness = 1
 
-    -- 3.2 色相滑块（修复拖动检测）
     local HueSlider = Instance.new("Frame")
     HueSlider.Name = "HueSlider"
     HueSlider.Parent = ColorFrame
@@ -5110,7 +5100,6 @@ function Root:ColorPickerButton(setup)
     HueSlider.Size = UDim2.new(0.96, 0, 0, 8)
     HueSlider.BackgroundColor3 = Color3.fromRGB(0,0,0)
     HueSlider.BackgroundTransparency = 0.1
-    -- 关键修复：滑块可交互
     HueSlider.Active = true
 
     local HueGradient = Instance.new("UIGradient")
@@ -5130,13 +5119,12 @@ function Root:ColorPickerButton(setup)
     HuePoint.Parent = HueSlider
     HuePoint.Size = UDim2.new(0, 16, 0, 16)
     HuePoint.AnchorPoint = Vector2.new(0.5, 0.5)
-    HuePoint.Position = UDim2.new(0, 0, 0.5, 0) -- 初始位置
+    HuePoint.Position = UDim2.new(0, 0, 0.5, 0)
     HuePoint.BackgroundTransparency = 1
     HuePoint.Image = "rbxassetid://7733710700"
     HuePoint.ImageColor3 = Color3.fromRGB(255,255,255)
     HuePoint.ZIndex = 20
 
-    -- 3.3 饱和度/明度面板（修复坐标计算）
     local SvPanel = Instance.new("Frame")
     SvPanel.Name = "SvPanel"
     SvPanel.Parent = ColorFrame
@@ -5144,10 +5132,8 @@ function Root:ColorPickerButton(setup)
     SvPanel.Size = UDim2.new(0.6, 0, 0, 80)
     SvPanel.BackgroundColor3 = Color3.fromRGB(0,0,0)
     SvPanel.BackgroundTransparency = 0.1
-    -- 关键修复：面板可交互
     SvPanel.Active = true
 
-    -- 修复SV面板背景（增加饱和度-明度渐变，确保颜色显示正常）
     local SvSatGradient = Instance.new("UIGradient")
     SvSatGradient.Parent = SvPanel
     SvSatGradient.Color = ColorSequence.new({
@@ -5169,13 +5155,12 @@ function Root:ColorPickerButton(setup)
     SvPoint.Parent = SvPanel
     SvPoint.Size = UDim2.new(0, 14, 0, 14)
     SvPoint.AnchorPoint = Vector2.new(0.5, 0.5)
-    SvPoint.Position = UDim2.new(1, 0, 0, 0) -- 初始位置（100%饱和度，100%明度）
+    SvPoint.Position = UDim2.new(1, 0, 0, 0)
     SvPoint.BackgroundTransparency = 1
     SvPoint.Image = "rbxassetid://7733710700"
     SvPoint.ImageColor3 = Color3.fromRGB(255,255,255)
     SvPoint.ZIndex = 20
 
-    -- 3.4 RGB输入区（修复数值同步）
     local RgbContainer = Instance.new("Frame")
     RgbContainer.Parent = ColorFrame
     RgbContainer.Position = UDim2.new(0.65, 0, 0, 100)
@@ -5219,7 +5204,6 @@ function Root:ColorPickerButton(setup)
         InputBox.TextColor3 = Library.Colors.TextColor
         InputBox.TextSize = 12
         InputBox.TextXAlignment = Enum.TextXAlignment.Center
-        -- 修复：只允许输入数字
         InputBox:GetPropertyChangedSignal("Text"):Connect(function()
             InputBox.Text = InputBox.Text:gsub("[^0-9]", "")
             if #InputBox.Text > 3 then InputBox.Text = InputBox.Text:sub(1, 3) end
@@ -5228,7 +5212,6 @@ function Root:ColorPickerButton(setup)
         table.insert(RgbInputs, InputBox)
     end
 
-    -- 3.5 确认按钮
     local ConfirmBtn = Instance.new("Frame")
     ConfirmBtn.Parent = ColorFrame
     ConfirmBtn.Position = UDim2.new(0.02, 0, 0, 190)
@@ -5255,46 +5238,35 @@ function Root:ColorPickerButton(setup)
     ConfirmClick.BackgroundTransparency = 1
     ConfirmClick.TextTransparency = 1
     ConfirmClick.ZIndex = 20
-
-    -- ===================== 4. 修复颜色选择逻辑 =====================
+    
     local isFrameOpen = false
     local h, s, v = cfg.DefaultColor:ToHSV()
     local currentColor = cfg.DefaultColor
-
-    -- 修复：初始化UI（确保坐标和数值正确）
+    
     local function updateColorUI()
-        -- 1. 更新预览色
         Preview.BackgroundColor3 = currentColor
-        -- 2. 更新色相滑块（关键：用绝对坐标计算，避免相对坐标错误）
         local huePointX = math.clamp(h * HueSlider.AbsoluteSize.X, 0, HueSlider.AbsoluteSize.X)
         HuePoint.Position = UDim2.new(0, huePointX, 0.5, 0)
-        -- 3. 更新SV面板（关键：修复饱和度/明度对应的坐标）
         local svPointX = math.clamp(s * SvPanel.AbsoluteSize.X, 0, SvPanel.AbsoluteSize.X)
         local svPointY = math.clamp((1 - v) * SvPanel.AbsoluteSize.Y, 0, SvPanel.AbsoluteSize.Y)
         SvPoint.Position = UDim2.new(0, svPointX, 0, svPointY)
-        -- 4. 更新RGB输入框
         local r = math.floor(currentColor.R * 255)
         local g = math.floor(currentColor.G * 255)
         local b = math.floor(currentColor.B * 255)
-        -- 避免输入框频繁刷新导致闪烁
         if RgbInputs[1].Text ~= tostring(r) then RgbInputs[1].Text = tostring(r) end
         if RgbInputs[2].Text ~= tostring(g) then RgbInputs[2].Text = tostring(g) end
         if RgbInputs[3].Text ~= tostring(b) then RgbInputs[3].Text = tostring(b) end
-        -- 5. 更新SV面板的色相叠加（让面板显示当前色相的饱和度-明度变化）
         SvSatGradient.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromHSV(h, 0, 1)),
             ColorSequenceKeypoint.new(1, Color3.fromHSV(h, 1, 1))
         })
     end
-    -- 初始执行一次，确保UI正确
     updateColorUI()
 
-    -- 修复：按钮点击展开/收起
     BtnClick.MouseButton1Click:Connect(function()
         isFrameOpen = not isFrameOpen
         if isFrameOpen then
             ColorFrame.Visible = true
-            -- 确保框架在按钮下方（用绝对位置避免滚动后错位）
             local btnBottomY = ColorBtn.AbsolutePosition.Y + ColorBtn.AbsoluteSize.Y
             ColorFrame.Position = UDim2.new(0, ColorBtn.AbsolutePosition.X, 0, btnBottomY + 10)
             TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
@@ -5311,26 +5283,20 @@ function Root:ColorPickerButton(setup)
         end
     end)
 
-    -- 修复：色相滑块拖动（增加InputBegan/InputEnded直接绑定到滑块）
     local isHueDragging = false
-    -- 用InputBegan替代MouseButton1Down，兼容触摸和鼠标
     HueSlider.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isHueDragging = true
-            -- 拖动时立即更新一次，避免延迟
             local sliderX = math.clamp(input.Position.X - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
             h = sliderX / HueSlider.AbsoluteSize.X
             currentColor = Color3.fromHSV(h, s, v)
             updateColorUI()
         end
     end)
-
-    -- 修复：SV面板拖动
     local isSvDragging = false
     SvPanel.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isSvDragging = true
-            -- 拖动时立即更新
             local panelX = math.clamp(input.Position.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
             local panelY = math.clamp(input.Position.Y - SvPanel.AbsolutePosition.Y, 0, SvPanel.AbsoluteSize.Y)
             s = panelX / SvPanel.AbsoluteSize.X
@@ -5340,21 +5306,15 @@ function Root:ColorPickerButton(setup)
         end
     end)
 
-    -- 修复：输入结束后取消拖动状态
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isHueDragging = false
             isSvDragging = false
         end
     end)
-
-    -- 修复：实时拖动更新（用RenderStepped确保流畅）
     RunService.RenderStepped:Connect(function()
-        if not isFrameOpen then return end -- 框架关闭时不执行
-
-        -- 1. 色相拖动更新
+        if not isFrameOpen then return end
         if isHueDragging then
-            -- 用鼠标绝对位置计算，避免InputChanged延迟
             local mouseX = UserInputService:GetMouseLocation().X
             local sliderX = math.clamp(mouseX - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
             h = sliderX / HueSlider.AbsoluteSize.X
@@ -5362,7 +5322,6 @@ function Root:ColorPickerButton(setup)
             updateColorUI()
         end
 
-        -- 2. SV拖动更新
         if isSvDragging then
             local mousePos = UserInputService:GetMouseLocation()
             local panelX = math.clamp(mousePos.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
@@ -5373,8 +5332,7 @@ function Root:ColorPickerButton(setup)
             updateColorUI()
         end
     end)
-
-    -- 修复：RGB输入框更新颜色
+    
     local function updateColorFromRGB()
         local r = tonumber(RgbInputs[1].Text) or 255
         local g = tonumber(RgbInputs[2].Text) or 255
@@ -5383,29 +5341,23 @@ function Root:ColorPickerButton(setup)
         g = math.clamp(g, 0, 255)
         b = math.clamp(b, 0, 255)
         currentColor = Color3.fromRGB(r, g, b)
-        -- 同步色相/饱和度/明度，确保滑块和面板同步
         h, s, v = currentColor:ToHSV()
         updateColorUI()
     end
-    -- 给每个输入框绑定失去焦点事件
     for _, box in ipairs(RgbInputs) do
         box.FocusLost:Connect(updateColorFromRGB)
-        -- 增加回车确认（优化体验）
         box.Focused:Connect(function()
             box.Changed:Connect(function(property)
                 if property == "Text" then
-                    -- 输入时实时更新（可选，优化体验）
                     updateColorFromRGB()
                 end
             end)
         end)
     end
 
-    -- 确认按钮逻辑
     ConfirmClick.MouseButton1Click:Connect(function()
         cfg.Callback(currentColor)
         SaveConfiguration()
-        -- 收起框架
         isFrameOpen = false
         TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
             BackgroundTransparency = 1
@@ -5415,7 +5367,6 @@ function Root:ColorPickerButton(setup)
         BtnStroke.Transparency = 0.85
     end)
 
-    -- ===================== 5. 外部接口 =====================
     local api = {}
     function api:SetColor(color)
         currentColor = color
@@ -5436,7 +5387,6 @@ function Root:ColorPickerButton(setup)
     return api
 end
 ------ // 按钮组件   ----------------------------------------------------------------------------------------
-        -- 假设 Root、Library、WindowLibrary、ScrollingFrame 已在其他代码中定义
 function Root:Button(setup)
     setup = setup or {};
     setup.Title = setup.Title or "按钮";
@@ -5444,7 +5394,6 @@ function Root:Button(setup)
     setup.Callback = setup.Callback or function() end;
     setup.Tip = setup.Tip or nil;
 
-    -- 1. 创建按钮所需的所有UI元素（每个按钮都是全新实例）
     local ButtonBlock = Instance.new("Frame")
     local DropShadow = Instance.new("ImageLabel")
     local UIStroke = Instance.new("UIStroke")
@@ -5453,7 +5402,6 @@ function Root:Button(setup)
     local Arrow = Instance.new("ImageLabel")
     local Button = Instance.new("TextButton")            
 
-    -- 2. 设置按钮根容器（ButtonBlock）属性
     ButtonBlock.Name = "ButtonBlock"
     ButtonBlock.Parent = ScrollingFrame
     ButtonBlock.BackgroundColor3 = Library.Colors.Default
@@ -5463,7 +5411,6 @@ function Root:Button(setup)
     ButtonBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
     ButtonBlock.ZIndex = 10
 
-    -- 3. 设置阴影（DropShadow）属性
     DropShadow.Name = "DropShadow"
     DropShadow.Parent = ButtonBlock
     DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5479,12 +5426,10 @@ function Root:Button(setup)
     DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     DropShadow.SliceScale = 0.050
 
-    -- 4. 设置边框（UIStroke）属性
     UIStroke.Transparency = 0.850
     UIStroke.Color = Color3.fromRGB(156, 156, 156)
     UIStroke.Parent = ButtonBlock
 
-    -- 5. 设置标题文本（TextLabel）属性
     TextLabel.Parent = ButtonBlock
     TextLabel.AnchorPoint = Vector2.new(0, 0.5)
     TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5504,7 +5449,6 @@ function Root:Button(setup)
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     TextLabel.RichText = true
 
-    -- 6. 设置内容文本（Content）属性
     Content.Name = "Content"
     Content.Parent = ButtonBlock
     Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5527,7 +5471,6 @@ function Root:Button(setup)
     Content.TextYAlignment = Enum.TextYAlignment.Top
     Content.RichText = true
 
-    -- 7. 设置箭头图标（Arrow）属性
     Arrow.Name = "Arrow"
     Arrow.Parent = ButtonBlock
     Arrow.AnchorPoint = Vector2.new(1, 0.5)
@@ -5542,7 +5485,6 @@ function Root:Button(setup)
     Arrow.Image = "rbxassetid://10709791437"
     Arrow.ImageTransparency = 0.150
 
-    -- 8. 设置点击按钮（Button）属性（透明点击层）
     Button.Name = "Button"
     Button.Parent = ButtonBlock
     Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5556,15 +5498,12 @@ function Root:Button(setup)
     Button.TextSize = 14.000
     Button.TextTransparency = 1.000
 
-    -- 9. 调用库方法添加悬浮效果（假设Library:MakeDrop已实现）
     Library:MakeDrop(ButtonBlock, UIStroke, Library.Colors.Hightlight)
-
-    -- 10. 添加 tooltip（提示文本）
+    
     if setup.Tip then
         WindowLibrary:AddToolTip(ButtonBlock, tostring(setup.Tip));
     end;
 
-    -- 11. 按钮按下/抬起的箭头动画
     Button.MouseButton1Down:Connect(function()
         Library:Tween(Arrow, Library.TweenLibrary.SmallEffect, {
             Position = UDim2.new(0.999, 0, 0.5, 0),
@@ -5579,12 +5518,10 @@ function Root:Button(setup)
         })
     end)
 
-    -- 12. 按钮点击回调（触发用户传入的setup.Callback）
     Button.MouseButton1Click:Connect(function()
         setup.Callback()
     end)
 
-    -- 13. 按钮高度更新方法（根据标题/内容自动调整高度）
     local UpdateBlock = function()
         local TitleSize = TextLabel.TextSize
         local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
@@ -5607,48 +5544,39 @@ function Root:Button(setup)
     end
     UpdateBlock()
 
-    -- 14. 按钮控制接口（返回给用户，用于控制单个按钮）
     local RootSkid = {};
 
-    -- 接口1：更新按钮内容文本
     function RootSkid:Content(Setup)
         Content.Text = Setup
         UpdateBlock()
     end;
 
-    -- 接口2：更新按钮标题（同Title接口，保留兼容性）
     function RootSkid:Value(Setup)
         TextLabel.Text = Setup
         UpdateBlock()
     end;
 
-    -- 接口3：手动触发按钮回调
     function RootSkid:Fire(...)
         return setup.Callback(...);
     end;
 
-    -- 接口4：更新按钮标题
     function RootSkid:Title(title)
         TextLabel.Text = title;
         UpdateBlock()
     end;
 
-    -- 接口5：直接设置按钮可见性（true显示，false隐藏）
     function RootSkid:Visible(value)
         ButtonBlock.Visible = value;
     end;
 
-    -- 接口6：隐藏按钮（简化调用，本质是Visible(false)）
     function RootSkid:Hide()
         self:Visible(false)
     end;
 
-    -- 接口7：显示按钮（简化调用，本质是Visible(true)）
     function RootSkid:Show()
         self:Visible(true)
     end;
 
-    -- 接口8：实时切换显示/隐藏（核心功能！当前显示则隐藏，反之则显示）
     function RootSkid:Toggle()
         self:Visible(not ButtonBlock.Visible)
     end;
@@ -5666,7 +5594,7 @@ end;
 			setup.Callback = setup.Callback or function() end;
 			
 		    local ToggleBlock = Instance.new("Frame") -- 切换按钮的外框
-		    local DropShadow = Instance.new("ImageLabel") -- 用于创建阴影效果图标签
+		    local DropShadow = Instance.new("ImageLabel")
 		    local UIStroke = Instance.new("UIStroke") -- UI边框
 		    local TextLabel = Instance.new("TextLabel") -- 文本标签
 		    local Content = Instance.new("TextLabel")
@@ -6539,6 +6467,374 @@ end;
 			return RootSkid;
 		end;
 ------ // 滑块组件   ----------------------------------------------------------------------------------------
+function Root:Slider(setup)
+    setup = setup or {};
+    setup.Title = setup.Title or '滑块';
+    setup.Content = setup.Content or "";
+    setup.Min = setup.Min or 0;
+    setup.Max = setup.Max or 100;
+    setup.Default = setup.Default or setup.Min;
+    setup.Round = setup.Round or 0;
+    setup.Callback = setup.Callback or function() end;
+
+    local SliderBlock = Instance.new("Frame")
+    local DropShadow = Instance.new("ImageLabel")
+    local UIStroke = Instance.new("UIStroke")
+    local TextLabel = Instance.new("TextLabel")
+    local Content = Instance.new("TextLabel")
+    local Block = Instance.new("Frame")
+    local UIStroke_2 = Instance.new("UIStroke")
+    local UICorner = Instance.new("UICorner")
+    local Move = Instance.new("ImageLabel")
+    local UICorner_2 = Instance.new("UICorner")
+    local UIStroke_3 = Instance.new("UIStroke")
+    local ValueText = Instance.new("TextLabel")
+    local InputBox = Instance.new("TextBox")
+    local EnableAutoBtn = Instance.new("TextButton")
+    local DisableAutoBtn = Instance.new("TextButton")
+
+    SliderBlock.Name = "SliderBlock"
+    SliderBlock.Parent = ScrollingFrame
+    SliderBlock.BackgroundColor3 = Library.Colors.Default
+    SliderBlock.BackgroundTransparency = 0.250
+    SliderBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    SliderBlock.BorderSizePixel = 0
+    SliderBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+    SliderBlock.ZIndex = 10
+
+    DropShadow.Name = "DropShadow"
+    DropShadow.Parent = SliderBlock
+    DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    DropShadow.BackgroundTransparency = 1.000
+    DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+    DropShadow.Position = UDim2.new(0, -5, 0, -5)
+    DropShadow.Size = UDim2.new(1, 10, 1, 10)
+    DropShadow.ZIndex = 9
+    DropShadow.Image = "rbxassetid://297694300"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.500
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+    DropShadow.SliceScale = 0.050
+
+    UIStroke.Transparency = 0.850
+    UIStroke.Color = Color3.fromRGB(156, 156, 156)
+    UIStroke.Parent = SliderBlock
+
+    TextLabel.RichText = true
+    TextLabel.Parent = SliderBlock
+    TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.BackgroundTransparency = 1.000
+    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel.BorderSizePixel = 0
+    TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+    TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+    TextLabel.ZIndex = 11
+    TextLabel.Font = Enum.Font.Gotham
+    TextLabel.Text = setup.Title
+    TextLabel.TextColor3 = Library.Colors.TextColor
+    TextLabel.TextScaled = true
+    TextLabel.TextSize = 14.000
+    TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+    TextLabel.TextStrokeTransparency = 0.950
+    TextLabel.TextWrapped = true
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    Content.Name = "Content"
+    Content.Parent = SliderBlock
+    Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Content.BackgroundTransparency = 1.000
+    Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Content.BorderSizePixel = 0
+    Content.Position = UDim2.new(0, 5, 0, 18)
+    Content.Size = UDim2.new(1, 0, 0, 45)
+    Content.Visible = false
+    Content.ZIndex = 11
+    Content.Font = Enum.Font.Gotham
+    Content.Text = setup.Content
+    Content.TextColor3 = Library.Colors.TextColor
+    Content.TextSize = 13.000
+    Content.TextStrokeColor3 = Library.Colors.TextColor
+    Content.TextStrokeTransparency = 0.950
+    Content.TextTransparency = 0.500
+    Content.TextWrapped = true
+    Content.TextXAlignment = Enum.TextXAlignment.Left
+    Content.TextYAlignment = Enum.TextYAlignment.Top
+    Content.RichText = true
+
+    Block.Name = "Block"
+    Block.Parent = SliderBlock
+    Block.AnchorPoint = Vector2.new(1, 0.5)
+    Block.BackgroundColor3 = Library.Colors.Default
+    Block.BackgroundTransparency = 0.500
+    Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Block.BorderSizePixel = 0
+    Block.Position = UDim2.new(0.980000019, 0, 0.649999976, 0)
+    Block.Size = UDim2.new(0, 95, 0.45, 0)
+    Block.ZIndex = 14
+
+    UIStroke_2.Transparency = 0.850
+    UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+    UIStroke_2.Parent = Block
+
+    UICorner.CornerRadius = UDim.new(0.300000012, 0)
+    UICorner.Parent = Block
+
+    Move.Name = "Move"
+    Move.Parent = Block
+    Move.AnchorPoint = Vector2.new(0.5, 0.5)
+    Move.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Move.BackgroundTransparency = 1
+    Move.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Move.BorderSizePixel = 0
+    Move.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Move.Size = UDim2.new(1.5, 0, 1.5, 0)
+    Move.SizeConstraint = Enum.SizeConstraint.RelativeYY
+    Move.ZIndex = 15
+    Move.Image = "rbxassetid://96996396016819"
+    Move.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    Move.ImageTransparency = 0
+    Move.ScaleType = Enum.ScaleType.Slice
+    Move.SliceCenter = Rect.new(50, 50, 50, 50)
+    Move.SliceScale = 1.0
+
+    UICorner_2.CornerRadius = UDim.new(1, 0)
+    UICorner_2.Parent = Move
+
+    UIStroke_3.Transparency = 0.850
+    UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
+    UIStroke_3.Parent = Move
+
+    ValueText.Name = "ValueText"
+    ValueText.Parent = SliderBlock
+    ValueText.AnchorPoint = Vector2.new(0, 0.5)
+    ValueText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ValueText.BackgroundTransparency = 1.000
+    ValueText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ValueText.BorderSizePixel = 0
+    ValueText.Position = UDim2.new(0.0199999996, 0, 0.239999995, 0)
+    ValueText.Size = UDim2.new(0.964999974, 0, 0.25, 0)
+    ValueText.ZIndex = 11
+    ValueText.Font = Enum.Font.Gotham
+    ValueText.Text = tostring(setup.Default)
+    ValueText.TextColor3 = Library.Colors.TextColor
+    ValueText.TextScaled = true
+    ValueText.TextSize = 14.000
+    ValueText.TextStrokeColor3 = Library.Colors.TextColor
+    ValueText.TextStrokeTransparency = 0.950
+    ValueText.TextWrapped = true
+    ValueText.TextXAlignment = Enum.TextXAlignment.Right
+
+    InputBox.Name = "InputBox"
+    InputBox.Parent = SliderBlock
+    InputBox.BackgroundColor3 = Library.Colors.Default
+    InputBox.BackgroundTransparency = 1.000
+    InputBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    InputBox.BorderSizePixel = 0
+    InputBox.Position = UDim2.new(0.25, 0, 0.4, 0)
+    InputBox.Size = UDim2.new(0.180000007, 0, 0.400000006, 0)
+    InputBox.ZIndex = 11
+    InputBox.Font = Enum.Font.Gotham
+    InputBox.TextColor3 = Library.Colors.TextColor
+    InputBox.TextScaled = true
+    InputBox.TextSize = 14.000
+    InputBox.TextStrokeColor3 = Library.Colors.TextColor
+    InputBox.TextStrokeTransparency = 0.950
+    InputBox.TextWrapped = true
+    InputBox.TextXAlignment = Enum.TextXAlignment.Right
+    InputBox.Text = tostring(setup.Default)
+
+    local IsHold = false
+    local RoundNum = setup.Round;
+    local IsAutoSync = true
+    local ExternalValue = setup.Default
+
+    EnableAutoBtn.Name = "EnableAutoBtn"
+    EnableAutoBtn.Parent = SliderBlock
+    EnableAutoBtn.BackgroundColor3 = Color3.fromRGB(50, 180, 50)
+    EnableAutoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    EnableAutoBtn.BorderSizePixel = 0
+    EnableAutoBtn.Position = UDim2.new(0.5, 10, 0.4, 0)
+    EnableAutoBtn.Size = UDim2.new(0.15, 0, 0.4, 0)
+    EnableAutoBtn.ZIndex = 11
+    EnableAutoBtn.Font = Enum.Font.Gotham
+    EnableAutoBtn.Text = "开启自动同步"
+    EnableAutoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    EnableAutoBtn.TextScaled = true
+    EnableAutoBtn.TextSize = 12.000
+
+    DisableAutoBtn.Name = "DisableAutoBtn"
+    DisableAutoBtn.Parent = SliderBlock
+    DisableAutoBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+    DisableAutoBtn.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    DisableAutoBtn.BorderSizePixel = 0
+    DisableAutoBtn.Position = UDim2.new(0.72, 10, 0.4, 0)
+    DisableAutoBtn.Size = UDim2.new(0.15, 0, 0.4, 0)
+    DisableAutoBtn.ZIndex = 11
+    DisableAutoBtn.Font = Enum.Font.Gotham
+    DisableAutoBtn.Text = "关闭自动同步"
+    DisableAutoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    DisableAutoBtn.TextScaled = true
+    DisableAutoBtn.TextSize = 12.000
+
+    Library:MakeDrop(SliderBlock , UIStroke , Library.Colors.Hightlight)
+
+    if setup.Tip then
+        WindowLibrary:AddToolTip(SliderBlock , tostring(setup.Tip));
+    end;
+
+    local function Rounding(num, numDecimalPlaces)
+        local mult = 10^(numDecimalPlaces or 0)
+        return math.floor(num * mult + 0.5) / mult
+    end
+
+    local UpdateSize = function()
+        if not WindowLibrary.Toggle then
+            return;
+        end
+        Block.Size = UDim2.new(0, (SliderBlock.AbsoluteSize.X / 2), 0.225, 0)
+    end;
+
+    Library:Tween(Move , Library.TweenLibrary.FastEffect,{
+        Position = UDim2.new((setup.Default - setup.Min) / (setup.Max - setup.Min), 0, 0.5, 0)
+    });
+
+    SliderBlock:GetPropertyChangedSignal('AbsoluteSize'):Connect(UpdateSize);
+
+    local function update(Input)
+        local SizeScale = math.clamp((((Input.Position.X) - Block.AbsolutePosition.X) / Block.AbsoluteSize.X), 0, 1)
+        local Main = ((setup.Max - setup.Min) * SizeScale) + setup.Min;
+        local Value = Rounding(Main, RoundNum)
+        local normalized = (Value - setup.Min) / (setup.Max - setup.Min)
+
+        Library:Tween(Move, Library.TweenLibrary.FastEffect, {
+            Position = UDim2.new(normalized, 0, 0.5, 0)
+        });
+
+        ValueText.Text = tostring(Value)
+        InputBox.Text = tostring(Value)
+
+        currentSliderValue = Value 
+        setup.Callback(Value)
+    end;
+
+    Block.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            IsHold = true
+            IsAutoSync = false
+            update(Input)
+        end
+    end)
+
+    Block.InputEnded:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            IsHold = false
+            IsAutoSync = true
+        end
+    end)
+
+    Library.UserInputService.InputChanged:Connect(function(Input)
+        if IsHold then
+            if (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+                update(Input)
+            end
+        end
+    end)
+
+    InputBox:GetPropertyChangedSignal("Text"):Connect(function()
+        local textValue = tonumber(InputBox.Text) or setup.Default
+        if textValue then
+            local normalized = (textValue - setup.Min) / (setup.Max - setup.Min)
+            Library:Tween(Move, Library.TweenLibrary.FastEffect, {
+                Position = UDim2.new(normalized, 0, 0.5, 0)
+            });
+            ValueText.Text = tostring(textValue)
+            setup.Callback(textValue)
+        end
+    end)
+
+    local UpdateBlock = function()
+        local TitleSize = TextLabel.TextSize
+        local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
+        local ContentSize = setup.Content:len() > 0 and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font) or Vector2.new(0, 0)
+
+        local TotalHeight = MainSize.Y + 10
+        if setup.Content:len() > 0 then
+            Content.Visible = true
+            TotalHeight = TotalHeight + ContentSize.Y + 5 
+            TextLabel.Position = UDim2.new(0, 5, 0, 12)
+            TextLabel.Size = UDim2.new(1, 0, 0, 14)
+        else
+            Content.Visible = false
+            TotalHeight = TotalHeight + 15.20000000000001
+            TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+            TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+        end
+
+        SliderBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+    end
+        UpdateBlock()
+
+    function RootSkid:SyncExternalValue(newValue)
+        if IsAutoSync and not IsHold then
+            local validValue = math.clamp(newValue, setup.Min, setup.Max)
+            ExternalValue = validValue
+            local normalizedPos = (validValue - setup.Min) / (setup.Max - setup.Min)
+            
+            Library:Tween(Move, Library.TweenLibrary.FastEffect, {
+                Position = UDim2.new(normalizedPos, 0, 0.5, 0)
+            });
+            
+            ValueText.Text = tostring(validValue)
+            InputBox.Text = tostring(validValue)
+            setup.Callback(validValue)
+        end
+    end
+
+    EnableAutoBtn.MouseButton1Click:Connect(function()
+        IsAutoSync = true
+        RootSkid:SyncExternalValue(ExternalValue)
+    end)
+
+    DisableAutoBtn.MouseButton1Click:Connect(function()
+        IsAutoSync = false
+    end)
+
+    local RootSkid = {};
+
+    function RootSkid:Content(Setup)
+        Content.Text = Setup
+        UpdateBlock()
+    end;
+
+    function RootSkid:Value(Setup)
+        setup.Default = Setup;
+        ExternalValue = Setup  -- 新增：更新外部值记录
+        
+        Library:Tween(Move , Library.TweenLibrary.FastEffect,{
+            Position = UDim2.new((setup.Default - setup.Min) / (setup.Max - setup.Min), 0, 0.5, 0)
+        });
+
+        ValueText.Text = tostring(setup.Default)
+        InputBox.Text = tostring(setup.Default)
+        UpdateBlock()
+    end;
+
+    function RootSkid:Visible(value)
+        SliderBlock.Visible = value;	
+    end;
+
+    -- 新增：暴露自动同步状态的控制接口
+    function RootSkid:SetAutoSync(enabled)
+        IsAutoSync = enabled
+    end
+
+    return RootSkid;
+end;
+
+
+--[[
         function Root:Slider(setup)
 			setup = setup or {};
 			setup.Title = setup.Title or '滑块';
@@ -6842,6 +7138,7 @@ end;
 
 			return RootSkid;
 		end;
+		--]]
 ------ // 按钮绑定键<快捷键>   ----------------------------------------------------------------------------------------
 		function Root:Keybind(setup)
 			setup = setup or {};
@@ -7267,16 +7564,13 @@ function Root:Dropdown(setup)
     ValueText.TextStrokeTransparency = 0.950
     ValueText.TextWrapped = true
 
-    -- 外部库样式配置（依赖Library）
     Library:MakeDrop(DropdownBlock , UIStroke , Library.Colors.Hightlight)
     Library:MakeDrop(Block,UIStroke_2,Library.Colors.Hightlight);
 
-    -- 提示文本（依赖WindowLibrary）
     if setup.Tip then
         WindowLibrary:AddToolTip(DropdownBlock , tostring(setup.Tip));
     end;
 
-    -- 选中值容器尺寸自适应
     local UpdateSize = function()
         local size = Library:GetTextSize(ValueText.Text,ValueText.TextSize,ValueText.Font)
         pcall(function()
@@ -7286,7 +7580,6 @@ function Root:Dropdown(setup)
         end)
     end;
 
-    -- 选择值变化回调（更新显示+触发外部回调）
     local OnCallback = function(a)
         ValueText.Text = (setup.Multi and Fconcat(a)) or tostring(a);
         setup.Default = a;
@@ -7294,10 +7587,8 @@ function Root:Dropdown(setup)
         setup.Callback(a)
     end;
 
-    -- 初始尺寸适配
     UpdateSize();
 
-    -- 新增：过滤隐藏选项的核心函数（仅返回显示状态为true的选项）
     local getVisibleValues = function()
         local visibleVals = {};
         for _, val in ipairs(setup.Values) do
@@ -7308,12 +7599,10 @@ function Root:Dropdown(setup)
         return visibleVals;
     end;
 
-    -- 下拉按钮点击事件（打开过滤后的选项列表）
     Button.MouseButton1Click:Connect(function()
         UpdateSize();
         WindowLibrary:ClearDropdown();
 
-        -- 关键：传入过滤后的可见选项
         local visibleValues = getVisibleValues();
         if setup.Multi then
             WindowLibrary:SetDropdownValues(0, visibleValues, {
@@ -7327,7 +7616,6 @@ function Root:Dropdown(setup)
         WindowLibrary:OpenDropdown(Block);
     end)
 
-    -- 菜单整体尺寸自适应
     local UpdateBlock = function()
         local TitleSize = TextLabel.TextSize
         local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
@@ -7348,23 +7636,19 @@ function Root:Dropdown(setup)
 
         DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
     end
-    UpdateBlock() -- 初始调用设置尺寸
+    UpdateBlock()
 
-    -- 下拉菜单操作API（新增SetOptionVisible控制选项显示/隐藏）
     local RootSkid = {};
 
-    -- 获取当前选中值
     function RootSkid:GetValue()
         return setup.Default;
     end;
 
-    -- 更新补充说明文本
     function RootSkid:Content(Setup)
         Content.Text = Setup
         UpdateBlock()
     end;
 
-    -- 手动设置选中值
     function RootSkid:Value(SetupR)
         setup.Default = SetupR;
         ValueText.Text = (setup.Multi and Fconcat(SetupR)) or tostring(SetupR);
@@ -7372,11 +7656,9 @@ function Root:Dropdown(setup)
         setup.Callback(SetupR)
         UpdateBlock()
     end;
-
-    -- 更新选项列表（新增选项默认显示）
+    
     function RootSkid:SetValue(data)
         setup.Values = data;
-        -- 新选项默认配置为显示状态
         for _, val in ipairs(data) do
             if setup.OptionVisible[val] == nil then
                 setup.OptionVisible[val] = true;
@@ -7384,16 +7666,11 @@ function Root:Dropdown(setup)
         end
     end;
 
-    -- 控制菜单整体显示/隐藏
     function RootSkid:Visible(value)
         DropdownBlock.Visible = value;
     end;
 
-    -- 新增：控制单个选项的显示/隐藏（核心API）
-    -- 参数1：option - 要控制的选项值（如"值2"）
-    -- 参数2：isVisible - 布尔值（true显示，false隐藏）
     function RootSkid:SetOptionVisible(option, isVisible)
-        -- 验证选项是否存在于选项列表中
         local isOptionValid = false;
         for _, val in ipairs(setup.Values) do
             if val == option then
@@ -7406,7 +7683,6 @@ function Root:Dropdown(setup)
             return;
         end
 
-        -- 更新选项状态
         setup.OptionVisible[option] = isVisible;
     end;
 
@@ -7714,7 +7990,7 @@ end;
 			setup = setup or {};
 
 			setup.Title = setup.Title or "\91\32\45\88\71\79\45\72\85\66\45\32\93";
-            setup.Content = setup.Content or "\91\32\45\88\71\79\45\72\85\66\45\32\93"; -- 允许外部传入内容 -- 新增的子标题默认值
+            setup.Content = setup.Content or "\91\32\45\88\71\79\45\72\85\66\45\32\93";
 			setup.Buttons = setup.Buttons or {
 				{
 					Title = "是",
@@ -7740,7 +8016,7 @@ end;
 			local UIStroke = Instance.new("UIStroke")
 			local UIGradient = Instance.new("UIGradient")
 			local Title = Instance.new("TextLabel")
-            local Content = Instance.new("TextLabel") -- 新增的内容标签
+            local Content = Instance.new("TextLabel")
 			local Buttons = Instance.new("Frame")
 			local UIListLayout = Instance.new("UIListLayout")
 
@@ -7830,7 +8106,7 @@ end;
             Content.Size = UDim2.new(0.899999976, 0, 0, 30)
             Content.ZIndex = 275
             Content.Font = Enum.Font.Gotham
-            Content.Text = setup.Content; -- 使用外部传入的内容
+            Content.Text = setup.Content;
             Content.TextColor3 = Library.Colors.TextColor
             Content.TextScaled = true
             Content.TextSize = 14.000
