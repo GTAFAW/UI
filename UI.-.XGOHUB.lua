@@ -3349,8 +3349,16 @@ function Library:Windowxgo(setup)
 	local isForward = true
 	local slideDuration = 1.5
 	local interval = 13
-	local preloadedNextIndex = getNextIndex()
 
+	local function getNextIndex()
+		if isForward then
+			return currentIndex == #images and #images - 1 or currentIndex + 1
+		else
+			return currentIndex == 1 and 2 or currentIndex - 1
+		end
+	end
+
+	local preloadedNextIndex = getNextIndex()
 	local preloader = Instance.new("ImageLabel")
 	preloader.Visible = false
 	preloader.Parent = ScreenGui
@@ -3384,32 +3392,21 @@ function Library:Windowxgo(setup)
 		end)
 	end
 
-	local function getNextIndex()
-		if isForward then
-			return currentIndex == #images and #images - 1 or currentIndex + 1
-		else
-			return currentIndex == 1 and 2 or currentIndex - 1
-		end
-	end
-
 	local function slideSwitch()
 		local nextIndex = preloadedNextIndex
 		BackgroundImage2.Image = images[nextIndex]
 
-		local startPos = UDim2.new(0, 0, 0, 0)
-		local endPos   = UDim2.new(0, 0, 0, 0)
-		local oldEndPos= UDim2.new(0, 0, 0, 0)
-
+		local startPos, endPos, oldEndPos
 		if isForward then
-			startPos  = UDim2.new(1, 0, 0, 0)
+			startPos = UDim2.new(1, 0, 0, 0)
 			oldEndPos = UDim2.new(-1, 0, 0, 0)
 		else
-			startPos  = UDim2.new(-1, 0, 0, 0)
+			startPos = UDim2.new(-1, 0, 0, 0)
 			oldEndPos = UDim2.new(1, 0, 0, 0)
 		end
+		endPos = UDim2.new(0, 0, 0, 0)
 
 		BackgroundImage2.Position = startPos
-		
 		Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
 		Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
