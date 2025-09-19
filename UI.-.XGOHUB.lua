@@ -3245,28 +3245,27 @@ end;
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
 	setup = setup or {};
-
 	setup.Title = setup.Title or "Window";
 	setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
 	setup.Size = setup.Size or Library.SizeLibrary.Default;
 	setup.KeySystem = setup.KeySystem or false;
 	setup.Logo = setup.Logo or "rbxassetid://7733920644";
 	setup.ToggleMethod = setup.ToggleMethod or "Application";
-	
+
 	if setup.KeySystem then
 		setup.KeySystemInfo = setup.KeySystemInfo or {};
 		setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
 		setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
 		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
 	end
-	
+
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
 	local DropShadow = Instance.new("ImageLabel")
 	local Ico = Instance.new("ImageLabel")
-	
+
     local images = {
         "rbxassetid://113180426865309",
         "rbxassetid://131471211520335",
@@ -3300,7 +3299,7 @@ function Library:Windowxgo(setup)
         "rbxassetid://129410104830757",
         "rbxassetid://117937637678090",
         "rbxassetid://89768207500333",
-        "rbxassetid://136363102949077",      
+        "rbxassetid://136363102949077",
         "rbxassetid://74648780628027",
         "rbxassetid://103232778626018",
         "rbxassetid://76127155963189",
@@ -3313,19 +3312,15 @@ function Library:Windowxgo(setup)
         "rbxassetid://113389633674712",
         "rbxassetid://94012779929465"
     }
-    
+
     local currentIndex = 1
     local isForward = true
     local slideDuration = 1
-    local interval = 15
+    local interval = 10
 
-    local function preloadNextImage()
-        local nextIndex = getNextIndex()
-        local nextImageId = images[nextIndex]
-        local tempLoader = Instance.new("ImageLabel")
-        tempLoader.Image = nextImageId
-        task.delay(1, function() tempLoader:Destroy() end)
-    end
+	local preloader = Instance.new("ImageLabel")
+	preloader.Visible = false
+	preloader.Parent = ScreenGui
 
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
@@ -3348,15 +3343,20 @@ function Library:Windowxgo(setup)
 
     local function getNextIndex()
         if isForward then
-            return currentIndex == #images and 1 or currentIndex + 1
+            return currentIndex == #images and #images - 1 or currentIndex + 1
         else
-            return currentIndex == 1 and #images or currentIndex - 1
+            return currentIndex == 1 and 2 or currentIndex - 1
         end
     end
 
     local function slideSwitch()
         local nextIndex = getNextIndex()
-        local startPos, oldEndPos
+		preloader.Image = images[nextIndex]
+		task.wait(2)
+
+        local startPos = UDim2.new(0, 0, 0, 0)
+        local endPos = UDim2.new(0, 0, 0, 0)
+        local oldEndPos = UDim2.new(0, 0, 0, 0)
 
         if isForward then
             startPos = UDim2.new(1, 0, 0, 0)
@@ -3368,11 +3368,17 @@ function Library:Windowxgo(setup)
 
         BackgroundImage2.Image = images[nextIndex]
         BackgroundImage2.Position = startPos
-        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0,0,0,0)}, slideDuration)
+
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
         Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
         task.wait(slideDuration)
         currentIndex = nextIndex
+        if currentIndex == #images then
+            isForward = false
+        elseif currentIndex == 1 then
+            isForward = true
+        end
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
         BackgroundImage2.Position = startPos
@@ -3397,14 +3403,12 @@ function Library:Windowxgo(setup)
     initBackgrounds()
 
     task.spawn(function()
-        preloadNextImage()
         while true do
             task.wait(interval)
-            slideSwitch()       
-            preloadNextImage()
+            slideSwitch()
         end
     end)
-   
+
 	local BlurEle = Library.UIBlur.new(MainFrame,true);
 
 	DropShadow.Name = "DropShadow"
