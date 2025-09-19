@@ -3348,11 +3348,18 @@ function Library:Windowxgo(setup)
 	local currentIndex = 1
 	local isForward = true
 	local slideDuration = 1.5
-	local interval = 13.5
+	local interval = 13
+	local preloadedNextIndex = getNextIndex()
 
 	local preloader = Instance.new("ImageLabel")
 	preloader.Visible = false
 	preloader.Parent = ScreenGui
+
+	local function prefetch(assetId)
+		preloader.Image = assetId
+		preloader.ContentLoaded:Wait()
+		task.wait(0.1)
+	end
 
 	local function initBackgrounds()
 		BackgroundImage1.Parent = MainFrame
@@ -3371,6 +3378,10 @@ function Library:Windowxgo(setup)
 		BackgroundImage2.ImageTransparency = 0
 		BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
 		BackgroundImage2.ZIndex = 2
+
+		task.spawn(function()
+			prefetch(images[preloadedNextIndex])
+		end)
 	end
 
 	local function getNextIndex()
@@ -3381,17 +3392,9 @@ function Library:Windowxgo(setup)
 		end
 	end
 
-	local function prefetch(assetId)
-		preloader.Image = assetId
-		task.wait(0.8)
-	end
-
 	local function slideSwitch()
-		local nextIndex = getNextIndex()
-		task.spawn(function()
-			prefetch(images[nextIndex])
-		end)
-		task.wait(1)
+		local nextIndex = preloadedNextIndex
+		BackgroundImage2.Image = images[nextIndex]
 
 		local startPos = UDim2.new(0, 0, 0, 0)
 		local endPos   = UDim2.new(0, 0, 0, 0)
@@ -3405,9 +3408,8 @@ function Library:Windowxgo(setup)
 			oldEndPos = UDim2.new(1, 0, 0, 0)
 		end
 
-		BackgroundImage2.Image = images[nextIndex]
 		BackgroundImage2.Position = startPos
-
+		
 		Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
 		Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
@@ -3423,6 +3425,11 @@ function Library:Windowxgo(setup)
 		BackgroundImage1.Image = BackgroundImage2.Image
 		BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
 		BackgroundImage2.Position = startPos
+
+		preloadedNextIndex = getNextIndex()
+		task.spawn(function()
+			prefetch(images[preloadedNextIndex])
+		end)
 
 		preloader.Image = ""
 	end
