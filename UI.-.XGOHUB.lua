@@ -3273,23 +3273,28 @@ function Library:Windowxgo(setup)
 		"rbxassetid://122958225353990",
 		"rbxassetid://140434608197988",
 		"rbxassetid://124568548523146",
+		"rbxassetid://76544783777123",
 		"rbxassetid://117347134697321",
 		"rbxassetid://98554545052070",
+		"rbxassetid://131266490485584",
 		"rbxassetid://131496206276220",
 		"rbxassetid://109752539854084",
 		"rbxassetid://70869793345513",
 		"rbxassetid://113186601959200",
 		"rbxassetid://73164000772284",
 		"rbxassetid://101305557601423",
+		"rbxassetid://104067029112641",
 		"rbxassetid://110630445580007",
 		"rbxassetid://108644687915512",
 		"rbxassetid://107018855884545",
 		"rbxassetid://112966984941036",
+		"rbxassetid://80598426066070",
 		"rbxassetid://108391089326665",
 		"rbxassetid://138013328013091",
 		"rbxassetid://110990525726887",
 		"rbxassetid://72760885562855",
 		"rbxassetid://105485276493469",
+		"rbxassetid://107983351429754",
 		"rbxassetid://121439238665385",
 		"rbxassetid://135083937747387",
 		"rbxassetid://131409006813490",
@@ -3297,6 +3302,7 @@ function Library:Windowxgo(setup)
 		"rbxassetid://129206776380514",
 		"rbxassetid://121697617411442",
 		"rbxassetid://129410104830757",
+		"rbxassetid://71101554362190",
 		"rbxassetid://117937637678090",
 		"rbxassetid://89768207500333",
 		"rbxassetid://136363102949077",
@@ -3315,8 +3321,8 @@ function Library:Windowxgo(setup)
 
 	local currentIndex = 1
 	local isForward = true
-	local slideDuration = 1
-	local interval = 2
+	local slideDuration = 1.7
+	local interval = 15
 
 	local preloader = Instance.new("ImageLabel")
 	preloader.Visible = false
