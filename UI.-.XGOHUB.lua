@@ -3272,6 +3272,14 @@ function Library:Windowxgo(setup)
         "rbxassetid://131471211520335",
 	    "rbxassetid://109520199976167",
 	    "rbxassetid://122958225353990",
+	    "rbxassetid://140434608197988",
+	    "rbxassetid://124568548523146",
+	    "rbxassetid://117347134697321",
+	    "rbxassetid://98554545052070",
+	    "rbxassetid://131496206276220",
+	    "rbxassetid://109752539854084",
+	    "rbxassetid://70869793345513",
+	    "rbxassetid://113186601959200",
         "rbxassetid://73164000772284",
 	    "rbxassetid://101305557601423",
         "rbxassetid://110630445580007",
@@ -3300,8 +3308,10 @@ function Library:Windowxgo(setup)
         "rbxassetid://112630176374798",
         "rbxassetid://74804451529535",
         "rbxassetid://115691043156297",
---        "rbxassetid://脚本认准XGOHUB",
---        "rbxassetid://脚本认准XGOHUB"
+        "rbxassetid://100980082510772",
+        "rbxassetid://135027711714247",
+        "rbxassetid://113389633674712",
+        "rbxassetid://94012779929465"
     }
     
     local currentIndex = 1
