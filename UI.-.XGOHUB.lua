@@ -3337,26 +3337,32 @@ function Library:Windowxgo(setup)
 		"rbxassetid://113389633674712",
 		"rbxassetid://94012779929465"
 	}
-
+	
 	local preloader = Instance.new("ImageLabel")
 	preloader.Visible = false
 	preloader.Parent = game.CoreGui
-	for _, assetId in ipairs(images) do
-		preloader.Image = assetId
-		local loaded = false
-		local conn = preloader.ContentLoaded:Connect(function()
-			loaded = true
-		end)
-		for _ = 1, 50 do
-			if loaded then break end
-			task.wait(0.1)
+	local loadedImages = {}
+	task.spawn(function()
+		for _, assetId in ipairs(images) do
+			local loaded = false
+			local conn = preloader.ContentLoaded:Connect(function()
+				loaded = true
+				loadedImages[assetId] = true
+			end)
+			preloader.Image = assetId
+			-- 5秒超时兜底
+			for _ = 1, 50 do
+				if loaded then break end
+				task.wait(0.1)
+			end
+			conn:Disconnect()
+			-- 加载失败用默认图
+			if not loaded then
+				loadedImages[assetId] = "rbxassetid://7733920644"
+			end
 		end
-		conn:Disconnect()
-		if not loaded then
-			assetId = "rbxassetid://7733920644"
-		end
-	end
-	preloader:Destroy()
+		preloader:Destroy()
+	end)
 
 	local ScreenGui = Instance.new("ScreenGui")
 	local MainFrame = Instance.new("Frame")
@@ -3364,7 +3370,7 @@ function Library:Windowxgo(setup)
 	local BackgroundImage2 = Instance.new("ImageLabel")
 	local DropShadow = Instance.new("ImageLabel")
 	local Ico = Instance.new("ImageLabel")
-	
+
 	local currentIndex = 1
 	local isForward = true
 	local slideDuration = 1.5
@@ -3378,21 +3384,30 @@ function Library:Windowxgo(setup)
 		end
 	end
 
+	local function getLoadedImage(assetId)
+		while not loadedImages[assetId] do
+			task.wait(0.05)
+		end
+		return type(loadedImages[assetId]) == "string" and loadedImages[assetId] or assetId
+	end
+
 	local function initBackgrounds()
+		local firstImg = getLoadedImage(images[currentIndex])
 		BackgroundImage1.Parent = MainFrame
 		BackgroundImage1.BackgroundTransparency = 1
 		BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
 		BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-		BackgroundImage1.Image = images[currentIndex]
+		BackgroundImage1.Image = firstImg
 		BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
 		BackgroundImage1.ImageTransparency = 0
 		BackgroundImage1.ZIndex = 1
 
+		local nextImg = getLoadedImage(images[getNextIndex()])
 		BackgroundImage2.Parent = MainFrame
 		BackgroundImage2.BackgroundTransparency = 1
 		BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
 		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
-		BackgroundImage2.Image = images[getNextIndex()]
+		BackgroundImage2.Image = nextImg
 		BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
 		BackgroundImage2.ImageTransparency = 0
 		BackgroundImage2.ZIndex = 1
@@ -3400,7 +3415,9 @@ function Library:Windowxgo(setup)
 
 	local function slideSwitch()
 		local nextIndex = getNextIndex()
-		BackgroundImage2.Image = images[nextIndex]
+		local nextImg = getLoadedImage(images[nextIndex])
+		
+		BackgroundImage2.Image = nextImg
 		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
 
 		Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0,0,0,0)}, slideDuration)
@@ -3414,9 +3431,11 @@ function Library:Windowxgo(setup)
 		elseif currentIndex == 1 then
 			isForward = true
 		end
-		BackgroundImage1.Image = images[currentIndex]
+
+		local currImg = getLoadedImage(images[currentIndex])
+		BackgroundImage1.Image = currImg
 		BackgroundImage1.Position = UDim2.new(0,0,0,0)
-		BackgroundImage2.Image = images[getNextIndex()]
+		BackgroundImage2.Image = getLoadedImage(images[getNextIndex()])
 		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
 	end
 
@@ -3446,7 +3465,7 @@ function Library:Windowxgo(setup)
 	end)
 
 	local BlurEle = Library.UIBlur.new(MainFrame, true)
-
+	
 	DropShadow.Name = "DropShadow"
 	DropShadow.Parent = MainFrame
 	DropShadow.BackgroundTransparency = 1.000
@@ -3476,7 +3495,7 @@ function Library:Windowxgo(setup)
 	Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
 
 	if setup.KeySystem then
-				setup.KeySystemInfo.Enabled = true
+		setup.KeySystemInfo.Enabled = true
 		setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
 
 		task.wait(1)
