@@ -3259,13 +3259,6 @@ function Library:Windowxgo(setup)
 		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
 	end
 
-	local ScreenGui = Instance.new("ScreenGui")
-	local MainFrame = Instance.new("Frame")
-	local BackgroundImage1 = Instance.new("ImageLabel")
-	local BackgroundImage2 = Instance.new("ImageLabel")
-	local DropShadow = Instance.new("ImageLabel")
-	local Ico = Instance.new("ImageLabel")
-
 	local images = {
 		"rbxassetid://113180426865309",
 		"rbxassetid://127110756366496",
@@ -3345,6 +3338,33 @@ function Library:Windowxgo(setup)
 		"rbxassetid://94012779929465"
 	}
 
+	local preloader = Instance.new("ImageLabel")
+	preloader.Visible = false
+	preloader.Parent = game.CoreGui
+	for _, assetId in ipairs(images) do
+		preloader.Image = assetId
+		local loaded = false
+		local conn = preloader.ContentLoaded:Connect(function()
+			loaded = true
+		end)
+		for _ = 1, 50 do
+			if loaded then break end
+			task.wait(0.1)
+		end
+		conn:Disconnect()
+		if not loaded then
+			assetId = "rbxassetid://7733920644"
+		end
+	end
+	preloader:Destroy()
+
+	local ScreenGui = Instance.new("ScreenGui")
+	local MainFrame = Instance.new("Frame")
+	local BackgroundImage1 = Instance.new("ImageLabel")
+	local BackgroundImage2 = Instance.new("ImageLabel")
+	local DropShadow = Instance.new("ImageLabel")
+	local Ico = Instance.new("ImageLabel")
+	
 	local currentIndex = 1
 	local isForward = true
 	local slideDuration = 1.5
@@ -3356,17 +3376,6 @@ function Library:Windowxgo(setup)
 		else
 			return currentIndex == 1 and 2 or currentIndex - 1
 		end
-	end
-
-	local preloadedNextIndex = getNextIndex()
-	local preloader = Instance.new("ImageLabel")
-	preloader.Visible = false
-	preloader.Parent = ScreenGui
-
-	local function prefetch(assetId)
-		preloader.Image = assetId
-		preloader.ContentLoaded:Wait()
-		task.wait(0.1)
 	end
 
 	local function initBackgrounds()
@@ -3382,33 +3391,20 @@ function Library:Windowxgo(setup)
 		BackgroundImage2.Parent = MainFrame
 		BackgroundImage2.BackgroundTransparency = 1
 		BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
-		BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-		BackgroundImage2.ImageTransparency = 0
+		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
+		BackgroundImage2.Image = images[getNextIndex()]
 		BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-		BackgroundImage2.ZIndex = 2
-
-		task.spawn(function()
-			prefetch(images[preloadedNextIndex])
-		end)
+		BackgroundImage2.ImageTransparency = 0
+		BackgroundImage2.ZIndex = 1
 	end
 
 	local function slideSwitch()
-		local nextIndex = preloadedNextIndex
+		local nextIndex = getNextIndex()
 		BackgroundImage2.Image = images[nextIndex]
+		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
 
-		local startPos, endPos, oldEndPos
-		if isForward then
-			startPos = UDim2.new(1, 0, 0, 0)
-			oldEndPos = UDim2.new(-1, 0, 0, 0)
-		else
-			startPos = UDim2.new(-1, 0, 0, 0)
-			oldEndPos = UDim2.new(1, 0, 0, 0)
-		end
-		endPos = UDim2.new(0, 0, 0, 0)
-
-		BackgroundImage2.Position = startPos
-		Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
-		Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
+		Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0,0,0,0)}, slideDuration)
+		Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(isForward and -1 or 1, 0, 0, 0)}, slideDuration)
 
 		task.wait(slideDuration)
 
@@ -3418,17 +3414,10 @@ function Library:Windowxgo(setup)
 		elseif currentIndex == 1 then
 			isForward = true
 		end
-
-		BackgroundImage1.Image = BackgroundImage2.Image
-		BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-		BackgroundImage2.Position = startPos
-
-		preloadedNextIndex = getNextIndex()
-		task.spawn(function()
-			prefetch(images[preloadedNextIndex])
-		end)
-
-		preloader.Image = ""
+		BackgroundImage1.Image = images[currentIndex]
+		BackgroundImage1.Position = UDim2.new(0,0,0,0)
+		BackgroundImage2.Image = images[getNextIndex()]
+		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
 	end
 
 	ScreenGui.Parent = game.CoreGui
@@ -3487,7 +3476,7 @@ function Library:Windowxgo(setup)
 	Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
 
 	if setup.KeySystem then
-		setup.KeySystemInfo.Enabled = true
+				setup.KeySystemInfo.Enabled = true
 		setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
 
 		task.wait(1)
