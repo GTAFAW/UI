@@ -3324,9 +3324,7 @@ function Library:Windowxgo(setup)
         local nextImageId = images[nextIndex]
         local tempLoader = Instance.new("ImageLabel")
         tempLoader.Image = nextImageId
-        task.delay(1, function()
-            tempLoader:Destroy()
-        end)
+        task.delay(1, function() tempLoader:Destroy() end)
     end
 
     local function initBackgrounds()
@@ -3350,17 +3348,15 @@ function Library:Windowxgo(setup)
 
     local function getNextIndex()
         if isForward then
-            return currentIndex == #images and #images - 1 or currentIndex + 1
+            return currentIndex == #images and 1 or currentIndex + 1
         else
-            return currentIndex == 1 and 2 or currentIndex - 1
+            return currentIndex == 1 and #images or currentIndex - 1
         end
     end
 
     local function slideSwitch()
         local nextIndex = getNextIndex()
-        local startPos = UDim2.new(0, 0, 0, 0)
-        local endPos = UDim2.new(0, 0, 0, 0)
-        local oldEndPos = UDim2.new(0, 0, 0, 0)
+        local startPos, oldEndPos
 
         if isForward then
             startPos = UDim2.new(1, 0, 0, 0)
@@ -3372,17 +3368,11 @@ function Library:Windowxgo(setup)
 
         BackgroundImage2.Image = images[nextIndex]
         BackgroundImage2.Position = startPos
-
-        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0,0,0,0)}, slideDuration)
         Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
         task.wait(slideDuration)
         currentIndex = nextIndex
-        if currentIndex == #images then
-            isForward = false
-        elseif currentIndex == 1 then
-            isForward = true
-        end
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
         BackgroundImage2.Position = startPos
@@ -3410,7 +3400,7 @@ function Library:Windowxgo(setup)
         preloadNextImage()
         while true do
             task.wait(interval)
-            slideSwitch()
+            slideSwitch()       
             preloadNextImage()
         end
     end)
