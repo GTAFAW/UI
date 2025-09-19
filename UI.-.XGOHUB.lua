@@ -6491,6 +6491,7 @@ function Root:Slider(setup)
     local ValueText = Instance.new("TextLabel")
     local InputBox = Instance.new("TextBox")
 
+    -- 滑块容器配置
     SliderBlock.Name = "SliderBlock"
     SliderBlock.Parent = ScrollingFrame
     SliderBlock.BackgroundColor3 = Library.Colors.Default
@@ -6500,6 +6501,7 @@ function Root:Slider(setup)
     SliderBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
     SliderBlock.ZIndex = 10
 
+    -- 阴影组件
     DropShadow.Name = "DropShadow"
     DropShadow.Parent = SliderBlock
     DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -6515,10 +6517,12 @@ function Root:Slider(setup)
     DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     DropShadow.SliceScale = 0.050
 
+    -- 容器边框
     UIStroke.Transparency = 0.850
     UIStroke.Color = Color3.fromRGB(156, 156, 156)
     UIStroke.Parent = SliderBlock
 
+    -- 标题文本
     TextLabel.RichText = true
     TextLabel.Parent = SliderBlock
     TextLabel.AnchorPoint = Vector2.new(0, 0.5)
@@ -6539,6 +6543,7 @@ function Root:Slider(setup)
     TextLabel.TextWrapped = true
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
+    -- 描述文本
     Content.Name = "Content"
     Content.Parent = SliderBlock
     Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -6561,6 +6566,7 @@ function Root:Slider(setup)
     Content.TextYAlignment = Enum.TextYAlignment.Top
     Content.RichText = true
 
+    -- 滑块轨道
     Block.Name = "Block"
     Block.Parent = SliderBlock
     Block.AnchorPoint = Vector2.new(1, 0.5)
@@ -6572,13 +6578,16 @@ function Root:Slider(setup)
     Block.Size = UDim2.new(0, 95, 0.45, 0)
     Block.ZIndex = 14
 
+    -- 轨道边框
     UIStroke_2.Transparency = 0.850
     UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
     UIStroke_2.Parent = Block
 
+    -- 轨道圆角
     UICorner.CornerRadius = UDim.new(0.300000012, 0)
     UICorner.Parent = Block
 
+    -- 滑块按钮
     Move.Name = "Move"
     Move.Parent = Block
     Move.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -6597,13 +6606,16 @@ function Root:Slider(setup)
     Move.SliceCenter = Rect.new(50, 50, 50, 50)
     Move.SliceScale = 1.0
 
+    -- 滑块按钮圆角
     UICorner_2.CornerRadius = UDim.new(1, 0)
     UICorner_2.Parent = Move
 
+    -- 滑块按钮边框
     UIStroke_3.Transparency = 0.850
     UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
     UIStroke_3.Parent = Move
 
+    -- 数值显示文本
     ValueText.Name = "ValueText"
     ValueText.Parent = SliderBlock
     ValueText.AnchorPoint = Vector2.new(0, 0.5)
@@ -6624,6 +6636,7 @@ function Root:Slider(setup)
     ValueText.TextWrapped = true
     ValueText.TextXAlignment = Enum.TextXAlignment.Right
 
+    -- 输入框
     InputBox.Name = "InputBox"
     InputBox.Parent = SliderBlock
     InputBox.BackgroundColor3 = Library.Colors.Default
@@ -6643,22 +6656,27 @@ function Root:Slider(setup)
     InputBox.TextXAlignment = Enum.TextXAlignment.Right
     InputBox.Text = tostring(setup.Default)
 
+    -- 核心：自动同步控制变量（无按钮，纯逻辑）
     local IsHold = false
     local RoundNum = setup.Round;
-    local IsAutoSync = true  
-    local ExternalValue = setup.Default
+    local IsAutoSync = true  -- 默认开启自动同步
+    local ExternalValue = setup.Default  -- 存储外部动态值
 
+    -- 下拉阴影效果（复用原有逻辑）
     Library:MakeDrop(SliderBlock , UIStroke , Library.Colors.Hightlight)
 
+    -- 提示框（复用原有逻辑）
     if setup.Tip then
         WindowLibrary:AddToolTip(SliderBlock , tostring(setup.Tip));
     end;
 
+    -- 数值四舍五入函数（复用原有逻辑）
     local function Rounding(num, numDecimalPlaces)
         local mult = 10^(numDecimalPlaces or 0)
         return math.floor(num * mult + 0.5) / mult
     end
 
+    -- 轨道尺寸更新函数（复用原有逻辑）
     local UpdateSize = function()
         if not WindowLibrary.Toggle then
             return;
@@ -6666,12 +6684,15 @@ function Root:Slider(setup)
         Block.Size = UDim2.new(0, (SliderBlock.AbsoluteSize.X / 2), 0.225, 0)
     end;
 
+    -- 滑块初始位置设置（复用原有逻辑）
     Library:Tween(Move , Library.TweenLibrary.FastEffect,{
         Position = UDim2.new((setup.Default - setup.Min) / (setup.Max - setup.Min), 0, 0.5, 0)
     });
 
+    -- 监听容器尺寸变化，更新轨道（复用原有逻辑）
     SliderBlock:GetPropertyChangedSignal('AbsoluteSize'):Connect(UpdateSize);
 
+    -- 滑块更新函数（复用原有逻辑）
     local function update(Input)
         local SizeScale = math.clamp((((Input.Position.X) - Block.AbsolutePosition.X) / Block.AbsoluteSize.X), 0, 1)
         local Main = ((setup.Max - setup.Min) * SizeScale) + setup.Min;
@@ -6689,21 +6710,24 @@ function Root:Slider(setup)
         setup.Callback(Value)
     end;
 
+    -- 核心：手动拖动开始（暂停自动同步）
     Block.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             IsHold = true
-            IsAutoSync = false 
+            IsAutoSync = false
             update(Input)
         end
     end)
 
+    -- 核心：手动拖动结束（恢复自动同步）
     Block.InputEnded:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
             IsHold = false
-            IsAutoSync = true  
+            IsAutoSync = true
         end
     end)
 
+    -- 监听鼠标/触摸移动，更新滑块（复用原有逻辑）
     Library.UserInputService.InputChanged:Connect(function(Input)
         if IsHold then
             if (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
@@ -6712,6 +6736,7 @@ function Root:Slider(setup)
         end
     end)
 
+    -- 输入框文本变化，更新滑块（复用原有逻辑）
     InputBox:GetPropertyChangedSignal("Text"):Connect(function()
         local textValue = tonumber(InputBox.Text) or setup.Default
         if textValue then
@@ -6724,6 +6749,7 @@ function Root:Slider(setup)
         end
     end)
 
+    -- 容器高度更新函数（复用原有逻辑）
     local UpdateBlock = function()
         local TitleSize = TextLabel.TextSize
         local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
@@ -6745,7 +6771,8 @@ function Root:Slider(setup)
         SliderBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
     end
     UpdateBlock()
-    
+
+    -- 核心：外部动态值同步接口（音乐/时间等通过此方法驱动）
     function RootSkid:SyncExternalValue(newValue)
         if IsAutoSync and not IsHold then
             local validValue = math.clamp(newValue, setup.Min, setup.Max)
@@ -6755,13 +6782,14 @@ function Root:Slider(setup)
             Library:Tween(Move, Library.TweenLibrary.FastEffect, {
                 Position = UDim2.new(normalizedPos, 0, 0.5, 0)
             });
-           
+            
             ValueText.Text = tostring(validValue)
             InputBox.Text = tostring(validValue)
             setup.Callback(validValue)
         end
     end
 
+    -- 滑块对外接口（复用原有逻辑）
     local RootSkid = {};
 
     function RootSkid:Content(Setup)
@@ -6771,28 +6799,29 @@ function Root:Slider(setup)
 
     function RootSkid:Value(Setup)
         setup.Default = Setup;
-        ExternalValue = Setup
+        Value = Setup
         local normalizedPos = (setup.Default - setup.Min) / (setup.Max - setup.Min)
-        
-        Library:Tween(Move , Library.TweenLibrary.FastEffect,{
-            Position = UDim2.new(normalizedPos, 0, 0.5, 0)
+ 
+        Library:Tween(Move, Library.TweenLibrary.FastEffect, {
+        Position = UDim2.new(normalizedPos, 0, 0.5, 0)
         });
-
+ 
         ValueText.Text = tostring(setup.Default)
         InputBox.Text = tostring(setup.Default)
         UpdateBlock()
-    end;
-
+        end;
+ 
     function RootSkid:Visible(value)
         SliderBlock.Visible = value;
     end;
-    
+ 
     function RootSkid:SetAutoSync(enabled)
         IsAutoSync = enabled
     end
-
+ 
     return RootSkid;
 end;
+  
 
 
 --[[
