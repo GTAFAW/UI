@@ -3268,7 +3268,10 @@ function Library:Windowxgo(setup)
 
 	local images = {
 		"rbxassetid://113180426865309",
+		"rbxassetid://127110756366496",
 		"rbxassetid://131471211520335",
+		"rbxassetid://102428625138886",
+		"rbxassetid://137332235358973",
 		"rbxassetid://109520199976167",
 		"rbxassetid://122958225353990",
 		"rbxassetid://140434608197988",
@@ -3280,6 +3283,10 @@ function Library:Windowxgo(setup)
 		"rbxassetid://131496206276220",
 		"rbxassetid://109752539854084",
 		"rbxassetid://70869793345513",
+		"rbxassetid://81618536870963",
+		"rbxassetid://96996068161496",
+		"rbxassetid://92875796313338",
+		"rbxassetid://89067121877834",
 		"rbxassetid://113186601959200",
 		"rbxassetid://73164000772284",
 		"rbxassetid://101305557601423",
@@ -3307,6 +3314,15 @@ function Library:Windowxgo(setup)
 		"rbxassetid://107983351429754",
 		"rbxassetid://121439238665385",
 		"rbxassetid://135083937747387",
+		"rbxassetid://130643405858214",
+		"rbxassetid://102409437463046",
+		"rbxassetid://87780505852956",
+		"rbxassetid://137945894459284",
+		"rbxassetid://101196101249400",
+		"rbxassetid://73934456979168",
+		"rbxassetid://124323332173934",
+		"rbxassetid://71240399712190",
+		"rbxassetid://127390304118462",
 		"rbxassetid://131409006813490",
 		"rbxassetid://80253796704859",
 		"rbxassetid://129206776380514",
@@ -3331,8 +3347,8 @@ function Library:Windowxgo(setup)
 
 	local currentIndex = 1
 	local isForward = true
-	local slideDuration = 1.7
-	local interval = 15
+	local slideDuration = 1.5
+	local interval = 13.5
 
 	local preloader = Instance.new("ImageLabel")
 	preloader.Visible = false
