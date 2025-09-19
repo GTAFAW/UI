@@ -3244,269 +3244,260 @@ end;
     end))
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
-	setup = setup or {};
-	setup.Title = setup.Title or "Window";
-	setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
-	setup.Size = setup.Size or Library.SizeLibrary.Default;
-	setup.KeySystem = setup.KeySystem or false;
-	setup.Logo = setup.Logo or "rbxassetid://7733920644";
-	setup.ToggleMethod = setup.ToggleMethod or "Application";
+    setup = setup or {};
+    setup.Title = setup.Title or "Window";
+    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
+    setup.Size = setup.Size or Library.SizeLibrary.Default;
+    setup.KeySystem = setup.KeySystem or false;
+    setup.Logo = setup.Logo or "rbxassetid://7733920644";
+    setup.ToggleMethod = setup.ToggleMethod or "Application";
 
-	if setup.KeySystem then
-		setup.KeySystemInfo = setup.KeySystemInfo or {};
-		setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
-		setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
-	end
+    if setup.KeySystem then
+        setup.KeySystemInfo = setup.KeySystemInfo or {};
+        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
+        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
+        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
+    end
 
-	local images = {
-		"rbxassetid://113180426865309",
-		"rbxassetid://127110756366496",
-		"rbxassetid://131471211520335",
-		"rbxassetid://102428625138886",
-		"rbxassetid://137332235358973",
-		"rbxassetid://109520199976167",
-		"rbxassetid://122958225353990",
-		"rbxassetid://140434608197988",
-		"rbxassetid://124568548523146",
-		"rbxassetid://76544783777123",
-		"rbxassetid://117347134697321",
-		"rbxassetid://98554545052070",
-		"rbxassetid://131266490485584",
-		"rbxassetid://131496206276220",
-		"rbxassetid://109752539854084",
-		"rbxassetid://70869793345513",
-		"rbxassetid://81618536870963",
-		"rbxassetid://96996068161496",
-		"rbxassetid://92875796313338",
-		"rbxassetid://89067121877834",
-		"rbxassetid://113186601959200",
-		"rbxassetid://73164000772284",
-		"rbxassetid://101305557601423",
-		"rbxassetid://104067029112641",
-		"rbxassetid://110630445580007",
-		"rbxassetid://108644687915512",
-		"rbxassetid://86540442133927",
-		"rbxassetid://107018855884545",
-		"rbxassetid://112966984941036",
-		"rbxassetid://80598426066070",
-		"rbxassetid://108391089326665",
-		"rbxassetid://138013328013091",
-		"rbxassetid://110990525726887",
-		"rbxassetid://72760885562855",
-		"rbxassetid://82117275977223",
-		"rbxassetid://80695281901172",
-		"rbxassetid://123238115911519",
-		"rbxassetid://135035617747628",
-		"rbxassetid://74297023080665",
-		"rbxassetid://84550607098866",
-		"rbxassetid://132992677171078",
-	    "rbxassetid://126722695077251",
-	    "rbxassetid://82915814593812",
-		"rbxassetid://105485276493469",
-		"rbxassetid://107983351429754",
-		"rbxassetid://121439238665385",
-		"rbxassetid://135083937747387",
-		"rbxassetid://130643405858214",
-		"rbxassetid://102409437463046",
-		"rbxassetid://87780505852956",
-		"rbxassetid://137945894459284",
-		"rbxassetid://101196101249400",
-		"rbxassetid://73934456979168",
-		"rbxassetid://124323332173934",
-		"rbxassetid://71240399712190",
-		"rbxassetid://127390304118462",
-		"rbxassetid://131409006813490",
-		"rbxassetid://80253796704859",
-		"rbxassetid://129206776380514",
-		"rbxassetid://121697617411442",
-		"rbxassetid://129410104830757",
-		"rbxassetid://71101554362190",
-		"rbxassetid://117937637678090",
-		"rbxassetid://89768207500333",
-		"rbxassetid://136363102949077",
-		"rbxassetid://74648780628027",
-		"rbxassetid://103232778626018",
-		"rbxassetid://76127155963189",
-		"rbxassetid://118305240093538",
-		"rbxassetid://112630176374798",
-		"rbxassetid://74804451529535",
-		"rbxassetid://115691043156297",
-		"rbxassetid://100980082510772",
-		"rbxassetid://135027711714247",
-		"rbxassetid://113389633674712",
-		"rbxassetid://94012779929465"
-	}
-	
-	local preloader = Instance.new("ImageLabel")
-	preloader.Visible = false
-	preloader.Parent = game.CoreGui
-	local loadedImages = {}
-	task.spawn(function()
-		for _, assetId in ipairs(images) do
-			local loaded = false
-			local conn = preloader.ContentLoaded:Connect(function()
-				loaded = true
-				loadedImages[assetId] = true
-			end)
-			preloader.Image = assetId
-			-- 5秒超时兜底
-			for _ = 1, 50 do
-				if loaded then break end
-				task.wait(0.1)
-			end
-			conn:Disconnect()
-			-- 加载失败用默认图
-			if not loaded then
-				loadedImages[assetId] = "rbxassetid://7733920644"
-			end
-		end
-		preloader:Destroy()
-	end)
+    local ScreenGui = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    local BackgroundImage1 = Instance.new("ImageLabel")
+    local BackgroundImage2 = Instance.new("ImageLabel")
+    local DropShadow = Instance.new("ImageLabel")
+    local Ico = Instance.new("ImageLabel")
 
-	local ScreenGui = Instance.new("ScreenGui")
-	local MainFrame = Instance.new("Frame")
-	local BackgroundImage1 = Instance.new("ImageLabel")
-	local BackgroundImage2 = Instance.new("ImageLabel")
-	local DropShadow = Instance.new("ImageLabel")
-	local Ico = Instance.new("ImageLabel")
+    local images = {
+        "rbxassetid://113180426865309",
+        "rbxassetid://127110756366496",
+        "rbxassetid://131471211520335",
+        "rbxassetid://102428625138886",
+        "rbxassetid://137332235358973",
+        "rbxassetid://109520199976167",
+        "rbxassetid://122958225353990",
+        "rbxassetid://140434608197988",
+        "rbxassetid://124568548523146",
+        "rbxassetid://76544783777123",
+        "rbxassetid://117347134697321",
+        "rbxassetid://98554545052070",
+        "rbxassetid://131266490485584",
+        "rbxassetid://131496206276220",
+        "rbxassetid://109752539854084",
+        "rbxassetid://70869793345513",
+        "rbxassetid://81618536870963",
+        "rbxassetid://96996068161496",
+        "rbxassetid://92875796313338",
+        "rbxassetid://89067121877834",
+        "rbxassetid://113186601959200",
+        "rbxassetid://73164000772284",
+        "rbxassetid://101305557601423",
+        "rbxassetid://104067029112641",
+        "rbxassetid://110630445580007",
+        "rbxassetid://108644687915512",
+        "rbxassetid://86540442133927",
+        "rbxassetid://107018855884545",
+        "rbxassetid://112966984941036",
+        "rbxassetid://80598426066070",
+        "rbxassetid://108391089326665",
+        "rbxassetid://138013328013091",
+        "rbxassetid://110990525726887",
+        "rbxassetid://72760885562855",
+        "rbxassetid://82117275977223",
+        "rbxassetid://80695281901172",
+        "rbxassetid://123238115911519",
+        "rbxassetid://135035617747628",
+        "rbxassetid://74297023080665",
+        "rbxassetid://84550607098866",
+        "rbxassetid://132992677171078",
+        "rbxassetid://126722695077251",
+        "rbxassetid://82915814593812",
+        "rbxassetid://105485276493469",
+        "rbxassetid://107983351429754",
+        "rbxassetid://121439238665385",
+        "rbxassetid://135083937747387",
+        "rbxassetid://130643405858214",
+        "rbxassetid://102409437463046",
+        "rbxassetid://87780505852956",
+        "rbxassetid://137945894459284",
+        "rbxassetid://101196101249400",
+        "rbxassetid://73934456979168",
+        "rbxassetid://124323332173934",
+        "rbxassetid://71240399712190",
+        "rbxassetid://127390304118462",
+        "rbxassetid://131409006813490",
+        "rbxassetid://80253796704859",
+        "rbxassetid://129206776380514",
+        "rbxassetid://121697617411442",
+        "rbxassetid://129410104830757",
+        "rbxassetid://71101554362190",
+        "rbxassetid://117937637678090",
+        "rbxassetid://89768207500333",
+        "rbxassetid://136363102949077",
+        "rbxassetid://74648780628027",
+        "rbxassetid://103232778626018",
+        "rbxassetid://76127155963189",
+        "rbxassetid://118305240093538",
+        "rbxassetid://112630176374798",
+        "rbxassetid://74804451529535",
+        "rbxassetid://115691043156297",
+        "rbxassetid://100980082510772",
+        "rbxassetid://135027711714247",
+        "rbxassetid://113389633674712",
+        "rbxassetid://94012779929465"
+    }
 
-	local currentIndex = 1
-	local isForward = true
-	local slideDuration = 1.5
-	local interval = 13
+    local currentIndex = 1
+    local isForward = true
+    local slideDuration = 1.5
+    local interval = 13.5
 
-	local function getNextIndex()
-		if isForward then
-			return currentIndex == #images and #images - 1 or currentIndex + 1
-		else
-			return currentIndex == 1 and 2 or currentIndex - 1
-		end
-	end
+    local preloader = Instance.new("ImageLabel")
+    preloader.Visible = false
+    preloader.Parent = ScreenGui
 
-	local function getLoadedImage(assetId)
-		while not loadedImages[assetId] do
-			task.wait(0.05)
-		end
-		return type(loadedImages[assetId]) == "string" and loadedImages[assetId] or assetId
-	end
+    local function initBackgrounds()
+        local firstImage = images[currentIndex]
+        BackgroundImage1.Parent = MainFrame
+        BackgroundImage1.BackgroundTransparency = 1
+        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage1.Image = firstImage
+        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage1.ImageTransparency = 0
+        BackgroundImage1.ZIndex = 1
 
-	local function initBackgrounds()
-		local firstImg = getLoadedImage(images[currentIndex])
-		BackgroundImage1.Parent = MainFrame
-		BackgroundImage1.BackgroundTransparency = 1
-		BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
-		BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-		BackgroundImage1.Image = firstImg
-		BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
-		BackgroundImage1.ImageTransparency = 0
-		BackgroundImage1.ZIndex = 1
+        BackgroundImage2.Parent = MainFrame
+        BackgroundImage2.BackgroundTransparency = 1
+        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
+        BackgroundImage2.Image = firstImage
+        BackgroundImage2.ImageTransparency = 0
+        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage2.ZIndex = 2
+    end
 
-		local nextImg = getLoadedImage(images[getNextIndex()])
-		BackgroundImage2.Parent = MainFrame
-		BackgroundImage2.BackgroundTransparency = 1
-		BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
-		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
-		BackgroundImage2.Image = nextImg
-		BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-		BackgroundImage2.ImageTransparency = 0
-		BackgroundImage2.ZIndex = 1
-	end
+    local function getNextIndex()
+        if isForward then
+            return currentIndex == #images and #images - 1 or currentIndex + 1
+        else
+            return currentIndex == 1 and 2 or currentIndex - 1
+        end
+    end
 
-	local function slideSwitch()
-		local nextIndex = getNextIndex()
-		local nextImg = getLoadedImage(images[nextIndex])
-		
-		BackgroundImage2.Image = nextImg
-		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
+    local function prefetch(assetId)
+        preloader.Image = assetId
+        task.wait(0.8)
+    end
 
-		Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0,0,0,0)}, slideDuration)
-		Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(isForward and -1 or 1, 0, 0, 0)}, slideDuration)
+    local function slideSwitch()
+        local nextIndex = getNextIndex()
+        task.spawn(function()
+            prefetch(images[nextIndex])
+        end)
+        task.wait(1)
 
-		task.wait(slideDuration)
+        BackgroundImage2.Image = images[nextIndex]
 
-		currentIndex = nextIndex
-		if currentIndex == #images then
-			isForward = false
-		elseif currentIndex == 1 then
-			isForward = true
-		end
+        local startPos = UDim2.new(0, 0, 0, 0)
+        local endPos   = UDim2.new(0, 0, 0, 0)
+        local oldEndPos= UDim2.new(0, 0, 0, 0)
 
-		local currImg = getLoadedImage(images[currentIndex])
-		BackgroundImage1.Image = currImg
-		BackgroundImage1.Position = UDim2.new(0,0,0,0)
-		BackgroundImage2.Image = getLoadedImage(images[getNextIndex()])
-		BackgroundImage2.Position = UDim2.new(isForward and 1 or -1, 0, 0, 0)
-	end
+        if isForward then
+            startPos  = UDim2.new(1, 0, 0, 0)
+            oldEndPos = UDim2.new(-1, 0, 0, 0)
+        else
+            startPos  = UDim2.new(-1, 0, 0, 0)
+            oldEndPos = UDim2.new(1, 0, 0, 0)
+        end
 
-	ScreenGui.Parent = game.CoreGui
-	ScreenGui.ResetOnSpawn = false
-	ScreenGui.IgnoreGuiInset = false
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        BackgroundImage2.Position = startPos
 
-	MainFrame.Name = "MainFrame"
-	MainFrame.Parent = ScreenGui
-	MainFrame.Active = true
-	MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	MainFrame.BackgroundTransparency = 0.250
-	MainFrame.BorderSizePixel = 0
-	MainFrame.ClipsDescendants = true
-	MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-	MainFrame.Size = UDim2.fromScale(0, 0)
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
-	initBackgrounds()
+        task.wait(slideDuration)
 
-	task.spawn(function()
-		while true do
-			task.wait(interval)
-			slideSwitch()
-		end
-	end)
+        currentIndex = nextIndex
+        if currentIndex == #images then
+            isForward = false
+        elseif currentIndex == 1 then
+            isForward = true
+        end
 
-	local BlurEle = Library.UIBlur.new(MainFrame, true)
-	
-	DropShadow.Name = "DropShadow"
-	DropShadow.Parent = MainFrame
-	DropShadow.BackgroundTransparency = 1.000
-	DropShadow.Position = UDim2.new(0, -5, 0, -5)
-	DropShadow.Rotation = 0.010
-	DropShadow.Size = UDim2.new(1, 10, 1, 10)
-	DropShadow.ZIndex = -5
-	DropShadow.Image = "rbxassetid://297694300"
-	DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-	DropShadow.ImageTransparency = 0.500
-	DropShadow.ScaleType = Enum.ScaleType.Slice
-	DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-	DropShadow.SliceScale = 0.050
+        BackgroundImage1.Image = BackgroundImage2.Image
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage2.Position = startPos
 
-	Ico.Name = "Ico"
-	Ico.Parent = MainFrame
-	Ico.AnchorPoint = Vector2.new(0.5, 0.5)
-	Ico.BackgroundTransparency = 1.000
-	Ico.BorderSizePixel = 0
-	Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
-	Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
-	Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	Ico.Image = setup.Logo
-	Ico.ImageTransparency = 1.000
+        preloader.Image = ""
+    end
 
-	Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
-	Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.IgnoreGuiInset = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
-	if setup.KeySystem then
-		setup.KeySystemInfo.Enabled = true
-		setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = ScreenGui
+    MainFrame.Active = true
+    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    MainFrame.BackgroundTransparency = 0.250
+    MainFrame.BorderSizePixel = 0
+    MainFrame.ClipsDescendants = true
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.Size = UDim2.fromScale(0, 0)
 
-		task.wait(1)
+    initBackgrounds()
 
-		task.delay(0.1, function()
-			Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1})
-		end)
+    task.spawn(function()
+        while true do
+            task.wait(interval)
+            slideSwitch()
+        end
+    end)
 
-		Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
+    local BlurEle = Library.UIBlur.new(MainFrame, true)
 
-		task.wait(1);
+    DropShadow.Name = "DropShadow"
+    DropShadow.Parent = MainFrame
+    DropShadow.BackgroundTransparency = 1.000
+    DropShadow.Position = UDim2.new(0, -5, 0, -5)
+    DropShadow.Rotation = 0.010
+    DropShadow.Size = UDim2.new(1, 10, 1, 10)
+    DropShadow.ZIndex = -5
+    DropShadow.Image = "rbxassetid://297694300"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.500
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+    DropShadow.SliceScale = 0.050
+
+    Ico.Name = "Ico"
+    Ico.Parent = MainFrame
+    Ico.AnchorPoint = Vector2.new(0.5, 0.5)
+    Ico.BackgroundTransparency = 1.000
+    Ico.BorderSizePixel = 0
+    Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
+    Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
+    Ico.Image = setup.Logo
+    Ico.ImageTransparency = 1.000
+
+    Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
+    Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
+
+    if setup.KeySystem then
+        setup.KeySystemInfo.Enabled = true
+        setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
+
+        task.wait(1)
+
+        task.delay(0.1, function()
+            Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1})
+        end)
+
+        Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
+
+        task.wait(1);
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
