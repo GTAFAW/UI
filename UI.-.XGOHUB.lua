@@ -3349,8 +3349,8 @@ function Library:Windowxgo(setup)
     local isForward = true
     local slideDuration = 1.5
     local interval = 13.5
-    local paused = false 
-    local switchRequested = false
+    local paused = false
+    local switchLock = false
 
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
@@ -3407,6 +3407,8 @@ function Library:Windowxgo(setup)
     end)
 
     local function slideSwitch()
+        if switchLock then return end
+        switchLock = true
         local nextIndex = getNextIndex(currentIndex, isForward)
         BackgroundImage2.Image = images[nextIndex]
 
@@ -3431,6 +3433,7 @@ function Library:Windowxgo(setup)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
 
         readyToLoad:Fire()
+        switchLock = false
     end
 
     ScreenGui.Parent = game.CoreGui
@@ -3453,11 +3456,9 @@ function Library:Windowxgo(setup)
 
     task.spawn(function()
         while true do
-            if not paused and not switchRequested then
+            if not paused then
                 task.wait(interval)
-                if not paused and not switchRequested then
-                    slideSwitch()
-                end
+                if not paused then slideSwitch() end
             else
                 task.wait()
             end
@@ -3510,26 +3511,26 @@ function Library:Windowxgo(setup)
 
         task.wait(1);
     end
-    
-    Library.Windowxgo = {}
 
+    Library.Windowxgo = {}
     function Library.Windowxgo.PauseToggle()
         paused = not paused
     end
-
     function Library.Windowxgo.PrevImage()
-        switchRequested = true
+        if switchLock then return end
+        paused = true
         isForward = false
         slideSwitch()
-        switchRequested = false
+        paused = false
     end
-
     function Library.Windowxgo.NextImage()
-        switchRequested = true
+        if switchLock then return end
+        paused = true
         isForward = true
         slideSwitch()
-        switchRequested = false
+        paused = false
     end
+end
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
