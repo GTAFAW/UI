@@ -3357,11 +3357,28 @@ function Library:Windowxgo(setup)
         "rbxassetid://113389633674712",
         "rbxassetid://94012779929465"
     }
-    
-    local shuffledList
-    local currentPos = 1
-    local slideDuration = 1.5
-    local interval = 13.5
+
+    local shuffleList = {table.unpack(images)}
+    local shuffleIdx  = 0
+
+    local function shuffle(t)
+        for i = #t, 2, -1 do
+            local j = math.random(i)
+            t[i], t[j] = t[j], t[i]
+        end
+    end
+
+    math.randomseed(tick())
+    shuffle(shuffleList)
+
+    local function nextImage()
+        shuffleIdx = shuffleIdx + 1
+        if shuffleIdx > #shuffleList then
+            shuffle(shuffleList)
+            shuffleIdx = 1
+        end
+        return shuffleList[shuffleIdx]
+    end
 
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
@@ -3374,79 +3391,15 @@ function Library:Windowxgo(setup)
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
-    local function shuffleImages()
-        shuffledList = {}
-        for _, img in ipairs(images) do
-            table.insert(shuffledList, img)
-        end
-        for i = #shuffledList, 2, -1 do
-            local j = math.random(1, i)
-            shuffledList[i], shuffledList],] = shuffledList],], shuffledList[i]
-        end
-        currentPos = 1
-    end
+    local slideDuration = 1.5
+    local interval      = 13.5
 
-    local function initBackgrounds()
-        shuffleImages()
-        local first = shuffledList[currentPos]
-        
-        BackgroundImage1.Parent = MainFrame
-        BackgroundImage1.BackgroundTransparency = 1
-        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
-        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = first
-        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage1.ImageTransparency = 0
-        BackgroundImage1.ZIndex = 1
-
-        BackgroundImage2.Parent = MainFrame
-        BackgroundImage2.BackgroundTransparency = 1
-        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
-        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = first
-        BackgroundImage2.ImageTransparency = 0
-        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage2.ZIndex = 2
-    end
-
-    local function getNextRandomImage()
-        currentPos = currentPos + 1
-        if currentPos > #shuffledList then
-            shuffleImages()
-        end
-        return shuffledList[currentPos]
-    end
-    
-    task.spawn(function()
-        while true do
-            readyToLoad.Event:Wait()
-            local nextImg = getNextRandomImage()
-            preloader.Image = nextImg
-            readyToLoad:Fire()
-            task.wait()
-        end
-    end)
-
-    local function slideSwitch()
-        local nextImg = getNextRandomImage()
-        BackgroundImage2.Image = nextImg
-
-        local startPos = UDim2.new(1, 0, 0, 0)
-        local endPos   = UDim2.new(0, 0, 0, 0)
-        local oldEndPos= UDim2.new(-1, 0, 0, 0)
-
-        BackgroundImage2.Position = startPos
-
-        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
-        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
-
-        task.wait(slideDuration)
-        
-        BackgroundImage1.Image = BackgroundImage2.Image
-        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-
-        readyToLoad:Fire()
+    local function fadeSwitch()
+        local nxt = nextImage()
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1}, slideDuration/2)
+        task.wait(slideDuration/2)
+        BackgroundImage1.Image = nxt
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0}, slideDuration/2)
     end
 
     ScreenGui.Parent = game.CoreGui
@@ -3465,12 +3418,20 @@ function Library:Windowxgo(setup)
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
-    initBackgrounds()
+    BackgroundImage1.Name = "BackgroundImage"
+    BackgroundImage1.Parent = MainFrame
+    BackgroundImage1.BackgroundTransparency = 1
+    BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
+    BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+    BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
+    BackgroundImage1.ImageTransparency = 0
+    BackgroundImage1.ZIndex = 1
+    BackgroundImage1.Image = nextImage()
 
     task.spawn(function()
         while true do
             task.wait(interval)
-            slideSwitch()
+            fadeSwitch()
         end
     end)
 
@@ -3491,7 +3452,7 @@ function Library:Windowxgo(setup)
     DropShadow.ScaleType = Enum.ScaleType.Slice
     DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     DropShadow.SliceScale = 0.050
-    
+
     Ico.Name = "Ico"
     Ico.Parent = MainFrame
     Ico.AnchorPoint = Vector2.new(0.5, 0.5)
