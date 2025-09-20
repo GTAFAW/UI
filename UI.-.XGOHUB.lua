@@ -3342,12 +3342,24 @@ function Library:Windowxgo(setup)
         "rbxassetid://115691043156297",
         "rbxassetid://100980082510772",
         "rbxassetid://135027711714247",
+        "rbxassetid://117021746100481",
+        "rbxassetid://124541797505196",
+        "rbxassetid://136302622336157",
+        "rbxassetid://74234951901491",
+        "rbxassetid://76489725657019",
+        "rbxassetid://77202377271252",
+        "rbxassetid://81630003819439",
+        "rbxassetid://134782997900491",
+        "rbxassetid://101854737639056",
+        "rbxassetid://85325057913063",
+        "rbxassetid://88726485475708",
+        "rbxassetid://124568043722207",
         "rbxassetid://113389633674712",
         "rbxassetid://94012779929465"
     }
-
-    local currentIndex = 1
-    local isForward = true
+    
+    local shuffledList
+    local currentPos = 1
     local slideDuration = 1.5
     local interval = 13.5
 
@@ -3362,8 +3374,22 @@ function Library:Windowxgo(setup)
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
+    local function shuffleImages()
+        shuffledList = {}
+        for _, img in ipairs(images) do
+            table.insert(shuffledList, img)
+        end
+        for i = #shuffledList, 2, -1 do
+            local j = math.random(1, i)
+            shuffledList[i], shuffledList],] = shuffledList],], shuffledList[i]
+        end
+        currentPos = 1
+    end
+
     local function initBackgrounds()
-        local first = images[currentIndex]
+        shuffleImages()
+        local first = shuffledList[currentPos]
+        
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
@@ -3383,39 +3409,31 @@ function Library:Windowxgo(setup)
         BackgroundImage2.ZIndex = 2
     end
 
-    local function getNextIndex(idx, fwd)
-        if fwd then
-            return idx == #images and #images - 1 or idx + 1
-        else
-            return idx == 1 and 2 or idx - 1
+    local function getNextRandomImage()
+        currentPos = currentPos + 1
+        if currentPos > #shuffledList then
+            shuffleImages()
         end
+        return shuffledList[currentPos]
     end
     
     task.spawn(function()
         while true do
             readyToLoad.Event:Wait()
-            local target = getNextIndex(currentIndex, isForward)
-            if (isForward and currentIndex == #images) or (not isForward and currentIndex == 1) then
-                isForward = not isForward
-                target = getNextIndex(currentIndex, isForward)
-            end
-            preloader.Image = images[target]
+            local nextImg = getNextRandomImage()
+            preloader.Image = nextImg
             readyToLoad:Fire()
             task.wait()
         end
     end)
 
     local function slideSwitch()
-        local nextIndex = getNextIndex(currentIndex, isForward)
-        BackgroundImage2.Image = images[nextIndex]
+        local nextImg = getNextRandomImage()
+        BackgroundImage2.Image = nextImg
 
         local startPos = UDim2.new(1, 0, 0, 0)
         local endPos   = UDim2.new(0, 0, 0, 0)
         local oldEndPos= UDim2.new(-1, 0, 0, 0)
-        if not isForward then
-            startPos = UDim2.new(-1, 0, 0, 0)
-            oldEndPos= UDim2.new(1, 0, 0, 0)
-        end
 
         BackgroundImage2.Position = startPos
 
@@ -3423,8 +3441,7 @@ function Library:Windowxgo(setup)
         Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
         task.wait(slideDuration)
-
-        currentIndex = nextIndex
+        
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
@@ -3474,7 +3491,7 @@ function Library:Windowxgo(setup)
     DropShadow.ScaleType = Enum.ScaleType.Slice
     DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     DropShadow.SliceScale = 0.050
-
+    
     Ico.Name = "Ico"
     Ico.Parent = MainFrame
     Ico.AnchorPoint = Vector2.new(0.5, 0.5)
