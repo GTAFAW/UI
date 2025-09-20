@@ -3358,17 +3358,14 @@ function Library:Windowxgo(setup)
 
     local shuffleList = {table.unpack(images)}
     local shuffleIdx  = 0
-
     local function shuffle(t)
         for i = #t, 2, -1 do
             local j = math.random(i)
             t[i], t[j] = t[j], t[i]
         end
     end
-
     math.randomseed(tick())
     shuffle(shuffleList)
-
     local function nextImage()
         shuffleIdx = shuffleIdx + 1
         if shuffleIdx > #shuffleList then
@@ -3380,7 +3377,6 @@ function Library:Windowxgo(setup)
 
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
-
     task.spawn(function()
         game:GetService("ContentProvider"):PreloadAsync(images)
     end)
@@ -3389,29 +3385,56 @@ function Library:Windowxgo(setup)
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
-    local slideDuration = 1.5
-    local interval      = 13.5
+    local slideDirection = "LeftRight"
+    local slideDuration  = 1.5
+    local interval       = 13.5
+    local isForward      = true
 
-local function spinWipe()
-    local nxt = nextImage()
-    BackgroundImage2.Image = nxt
-    BackgroundImage2.ImageRectSize = Vector2.new(0, 0)
-    BackgroundImage1.ImageRectSize = Vector2.new(1, 1)
-
-    local duration = slideDuration
-    local steps    = 60
-    local delta    = 1 / steps
-    for i = 1, steps do
-        local t = i * delta
-        BackgroundImage2.ImageRectSize = Vector2.new(t, t)
-        BackgroundImage1.ImageRectSize = Vector2.new(1 - t, 1 - t)
-        task.wait(duration / steps)
+    local function getNextIndex(idx, fwd)
+        if fwd then
+            return idx == #shuffleList and #shuffleList - 1 or idx + 1
+        else
+            return idx == 1 and 2 or idx - 1
+        end
     end
 
-    BackgroundImage1.Image = nxt
-    BackgroundImage1.ImageRectSize = Vector2.new(1, 1)
-    BackgroundImage2.ImageRectSize = Vector2.new(0, 0)
-end
+    local function slideSwitch()
+        local nxt = nextImage()
+        BackgroundImage2.Image = nxt
+
+        local startPos, endPos, oldEndPos
+        if slideDirection == "LeftRight" then
+            startPos  = UDim2.new(1, 0, 0, 0)
+            endPos    = UDim2.new(0, 0, 0, 0)
+            oldEndPos = UDim2.new(-1, 0, 0, 0)
+            if not isForward then
+                startPos  = UDim2.new(-1, 0, 0, 0)
+                oldEndPos = UDim2.new(1, 0, 0, 0)
+            end
+        else
+            startPos  = UDim2.new(0, 0, 1, 0)
+            endPos    = UDim2.new(0, 0, 0, 0)
+            oldEndPos = UDim2.new(0, 0, -1, 0)
+            if not isForward then
+                startPos  = UDim2.new(0, 0, -1, 0)
+                oldEndPos = UDim2.new(0, 0, 1, 0)
+            end
+        end
+
+        BackgroundImage2.Position = startPos
+
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
+
+        task.wait(slideDuration)
+
+        BackgroundImage1.Image = BackgroundImage2.Image
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage2.Position = slideDirection == "LeftRight" and UDim2.new(1, 0, 0, 0) or UDim2.new(0, 0, 1, 0)
+
+        isForward = not isForward
+        readyToLoad:Fire()
+    end
 
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ResetOnSpawn = false
@@ -3429,42 +3452,35 @@ end
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
-    -- 初始化两张背景图
-local function initBackgrounds()
-    local first = nextImage()
-    BackgroundImage1.Name = "BackgroundImage1"
-    BackgroundImage1.Parent = MainFrame
-    BackgroundImage1.BackgroundTransparency = 1
-    BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
-    BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-    BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
-    BackgroundImage1.ZIndex = 1
-    BackgroundImage1.Image = first                 -- 真正背景图
-    BackgroundImage1.ImageRectSize = Vector2.new(1, 1)
-    BackgroundImage1.ImageRectOffset = Vector2.new(0, 0)
-    -- 遮罩图
-    BackgroundImage1.SliceCenter = Rect.new(128, 128, 128, 128)
+    local function initBackgrounds()
+        local first = nextImage()
+        BackgroundImage1.Parent = MainFrame
+        BackgroundImage1.BackgroundTransparency = 1
+        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage1.ImageTransparency = 0
+        BackgroundImage1.ZIndex = 1
+        BackgroundImage1.Image = first
 
-    BackgroundImage2.Name = "BackgroundImage2"
-    BackgroundImage2.Parent = MainFrame
-    BackgroundImage2.BackgroundTransparency = 1
-    BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
-    BackgroundImage2.Position = UDim2.new(0, 0, 0, 0)
-    BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-    BackgroundImage2.ZIndex = 2
-    BackgroundImage2.Image = first
-    BackgroundImage2.ImageRectSize = Vector2.new(0, 0)
-    BackgroundImage2.SliceCenter = Rect.new(128, 128, 128, 128)
-end
+        BackgroundImage2.Parent = MainFrame
+        BackgroundImage2.BackgroundTransparency = 1
+        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage2.Position = slideDirection == "LeftRight" and UDim2.new(1, 0, 0, 0) or UDim2.new(0, 0, 1, 0)
+        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage2.ZIndex = 2
+        BackgroundImage2.Image = first
+    end
+
+    initBackgrounds()
+    readyToLoad:Fire()
 
     task.spawn(function()
         while true do
             task.wait(interval)
-            spinWipe()
+            slideSwitch()
         end
     end)
-
-    readyToLoad:Fire()
 
     local BlurEle = Library.UIBlur.new(MainFrame, true)
 
@@ -3509,315 +3525,6 @@ end
         Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
 
         task.wait(1);
-
------- // 卡密系统设置    ----------------------------------------------------------------------------------------
-
-		local AuthFunction = Instance.new("Frame")
-		local Title = Instance.new("TextLabel")
-		local TextBox = Instance.new("TextBox")
-		local DropShadow = Instance.new("ImageLabel")
-		local UIStroke = Instance.new("UIStroke") -- 边框
-		local UIStroke_2 = Instance.new("UIStroke")
-		local GetButton = Instance.new("Frame")
-		local DropShadow_2 = Instance.new("ImageLabel")
-		local UIStroke_3 = Instance.new("UIStroke")
-		local GTitle = Instance.new("TextLabel")
-		local GButton = Instance.new("TextButton")
-		local LoginButton = Instance.new("Frame")
-		local DropShadow_3 = Instance.new("ImageLabel")
-		local UIStroke_4 = Instance.new("UIStroke")
-		local LTitle = Instance.new("TextLabel")
-		local LButton = Instance.new("TextButton")
-        local CloseButton = Instance.new("TextButton")
-        local Workspace = game:GetService("Workspace")
-        local CloseSound = Instance.new("Sound")
-       
-        AuthFunction.Name = "AuthFunction"
-		AuthFunction.Parent = MainFrame
-		AuthFunction.Active = true
-		AuthFunction.AnchorPoint = Vector2.new(0.5, 0.5)
-		AuthFunction.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		AuthFunction.BackgroundTransparency = 1.000
-		AuthFunction.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		AuthFunction.BorderSizePixel = 0
-		AuthFunction.Position = UDim2.new(0.5, 0, -1.5, 0)
-		AuthFunction.Size = UDim2.new(1, 0, 1, 0)
-
-		Library:Tween(AuthFunction , Library.TweenLibrary.SmallEffect,{Position = UDim2.new(0.5, 0, 0.5, 0)})
-          
-		Title.Name = "Title"
-		Title.Parent = AuthFunction
-		Title.AnchorPoint = Vector2.new(0.5, 0.5)
-		Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		Title.BackgroundTransparency = 1.000
-		Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		Title.BorderSizePixel = 0
-		Title.Position = UDim2.new(0.5, 0, 0.100000001, 0)
-		Title.Size = UDim2.new(0.899999976, 0, 0.100000001, 0)
-		Title.Font = Enum.Font.Gotham
-		Title.Text = setup.KeySystemInfo.Title
-		Title.TextColor3 = Library.Colors.TextColor
-		Title.TextScaled = true
-		Title.TextSize = 14.000
-		Title.TextStrokeColor3 = Library.Colors.TextColor
-		Title.TextStrokeTransparency = 0.950
-		Title.TextWrapped = true
-		Title.RichText = true;
-
-		TextBox.Parent = AuthFunction
-		TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
-		TextBox.BackgroundColor3 = Library.Colors.Default
-		TextBox.BackgroundTransparency = 0.250
-		TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		TextBox.BorderSizePixel = 0
-		TextBox.Position = UDim2.new(0.5, 0, 0.349999994, 0)
-		TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
-		TextBox.ZIndex = 5
-		TextBox.ClearTextOnFocus = false
-		TextBox.Font = Enum.Font.SourceSans
-		TextBox.PlaceholderText = "请输入卡密"
-		TextBox.Text = ""
-		TextBox.TextColor3 = Library.Colors.TextColor
-		TextBox.TextSize = 13.000
-		TextBox.TextStrokeColor3 = Library.Colors.TextColor
-		TextBox.TextStrokeTransparency = 0.950
-		TextBox.TextTransparency = 0.250
-		TextBox.TextWrapped = true
-
-		DropShadow.Name = "DropShadow"
-		DropShadow.Parent = TextBox
-		DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		DropShadow.BackgroundTransparency = 1.000
-		DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		DropShadow.Position = UDim2.new(0, -5, 0, -5)
-		DropShadow.Size = UDim2.new(1, 10, 1, 10)
-		DropShadow.ZIndex = 4
-		DropShadow.Image = "rbxassetid://297694300"  --2
-		DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-		DropShadow.ImageTransparency = 0.500
-		DropShadow.ScaleType = Enum.ScaleType.Slice
-		DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-		DropShadow.SliceScale = 0.050
-
-		UIStroke.Transparency = 0.850
-		UIStroke.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		UIStroke.Parent = TextBox
-
-		UIStroke_2.Transparency = 0.850
-		UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke_2.Parent = AuthFunction
-
-		GetButton.Name = "GetButton"
-		GetButton.Parent = AuthFunction
-		GetButton.AnchorPoint = Vector2.new(0.5, 0.5)
-		GetButton.BackgroundColor3 = Library.Colors.Default
-		GetButton.BackgroundTransparency = 0.250
-		GetButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		GetButton.BorderSizePixel = 0
-		GetButton.Position = UDim2.new(0.25, 0, 0.649999976, 0)
-		GetButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
-		GetButton.ZIndex = 5
-
-		DropShadow_2.Name = "DropShadow"
-		DropShadow_2.Parent = GetButton
-		DropShadow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		DropShadow_2.BackgroundTransparency = 1.000
-		DropShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		DropShadow_2.Position = UDim2.new(0, -5, 0, -5)
-		DropShadow_2.Size = UDim2.new(1, 10, 1, 10)
-		DropShadow_2.ZIndex = 4
-		DropShadow_2.Image = "rbxassetid://297694300"  --3
-		DropShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
-		DropShadow_2.ImageTransparency = 0.500
-		DropShadow_2.ScaleType = Enum.ScaleType.Slice
-		DropShadow_2.SliceCenter = Rect.new(95, 103, 894, 902)
-		DropShadow_2.SliceScale = 0.050
-
-		UIStroke_3.Transparency = 0.850
-		UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke_3.Parent = GetButton
-
-		GTitle.Name = "GTitle"
-		GTitle.Parent = GetButton
-		GTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-		GTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		GTitle.BackgroundTransparency = 1.000
-		GTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		GTitle.BorderSizePixel = 0
-		GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-		GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
-		GTitle.ZIndex = 6
-		GTitle.Font = Enum.Font.Gotham
-		GTitle.Text = "链接"
-		GTitle.TextColor3 = Library.Colors.TextColor
-		GTitle.TextScaled = true
-		GTitle.TextSize = 14.000
-		GTitle.TextStrokeColor3 = Library.Colors.TextColor
-		GTitle.TextStrokeTransparency = 0.950
-		GTitle.TextWrapped = true
-		
-		GButton.Name = "GButton"
-		GButton.Parent = GetButton
-		GButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		GButton.BackgroundTransparency = 1.000
-		GButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		GButton.BorderSizePixel = 0
-		GButton.Size = UDim2.new(1, 0, 1, 0)
-		GButton.ZIndex = 15
-		GButton.Font = Enum.Font.SourceSans
-		GButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-		GButton.TextSize = 14.000
-		GButton.TextTransparency = 1.000
-		
-		LoginButton.Name = "LoginButton"
-		LoginButton.Parent = AuthFunction
-		LoginButton.AnchorPoint = Vector2.new(0.5, 0.5)
-		LoginButton.BackgroundColor3 = Library.Colors.Default
-		LoginButton.BackgroundTransparency = 0.250
-		LoginButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		LoginButton.BorderSizePixel = 0
-		LoginButton.Position = UDim2.new(0.75, 0, 0.649999976, 0)
-		LoginButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
-		LoginButton.ZIndex = 5
-
-		DropShadow_3.Name = "DropShadow"
-		DropShadow_3.Parent = LoginButton
-		DropShadow_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		DropShadow_3.BackgroundTransparency = 1.000
-		DropShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		DropShadow_3.Position = UDim2.new(0, -5, 0, -5)
-		DropShadow_3.Size = UDim2.new(1, 10, 1, 10)
-		DropShadow_3.ZIndex = 4
-		DropShadow_3.Image = "rbxassetid://297694300"  --4
-		DropShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
-		DropShadow_3.ImageTransparency = 0.500
-		DropShadow_3.ScaleType = Enum.ScaleType.Slice
-		DropShadow_3.SliceCenter = Rect.new(95, 103, 894, 902)
-		DropShadow_3.SliceScale = 0.050
-
-		UIStroke_4.Transparency = 0.850
-		UIStroke_4.Color = Color3.fromRGB(156, 156, 156)
-		UIStroke_4.Parent = LoginButton
-
-		LTitle.Name = "LTitle"
-		LTitle.Parent = LoginButton
-		LTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-		LTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		LTitle.BackgroundTransparency = 1.000
-		LTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		LTitle.BorderSizePixel = 0
-		LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-		LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
-		LTitle.ZIndex = 6
-		LTitle.Font = Enum.Font.Gotham
-		LTitle.Text = "确认"
-		LTitle.TextColor3 = Library.Colors.TextColor
-		LTitle.TextScaled = true
-		LTitle.TextSize = 14.000
-		LTitle.TextStrokeColor3 = Library.Colors.TextColor
-		LTitle.TextStrokeTransparency = 0.950
-		LTitle.TextWrapped = true
-
-		LButton.Name = "LButton"
-		LButton.Parent = LoginButton
-		LButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		LButton.BackgroundTransparency = 1.000
-		LButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		LButton.BorderSizePixel = 0
-		LButton.Size = UDim2.new(1, 0, 1, 0)
-		LButton.ZIndex = 15
-		LButton.Font = Enum.Font.SourceSans
-		LButton.Text = "确认"
-		LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-		LButton.TextSize = 14.000
-		LButton.TextTransparency = 1.000
-		
-		CloseSound.Name = "CloseSound"
-        CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
-        CloseSound.Volume = 1.0
-        CloseSound.PlayOnRemove = false
-        CloseSound.Parent = Workspace
-		   
-        CloseButton.Name = "CloseButton"
-        CloseButton.Parent = AuthFunction
-        CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
-        CloseButton.BackgroundTransparency = 1 
-        CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-        CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
-        CloseButton.Font = Enum.Font.GothamSemibold
-        CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        CloseButton.Text = "X"
-        CloseButton.TextSize = 14
-        CloseButton.MouseButton1Click:Connect(function()
-            CloseSound:Play()  
-            Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
-            task.wait(0.5)
-            ScreenGui:Destroy()
-            task.spawn(function()
-                while CloseSound.Playing do task.wait(0.05) end
-                CloseSound:Destroy()
-            end)
-        end)
-        
-        Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
-		Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
-		Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
-		setup.KeySystemInfo.CodeId = game:GetService('HttpService'):GenerateGUID(false);
-        setup.KeySystemInfo.AntiSpam = false;
-
-		LButton.MouseButton1Click:Connect(function()
-		    if setup.KeySystemInfo.AntiSpam then return end;
-		    setup.KeySystemInfo.AntiSpam = true;
-		    
-		    if TextBox.Text == "" then
-		        TextBox.PlaceholderText = "你没有填入卡密"
-		        task.wait(1.5)
-		        TextBox.PlaceholderText = "请输入卡密"
-		    else
-		        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
-		        if verify then
-		            setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-		            
-		            CloseButton.Visible = false;
-		            return TextBox.Text;
-		        else
-		            task.wait(0.1)
-		            TextBox.Text = ""
-		            TextBox.PlaceholderText = "你输入的卡密错误"
-		            task.wait(1.5)
-		            TextBox.PlaceholderText = "请重新输入卡密"
-		        end;
-		    end;
-		    setup.KeySystemInfo.AntiSpam = false;
-		end)
-	    
-		GButton.MouseButton1Click:Connect(setup.KeySystemInfo.OnGetKey)
-
-		function setup:CancelLogin()
-			setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-		end;
-
-		while true do 
-			local this = setup.KeySystemInfo.Finished.Event:Wait();
-
-			if this == setup.KeySystemInfo.CodeId then
-				break;
-			end;
-		end;
-
-		TextBox.TextEditable = false;
-
-		Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)});
-
-		task.wait(0.5)
-	else
-		repeat task.wait(1.5) until game:IsLoaded();		
-	end;
-
-	Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
-	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
-	
 
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
