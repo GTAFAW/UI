@@ -3244,7 +3244,7 @@ end;
     end))
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 
-function Library:Windowxgo(setup)
+Library:Windowxgo(setup)
     setup = setup or {};
     setup.Title = setup.Title or "Window";
     setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
@@ -3356,8 +3356,11 @@ function Library:Windowxgo(setup)
         "rbxassetid://94012779929465"
     }
 
-    local shuffleList = {table.unpack(images)}
-    local shuffleIdx  = 0
+    local playable = {}
+    local used     = {}
+    for _, id in ipairs(images) do
+        table.insert(playable, id)
+    end
     local function shuffle(t)
         for i = #t, 2, -1 do
             local j = math.random(i)
@@ -3365,74 +3368,68 @@ function Library:Windowxgo(setup)
         end
     end
     math.randomseed(tick())
-    shuffle(shuffleList)
+    shuffle(playable)
     local function nextImage()
-        shuffleIdx = shuffleIdx + 1
-        if shuffleIdx > #shuffleList then
-            shuffle(shuffleList)
-            shuffleIdx = 1
+        if #playable == 0 then
+            for _, id in ipairs(used) do
+                table.insert(playable, id)
+            end
+            used = {}
+            shuffle(playable)
         end
-        return shuffleList[shuffleIdx]
+        local id = table.remove(playable, 1)
+        table.insert(used, id)
+        return id
     end
 
-    local readyToLoad = Instance.new("BindableEvent")
-    local nextToPreload = 2
-    task.spawn(function()
-        game:GetService("ContentProvider"):PreloadAsync(images)
-    end)
+    local slideDuration = 1.5
+    local interval      = 13.5
+    local readyToLoad   = Instance.new("BindableEvent")
 
     local preloader = Instance.new("ImageLabel")
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
-    local slideDirection = "LeftRight"
-    local slideDuration  = 1.5
-    local interval       = 13.5
-    local isForward      = true
-
-    local function getNextIndex(idx, fwd)
-        if fwd then
-            return idx == #shuffleList and #shuffleList - 1 or idx + 1
-        else
-            return idx == 1 and 2 or idx - 1
+    task.spawn(function()
+        while true do
+            readyToLoad.Event:Wait()
+            preloader.Image = nextImage()
+            readyToLoad:Fire()
+            task.wait()
         end
+    end)
+
+    local function initBackgrounds()
+        local first = nextImage()
+        BackgroundImage1.Parent = MainFrame
+        BackgroundImage1.BackgroundTransparency = 1
+        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage1.Image = first
+        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage1.ImageTransparency = 0
+        BackgroundImage1.ZIndex = 1
+
+        BackgroundImage2.Parent = MainFrame
+        BackgroundImage2.BackgroundTransparency = 1
+        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
+        BackgroundImage2.Image = first
+        BackgroundImage2.ImageTransparency = 0
+        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage2.ZIndex = 2
     end
 
     local function slideSwitch()
-        local nxt = nextImage()
-        BackgroundImage2.Image = nxt
-
-        local startPos, endPos, oldEndPos
-        if slideDirection == "LeftRight" then
-            startPos  = UDim2.new(1, 0, 0, 0)
-            endPos    = UDim2.new(0, 0, 0, 0)
-            oldEndPos = UDim2.new(-1, 0, 0, 0)
-            if not isForward then
-                startPos  = UDim2.new(-1, 0, 0, 0)
-                oldEndPos = UDim2.new(1, 0, 0, 0)
-            end
-        else
-            startPos  = UDim2.new(0, 0, 1, 0)
-            endPos    = UDim2.new(0, 0, 0, 0)
-            oldEndPos = UDim2.new(0, 0, -1, 0)
-            if not isForward then
-                startPos  = UDim2.new(0, 0, -1, 0)
-                oldEndPos = UDim2.new(0, 0, 1, 0)
-            end
-        end
-
-        BackgroundImage2.Position = startPos
-
-        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
-        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
-
+        local newId = nextImage()
+        BackgroundImage2.Image = newId
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0, 0, 0, 0)}, slideDuration)
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(-1, 0, 0, 0)}, slideDuration)
         task.wait(slideDuration)
-
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage2.Position = slideDirection == "LeftRight" and UDim2.new(1, 0, 0, 0) or UDim2.new(0, 0, 1, 0)
-
-        isForward = not isForward
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
         readyToLoad:Fire()
     end
 
@@ -3451,26 +3448,6 @@ function Library:Windowxgo(setup)
     MainFrame.ClipsDescendants = true
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
-
-    local function initBackgrounds()
-        local first = nextImage()
-        BackgroundImage1.Parent = MainFrame
-        BackgroundImage1.BackgroundTransparency = 1
-        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
-        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage1.ImageTransparency = 0
-        BackgroundImage1.ZIndex = 1
-        BackgroundImage1.Image = first
-
-        BackgroundImage2.Parent = MainFrame
-        BackgroundImage2.BackgroundTransparency = 1
-        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
-        BackgroundImage2.Position = slideDirection == "LeftRight" and UDim2.new(1, 0, 0, 0) or UDim2.new(0, 0, 1, 0)
-        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage2.ZIndex = 2
-        BackgroundImage2.Image = first
-    end
 
     initBackgrounds()
     readyToLoad:Fire()
