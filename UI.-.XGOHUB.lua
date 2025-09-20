@@ -3244,7 +3244,7 @@ end;
     end))
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 
-Library:Windowxgo(setup)
+function Library:Windowxgo(setup)
     setup = setup or {};
     setup.Title = setup.Title or "Window";
     setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
