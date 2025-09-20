@@ -3342,7 +3342,6 @@ function Library:Windowxgo(setup)
         "rbxassetid://115691043156297",
         "rbxassetid://100980082510772",
         "rbxassetid://135027711714247",
-        "rbxassetid://117021746100481",
         "rbxassetid://124541797505196",
         "rbxassetid://136302622336157",
         "rbxassetid://74234951901491",
@@ -3351,7 +3350,6 @@ function Library:Windowxgo(setup)
         "rbxassetid://81630003819439",
         "rbxassetid://134782997900491",
         "rbxassetid://101854737639056",
-        "rbxassetid://85325057913063",
         "rbxassetid://88726485475708",
         "rbxassetid://124568043722207",
         "rbxassetid://113389633674712",
@@ -3394,12 +3392,25 @@ function Library:Windowxgo(setup)
     local slideDuration = 1.5
     local interval      = 13.5
 
-    local function fadeSwitch()
+    local function spinWipe()
         local nxt = nextImage()
-        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1}, slideDuration/2)
-        task.wait(slideDuration/2)
+        BackgroundImage2.Image = nxt
+        BackgroundImage2.ImageRectSize = Vector2.new(0, 0)
+        BackgroundImage1.ImageRectSize = Vector2.new(1, 1)
+
+        local duration = slideDuration
+        local steps    = 60
+        local delta    = 1 / steps
+        for i = 1, steps do
+            local t = i * delta
+            BackgroundImage2.ImageRectSize = Vector2.new(t, t)
+            BackgroundImage1.ImageRectSize = Vector2.new(1 - t, 1 - t)
+            task.wait(duration / steps)
+        end
+
         BackgroundImage1.Image = nxt
-        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0}, slideDuration/2)
+        BackgroundImage1.ImageRectSize = Vector2.new(1, 1)
+        BackgroundImage2.ImageRectSize = Vector2.new(0, 0)
     end
 
     ScreenGui.Parent = game.CoreGui
@@ -3418,20 +3429,39 @@ function Library:Windowxgo(setup)
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
-    BackgroundImage1.Name = "BackgroundImage"
-    BackgroundImage1.Parent = MainFrame
-    BackgroundImage1.BackgroundTransparency = 1
-    BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
-    BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-    BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
-    BackgroundImage1.ImageTransparency = 0
-    BackgroundImage1.ZIndex = 1
-    BackgroundImage1.Image = nextImage()
+    local function initBackgrounds()
+        local first = nextImage()
+        BackgroundImage1.Name = "BackgroundImage1"
+        BackgroundImage1.Parent = MainFrame
+        BackgroundImage1.BackgroundTransparency = 1
+        BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage1.ImageTransparency = 0
+        BackgroundImage1.ZIndex = 1
+        BackgroundImage1.Image = first
+        BackgroundImage1.ImageRectSize = Vector2.new(1, 1)
+        BackgroundImage1.ImageRectOffset = Vector2.new(0, 0)
+        BackgroundImage1.Image = "rbxassetid://981336916"
+        BackgroundImage1.SliceCenter = Rect.new(128, 128, 128, 128)
+
+        BackgroundImage2.Name = "BackgroundImage2"
+        BackgroundImage2.Parent = MainFrame
+        BackgroundImage2.BackgroundTransparency = 1
+        BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
+        BackgroundImage2.Position = UDim2.new(0, 0, 0, 0)
+        BackgroundImage2.ImageTransparency = 0
+        BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
+        BackgroundImage2.ZIndex = 2
+        BackgroundImage2.ImageRectSize = Vector2.new(0, 0)
+        BackgroundImage2.Image = "rbxassetid://981336916"
+        BackgroundImage2.SliceCenter = Rect.new(128, 128, 128, 128)
+    end
 
     task.spawn(function()
         while true do
             task.wait(interval)
-            fadeSwitch()
+            spinWipe()
         end
     end)
 
@@ -3480,6 +3510,7 @@ function Library:Windowxgo(setup)
         Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
 
         task.wait(1);
+
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 		local AuthFunction = Instance.new("Frame")
