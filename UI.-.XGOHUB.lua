@@ -4009,10 +4009,10 @@ DataScrollingFrame.Position = UDim2.new(0.5, 0, 1.75, 0)
 DataScrollingFrame.Size = UDim2.new(0.99000001, 0, 0.980000019, 0)
 DataScrollingFrame.ScrollBarThickness = 0
 
-ThListLayout_2.Parent = DataScrollingFrame
-ThListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
-ThListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
-ThListLayout_2.Padding = UDim.new(0, 1000)
+UIListLayout_2.Parent = DataScrollingFrame
+UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout_2.Padding = UDim.new(0, 1000)
 
 local LogUpdate = function()
 	if not WindowLibrary.Toggle then
@@ -4067,23 +4067,6 @@ TabFrames.Position = UDim2.new(0.995, 0, 0.99, 0)
 TabFrames.Size = UDim2.new(0.670454323, 0, 0.88989073, 0)
 TabFrames.ZIndex = 4
 
-local function createRotateTween(button, duration)
-    local tweenInfo = TweenInfo.new(
-        duration,
-        Enum.EasingStyle.Linear,
-        Enum.EasingDirection.InOut,
-        -1,
-        false,
-        0
-    )
-    Library:Tween(button, tweenInfo, {Rotation = 360})
-    button:GetPropertyChangedSignal("Rotation"):Connect(function()
-        if button.Rotation >= 360 then
-            button.Rotation = 0
-        end
-    end)
-end
-
 WindowLibrary.FullScreen = false;
 WindowLibrary.Status = 'Show';
 WindowLibrary.Toggle = true;
@@ -4095,8 +4078,7 @@ UICorner:Destroy()
 UIStroke:Destroy()
 MinimizeButton.Image = "rbxassetid://7734068321"
 MinimizeButton.ScaleType = Enum.ScaleType.Fit
-MinimizeButton.ImageColor3 = Color3.fromRGB(80, 255, 71)
-createRotateTween(MinimizeButton, 5)
+MinimizeButton.ImageColor3 = Color3.fromRGB(80, 255, 71) --绿色星星
 
 MaxisizweButton.BackgroundTransparency = 1
 MaxisizweButton.BorderSizePixel = 0
@@ -4104,8 +4086,7 @@ UICorner_2:Destroy()
 UIStroke_2:Destroy()
 MaxisizweButton.Image = "rbxassetid://7734068321"
 MaxisizweButton.ScaleType = Enum.ScaleType.Fit
-MaxisizweButton.ImageColor3 = Color3.fromRGB(255, 249, 85)
-createRotateTween(MaxisizweButton, 6)
+MaxisizweButton.ImageColor3 = Color3.fromRGB(255, 249, 85) --黄色星星
 
 CloseButton.BackgroundTransparency = 1
 CloseButton.BorderSizePixel = 0
@@ -4113,8 +4094,7 @@ UICorner_3:Destroy()
 UIStroke_3:Destroy()
 CloseButton.Image = "rbxassetid://7734068321"
 CloseButton.ScaleType = Enum.ScaleType.Fit
-CloseButton.ImageColor3 = Color3.fromRGB(255, 88, 91)
-createRotateTween(CloseButton, 4)
+CloseButton.ImageColor3 = Color3.fromRGB(255, 88, 91) --红色星星
 
 local InitDropdown = function()
 	local DropdownLibrary = {};
@@ -4151,249 +4131,251 @@ local InitDropdown = function()
 	ScrollingFrame.BorderSizePixel = 0
 	ScrollingFrame.ClipsDescendants = false
 	ScrollingFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-ScrollingFrame.Size = UDim2.new(0.980000019, 0, 0.980000019, 0)
-ScrollingFrame.ZIndex = 110
-ScrollingFrame.ScrollBarThickness = 0
+	ScrollingFrame.Size = UDim2.new(0.980000019, 0, 0.980000019, 0)
+	ScrollingFrame.ZIndex = 110
+	ScrollingFrame.ScrollBarThickness = 0
 
-ThListLayout.Parent = ScrollingFrame
-ThListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-ThListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-ThListLayout.Padding = UDim.new(0, 6)
-ThListLayout.VerticalAlignment = Enum.VerticalAlignment.Center;
+	UIListLayout.Parent = ScrollingFrame
+	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 6)
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center;
 
-ThListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
-    if WindowLibrary.Toggle then
-        ScrollingFrame.CanvasSize = UDim2.fromOffset(0,UIListLayout.AbsoluteContentSize.Y)
-    end
-end)
+	UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
+		if WindowLibrary.Toggle then
+			ScrollingFrame.CanvasSize = UDim2.fromOffset(0,UIListLayout.AbsoluteContentSize.Y)
+		end
+	end)
 
-DropShadow.Name = "DropShadow"
-DropShadow.Parent = Dropdown
-DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-DropShadow.BackgroundTransparency = 1.000
-DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-DropShadow.Position = UDim2.new(0, -5, 0, -5)
-DropShadow.Rotation = 0.010
-DropShadow.Size = UDim2.new(1, 10, 1, 10)
-DropShadow.ZIndex = 99
-DropShadow.Image = "rbxassetid://297694300"
-DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-DropShadow.ImageTransparency = 0.500
-DropShadow.ScaleType = Enum.ScaleType.Slice
-DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-DropShadow.SliceScale = 0.050
+	DropShadow.Name = "DropShadow"
+	DropShadow.Parent = Dropdown
+	DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	DropShadow.BackgroundTransparency = 1.000
+	DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+	DropShadow.Position = UDim2.new(0, -5, 0, -5)
+	DropShadow.Rotation = 0.010
+	DropShadow.Size = UDim2.new(1, 10, 1, 10)
+	DropShadow.ZIndex = 99
+	DropShadow.Image = "rbxassetid://297694300"
+	DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	DropShadow.ImageTransparency = 0.500
+	DropShadow.ScaleType = Enum.ScaleType.Slice
+	DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+	DropShadow.SliceScale = 0.050
 
-local NewButton = function(Title,HasIcon,IsDefault)
-    local Frame = Instance.new("Frame")
-    local DropShadow = Instance.new("ImageLabel")
-    local UIStroke = Instance.new("UIStroke")
-    local TextLabel = Instance.new("TextLabel")
-    local Button = Instance.new("TextButton")
-    local Icon = Instance.new("ImageLabel")
+	local NewButton = function(Title,HasIcon,IsDefault)
+		local Frame = Instance.new("Frame")
+		local DropShadow = Instance.new("ImageLabel")
+		local UIStroke = Instance.new("UIStroke")
+		local TextLabel = Instance.new("TextLabel")
+		local Button = Instance.new("TextButton")
+		local Icon = Instance.new("ImageLabel")
 
-    Frame.Parent = ScrollingFrame
-    Frame.BackgroundColor3 = Library.Colors.Default
-    Frame.BackgroundTransparency = 0.250
-    Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    Frame.BorderSizePixel = 0
-    Frame.Size = UDim2.new(0.980000019, 0, 0, 22)
-    Frame.ZIndex = 115
+		Frame.Parent = ScrollingFrame
+		Frame.BackgroundColor3 = Library.Colors.Default
+		Frame.BackgroundTransparency = 0.250
+		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Frame.BorderSizePixel = 0
+		Frame.Size = UDim2.new(0.980000019, 0, 0, 22)
+		Frame.ZIndex = 115
 
-    DropShadow.Name = "DropShadow"
-    DropShadow.Parent = Frame
-    DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    DropShadow.BackgroundTransparency = 1.000
-    DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
-    DropShadow.Position = UDim2.new(0, -5, 0, -5)
-    DropShadow.Size = UDim2.new(1, 10, 1, 10)
-    DropShadow.ZIndex = 114
-    DropShadow.Image = "rbxassetid://297694300"
-    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    DropShadow.ImageTransparency = 0.500
-    DropShadow.ScaleType = Enum.ScaleType.Slice
-    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-    DropShadow.SliceScale = 0.050
+		DropShadow.Name = "DropShadow"
+		DropShadow.Parent = Frame
+		DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		DropShadow.BackgroundTransparency = 1.000
+		DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+		DropShadow.Position = UDim2.new(0, -5, 0, -5)
+		DropShadow.Size = UDim2.new(1, 10, 1, 10)
+		DropShadow.ZIndex = 114
+		DropShadow.Image = "rbxassetid://297694300"
+		DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+		DropShadow.ImageTransparency = 0.500
+		DropShadow.ScaleType = Enum.ScaleType.Slice
+		DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+		DropShadow.SliceScale = 0.050
 
-    UIStroke.Transparency = 0.850
-    UIStroke.Color = Color3.fromRGB(156, 156, 156)
-    UIStroke.Parent = Frame
+		UIStroke.Transparency = 0.850
+		UIStroke.Color = Color3.fromRGB(156, 156, 156)
+		UIStroke.Parent = Frame
 
-    if IsDefault then
-        UIStroke.Color = Library.Colors.Hightlight	
-    end;
+		if IsDefault then
+			UIStroke.Color = Library.Colors.Hightlight	
+		end;
 
-    TextLabel.Parent = Frame
-    TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel.BackgroundTransparency = 1.000
-    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    TextLabel.BorderSizePixel = 0
-    TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    TextLabel.Size = UDim2.new(0.980000019, 0, 0.550000012, 0)
-    TextLabel.ZIndex = 116
-    TextLabel.Font = Enum.Font.Gotham
-    TextLabel.Text = Title
-    TextLabel.TextColor3 = Library.Colors.TextColor
-    TextLabel.TextScaled = true
-    TextLabel.TextSize = 14.000
-    TextLabel.TextStrokeColor3 = Library.Colors.TextColor
-    TextLabel.TextStrokeTransparency = 0.950
-    TextLabel.TextWrapped = true
+		TextLabel.Parent = Frame
+		TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+		TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		TextLabel.BackgroundTransparency = 1.000
+		TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		TextLabel.BorderSizePixel = 0
+		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+		TextLabel.Size = UDim2.new(0.980000019, 0, 0.550000012, 0)
+		TextLabel.ZIndex = 116
+		TextLabel.Font = Enum.Font.Gotham
+		TextLabel.Text = Title
+		TextLabel.TextColor3 = Library.Colors.TextColor
+		TextLabel.TextScaled = true
+		TextLabel.TextSize = 14.000
+		TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+		TextLabel.TextStrokeTransparency = 0.950
+		TextLabel.TextWrapped = true
 
-    if IsDefault then
-        TextLabel.TextColor3 = Library.Colors.Hightlight
-    end;
+		if IsDefault then
+			TextLabel.TextColor3 = Library.Colors.Hightlight
+		end;
 
-    Button.Name = "Button"
-    Button.Parent = Frame
-    Button.AnchorPoint = Vector2.new(0.5, 0.5)
-    Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Button.BackgroundTransparency = 1.000
-    Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    Button.BorderSizePixel = 0
-    Button.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Button.Size = UDim2.new(1, 0, 1, 0)
-    Button.ZIndex = 200
-    Button.Font = Enum.Font.SourceSans
-    Button.Text = ""
-    Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-    Button.TextSize = 14.000
-    Button.TextTransparency = 1.000
+		Button.Name = "Button"
+		Button.Parent = Frame
+		Button.AnchorPoint = Vector2.new(0.5, 0.5)
+		Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Button.BackgroundTransparency = 1.000
+		Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Button.BorderSizePixel = 0
+		Button.Position = UDim2.new(0.5, 0, 0.5, 0)
+		Button.Size = UDim2.new(1, 0, 1, 0)
+		Button.ZIndex = 200
+		Button.Font = Enum.Font.SourceSans
+		Button.Text = ""
+		Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+		Button.TextSize = 14.000
+		Button.TextTransparency = 1.000
 
-    Icon.Name = "Icon"
-    Icon.Parent = Frame
-    Icon.AnchorPoint = Vector2.new(0.5, 0.5)
-    Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Icon.BackgroundTransparency = 1.000
-    Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    Icon.BorderSizePixel = 0
-    Icon.Position = UDim2.new(0.075000003, 0, 0.5, 0)
-    Icon.Size = UDim2.new(0.699999988, 0, 0.699999988, 0)
-    Icon.SizeConstraint = Enum.SizeConstraint.RelativeYY
-    Icon.Visible = false
-    Icon.ZIndex = 116
-    Icon.Image = "rbxassetid://10709775704"
+		Icon.Name = "Icon"
+		Icon.Parent = Frame
+		Icon.AnchorPoint = Vector2.new(0.5, 0.5)
+		Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Icon.BackgroundTransparency = 1.000
+		Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Icon.BorderSizePixel = 0
+		Icon.Position = UDim2.new(0.075000003, 0, 0.5, 0)
+		Icon.Size = UDim2.new(0.699999988, 0, 0.699999988, 0)
+		Icon.SizeConstraint = Enum.SizeConstraint.RelativeYY
+		Icon.Visible = false
+		Icon.ZIndex = 116
+		Icon.Image = "rbxassetid://10709775704"
 
-    if HasIcon then
-        Icon.Visible = true
-        Icon.Image = HasIcon;
-    end;
+		if HasIcon then
+			Icon.Visible = true
+			Icon.Image = HasIcon;
+		end;
 
-    return Button
-end;
+		return Button
+	end;
 
-function WindowLibrary:ClearDropdown()
-    table.foreach(ScrollingFrame:GetChildren(),function(i,v)
-        if v.ClassName == 'Frame' then
-            v:Destroy();
-        end;
-    end)
-end;
+	function WindowLibrary:ClearDropdown()
+		table.foreach(ScrollingFrame:GetChildren(),function(i,v)
+			if v.ClassName == 'Frame' then
+				v:Destroy();
+			end;
+		end)
+	end;
 
-function WindowLibrary:SetDropdownValues(Type,Table,Default,Callback)
-    if Type == 1 then
-        local OldButton = nil;
+	function WindowLibrary:SetDropdownValues(Type,Table,Default,Callback)
+		if Type == 1 then -- Normal
+			local OldButton = nil;
 
-        for i,v in pairs(Table) do
-            local Button;
-            if typeof(v) ~= 'table' then
-                Button = NewButton(tostring(v),false,v == Default);
-            else
-                Button = NewButton(tostring(v),v.Icon,v == Default);
-            end;
+			for i,v in pairs(Table) do
+				local Button;
+				if typeof(v) ~= 'table' then
+					Button = NewButton(tostring(v),false,v == Default);
+				else
+					Button = NewButton(tostring(v),v.Icon,v == Default);
+				end;
 
-            Button.MouseButton1Click:Connect(function()
-                if OldButton then
-                    if OldButton.Object ~= v then
-                        OldButton.UIStroke.Color = Color3.fromRGB(156, 156, 156)	
-                        OldButton.TextLabel.TextColor3 = Library.Colors.TextColor
-                    end;
-                end;
+				Button.MouseButton1Click:Connect(function()
+					if OldButton then
+						if OldButton.Object ~= v then
+							OldButton.UIStroke.Color = Color3.fromRGB(156, 156, 156)	
+							OldButton.TextLabel.TextColor3 = Library.Colors.TextColor
+						end;
+					end;
 
-                OldButton = {
-                    UIStroke = Button.Parent:WaitForChild('UIStroke'),
-                    TextLabel = Button.Parent:WaitForChild('TextLabel'),
-                    Object = v;
-                };
+					OldButton = {
+						UIStroke = Button.Parent:WaitForChild('UIStroke'),
+						TextLabel = Button.Parent:WaitForChild('TextLabel'),
+						Object = v;
+					};
 
-                Button.Parent:WaitForChild('UIStroke').Color = Library.Colors.Hightlight;
-                Button.Parent:WaitForChild('TextLabel').TextColor3 = Library.Colors.Hightlight
+					Button.Parent:WaitForChild('UIStroke').Color = Library.Colors.Hightlight;
+					Button.Parent:WaitForChild('TextLabel').TextColor3 = Library.Colors.Hightlight
 
-                Callback(v);
-            end)
+					Callback(v);
+				end)
 
-            if v == Default then
-                OldButton = {
-                    UIStroke = Button.Parent:WaitForChild('UIStroke'),
-                    TextLabel = Button.Parent:WaitForChild('TextLabel'),
-                    Object = v;
-                };
-            end
-        end;
-    else
-        local MaxMulti = Default.Max;
-        local DefaultInfo = Default.Info;
-        local MultiData = {};
+				if v == Default then
+					OldButton = {
+						UIStroke = Button.Parent:WaitForChild('UIStroke'),
+						TextLabel = Button.Parent:WaitForChild('TextLabel'),
+						Object = v;
+					};
+				end
+			end;
+		else -- Multi
+			local MaxMulti = Default.Max;
+			local DefaultInfo = Default.Info;
+			local MultiData = {};
 
-        local Len = function()
-            local std = 0;
+			local Len = function()
+				local std = 0;
 
-            table['foreach'](MultiData,function()
-                std += 1;
-            end)
+				table['foreach'](MultiData,function()
+					std += 1;
+				end)
 
-            return std;
-        end;
+				return std;
+			end;
 
-        for i,v in pairs(Table) do
-            local Button;
+			for i,v in pairs(Table) do
+				local Button;
 
-            if typeof(v) ~= 'table' then
-                Button = NewButton(tostring(v),false,table.find(DefaultInfo,v));
-            else
-                Button = NewButton(tostring(v),v.Icon,table.find(DefaultInfo,v));
-            end;
+				if typeof(v) ~= 'table' then
+					Button = NewButton(tostring(v),false,table.find(DefaultInfo,v));
+				else
+					Button = NewButton(tostring(v),v.Icon,table.find(DefaultInfo,v));
+				end;
 
-            local UIStroke = Button.Parent:WaitForChild('UIStroke');
+				local UIStroke = Button.Parent:WaitForChild('UIStroke');
 
-            Button.MouseButton1Click:Connect(function()
-                if MultiData[v] then
-                    UIStroke.Color = Color3.fromRGB(156, 156, 156)
-                    Button.Parent:WaitForChild('TextLabel').TextColor3 = Library.Colors.TextColor
+				Button.MouseButton1Click:Connect(function()
+					if MultiData[v] then
+						UIStroke.Color = Color3.fromRGB(156, 156, 156)
+						Button.Parent:WaitForChild('TextLabel').TextColor3 = Library.Colors.TextColor
 
-                    MultiData[v] = nil;
-                else
-                    if (Len() + 1) > MaxMulti then
-                        return;
-                    end;
+						MultiData[v] = nil;
+					else
+						if (Len() + 1) > MaxMulti then
+							return;
+						end;
 
-                    MultiData[v] = {
-                        Object = v,
-                        UIStroke = UIStroke,
-                    };
+						MultiData[v] = {
+							Object = v,
+							UIStroke = UIStroke,
+						};
 
-                    Button.Parent:WaitForChild('TextLabel').TextColor3 = Library.Colors.Hightlight
-                    UIStroke.Color = Library.Colors.Hightlight;
-                end;
+						Button.Parent:WaitForChild('TextLabel').TextColor3 = Library.Colors.Hightlight
+						UIStroke.Color = Library.Colors.Hightlight;
+					end;
 
-                local info = {};
+					local info = {};
 
-                table.foreach(MultiData,function(a)
-                    table.insert(info,a)
-                end)
+					table.foreach(MultiData,function(a)
+						table.insert(info,a)
+					end)
 
-                Callback(info);
-            end)
+					Callback(info);
+				end)
 
-            if table.find(DefaultInfo,v) then
-                MultiData[v] = {
-                    Object = v,
-                    UIStroke = UIStroke,
-                }
-            end
-        end;
-    end;
-end;
+				if table.find(DefaultInfo,v) then
+
+					MultiData[v] = {
+						Object = v,
+						UIStroke = UIStroke,
+					}
+
+				end
+			end;
+		end;
+	end;
 do
 -----// 水印 ---------------------------------------------------------------------------------------------------------------------------------------------
 			local Watermark = Instance.new("Frame")
