@@ -3244,28 +3244,29 @@ end;
     end))
 ------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
-    setup = setup or {};
-    setup.Title = setup.Title or "Window";
-    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
-    setup.Size = setup.Size or Library.SizeLibrary.Default;
-    setup.KeySystem = setup.KeySystem or false;
-    setup.Logo = setup.Logo or "rbxassetid://7733920644";
-    setup.ToggleMethod = setup.ToggleMethod or "Application";
+	setup = setup or {};
 
-    if setup.KeySystem then
-        setup.KeySystemInfo = setup.KeySystemInfo or {};
-        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
-        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
-    end
-
+	setup.Title = setup.Title or "Window";
+	setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
+	setup.Size = setup.Size or Library.SizeLibrary.Default;
+	setup.KeySystem = setup.KeySystem or false;
+	setup.Logo = setup.Logo or "rbxassetid://7733920644";
+	setup.ToggleMethod = setup.ToggleMethod or "Application";
+	
+	if setup.KeySystem then
+		setup.KeySystemInfo = setup.KeySystemInfo or {};
+		setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
+		setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
+		setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
+	end
+	
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
     local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
-    local DropShadow = Instance.new("ImageLabel")
-    local Ico = Instance.new("ImageLabel")
-
+	local DropShadow = Instance.new("ImageLabel")
+	local Ico = Instance.new("ImageLabel")
+	
     local images = {
         "rbxassetid://113180426865309",
         "rbxassetid://127110756366496",
@@ -3354,30 +3355,18 @@ function Library:Windowxgo(setup)
         "rbxassetid://113389633674712",
         "rbxassetid://94012779929465"
     }
-
+    
     local currentIndex = 1
     local isForward = true
-    local slideDuration = 1.5
-    local interval = 13.5
-
-    local readyToLoad = Instance.new("BindableEvent")
-    local nextToPreload = 2
-
-    task.spawn(function()
-        game:GetService("ContentProvider"):PreloadAsync(images)
-    end)
-
-    local preloader = Instance.new("ImageLabel")
-    preloader.Visible = false
-    preloader.Parent = ScreenGui
+    local slideDuration = 1
+    local interval = 10
 
     local function initBackgrounds()
-        local first = images[currentIndex]
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = first
+        BackgroundImage1.Image = images[currentIndex]
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3386,59 +3375,49 @@ function Library:Windowxgo(setup)
         BackgroundImage2.BackgroundTransparency = 1
         BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = first
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ZIndex = 2
     end
 
-    local function getNextIndex(idx, fwd)
-        if fwd then
-            return idx == #images and #images - 1 or idx + 1
+    local function getNextIndex()
+        if isForward then
+            return currentIndex == #images and #images - 1 or currentIndex + 1
         else
-            return idx == 1 and 2 or idx - 1
+            return currentIndex == 1 and 2 or currentIndex - 1
         end
     end
-    
-    task.spawn(function()
-        while true do
-            readyToLoad.Event:Wait()
-            local target = getNextIndex(currentIndex, isForward)
-            if (isForward and currentIndex == #images) or (not isForward and currentIndex == 1) then
-                isForward = not isForward
-                target = getNextIndex(currentIndex, isForward)
-            end
-            preloader.Image = images[target]
-            readyToLoad:Fire()
-            task.wait()
-        end
-    end)
 
     local function slideSwitch()
-        local nextIndex = getNextIndex(currentIndex, isForward)
-        BackgroundImage2.Image = images[nextIndex]
+        local nextIndex = getNextIndex()
+        local startPos = UDim2.new(0, 0, 0, 0)
+        local endPos = UDim2.new(0, 0, 0, 0)
+        local oldEndPos = UDim2.new(0, 0, 0, 0)
 
-        local startPos = UDim2.new(1, 0, 0, 0)
-        local endPos   = UDim2.new(0, 0, 0, 0)
-        local oldEndPos= UDim2.new(-1, 0, 0, 0)
-        if not isForward then
+        if isForward then
+            startPos = UDim2.new(1, 0, 0, 0)
+            oldEndPos = UDim2.new(-1, 0, 0, 0)
+        else
             startPos = UDim2.new(-1, 0, 0, 0)
-            oldEndPos= UDim2.new(1, 0, 0, 0)
+            oldEndPos = UDim2.new(1, 0, 0, 0)
         end
 
+        BackgroundImage2.Image = images[nextIndex]
         BackgroundImage2.Position = startPos
 
         Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
         Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
 
         task.wait(slideDuration)
-
         currentIndex = nextIndex
+        if currentIndex == #images then
+            isForward = false
+        elseif currentIndex == 1 then
+            isForward = true
+        end
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-
-        readyToLoad:Fire()
+        BackgroundImage2.Position = startPos
     end
 
     ScreenGui.Parent = game.CoreGui
@@ -3465,53 +3444,50 @@ function Library:Windowxgo(setup)
             slideSwitch()
         end
     end)
+   
+	local BlurEle = Library.UIBlur.new(MainFrame,true);
 
-    readyToLoad:Fire()
+	DropShadow.Name = "DropShadow"
+	DropShadow.Parent = MainFrame
+	DropShadow.BackgroundTransparency = 1.000
+	DropShadow.Position = UDim2.new(0, -5, 0, -5)
+	DropShadow.Rotation = 0.010
+	DropShadow.Size = UDim2.new(1, 10, 1, 10)
+	DropShadow.ZIndex = -5
+	DropShadow.Image = "rbxassetid://297694300"
+	DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	DropShadow.ImageTransparency = 0.500
+	DropShadow.ScaleType = Enum.ScaleType.Slice
+	DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+	DropShadow.SliceScale = 0.050
 
-    local BlurEle = Library.UIBlur.new(MainFrame, true)
+	Ico.Name = "Ico"
+	Ico.Parent = MainFrame
+	Ico.AnchorPoint = Vector2.new(0.5, 0.5)
+	Ico.BackgroundTransparency = 1.000
+	Ico.BorderSizePixel = 0
+	Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
+	Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
+	Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
+	Ico.Image = setup.Logo
+	Ico.ImageTransparency = 1.000
 
-    DropShadow.Name = "DropShadow"
-    DropShadow.Parent = MainFrame
-    DropShadow.BackgroundTransparency = 1.000
-    DropShadow.Position = UDim2.new(0, -5, 0, -5)
-    DropShadow.Rotation = 0.010
-    DropShadow.Size = UDim2.new(1, 10, 1, 10)
-    DropShadow.ZIndex = -5
-    DropShadow.Image = "rbxassetid://297694300"
-    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    DropShadow.ImageTransparency = 0.500
-    DropShadow.ScaleType = Enum.ScaleType.Slice
-    DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-    DropShadow.SliceScale = 0.050
+	Library:Tween(MainFrame , Library.TweenLibrary.SmallEffect,{Size = Library.SizeLibrary.Loading})
+	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 0.25})
 
-    Ico.Name = "Ico"
-    Ico.Parent = MainFrame
-    Ico.AnchorPoint = Vector2.new(0.5, 0.5)
-    Ico.BackgroundTransparency = 1.000
-    Ico.BorderSizePixel = 0
-    Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
-    Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
-    Ico.Image = setup.Logo
-    Ico.ImageTransparency = 1.000
+	if setup.KeySystem then
+		setup.KeySystemInfo.Enabled = true;
+		setup.KeySystemInfo.Finished = Instance.new('BindableEvent');
 
-    Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
-    Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
+		task.wait(1)
 
-    if setup.KeySystem then
-        setup.KeySystemInfo.Enabled = true
-        setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
+		task.delay(0.1,function()
+			Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
+		end)
 
-        task.wait(1)
+		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
 
-        task.delay(0.1, function()
-            Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1})
-        end)
-
-        Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = Library.SizeLibrary.Auth})
-
-        task.wait(1);
-
+		task.wait(1);
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
 	local OpenDelay = tick();
