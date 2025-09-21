@@ -1364,15 +1364,21 @@ Library.Icons = { -- 图片/常用图片
 	["暂停-八边形"] = "rbxassetid://7734021827",
 	["向下-双箭头"] = "rbxassetid://7733720604",
 	["向左-双箭头"] = "rbxassetid://7733720701",
-    ["XGO1"]= "rbxassetid://123698784885744",
-	["XGO2"]= "rbxassetid://88666635012556",
-	["XGO3"]= "rbxassetid://102797584513959",
-	["XGO4"]= "rbxassetid://96996396016819",
-	["XGO5"]= "rbxassetid://128885038925647",
-	["XGO6"]= "rbxassetid://120611289434746",
-	["XGO7"]= "rbxassetid://86451637909512",
-	["XGO8"]= "rbxassetid://109948306798374",
-	["XGO9"]= "rbxassetid://92630758837243",
+    ["XGO1"] = "rbxassetid://123698784885744",
+    ["XGO2"] = "rbxassetid://88666635012556",
+    ["XGO3"] = "rbxassetid://102797584513959",
+    ["XGO4"] = "rbxassetid://96996396016819",
+    ["XGO5"] = "rbxassetid://128885038925647",
+    ["XGO6"] = "rbxassetid://120611289434746",
+    ["XGO7"] = "rbxassetid://86451637909512",
+    ["XGO8"] = "rbxassetid://109948306798374",
+    ["XGO9"] = "rbxassetid://92630758837243",
+    ["XGOA"] = "rbxassetid://123841629074044",
+    ["XGOB"] = "rbxassetid://116659429137594",
+    ["XGOC"] = "rbxassetid://114637828840342",
+    ["XGOD"] = "rbxassetid://105061267460765",
+    ["XGOE"] = "rbxassetid://94515694400442",
+    ["XGOF"] = "rbxassetid://77486522529796",
 	["向下箭头-圆形"] = "rbxassetid://7733671763",
 	["收音机-接收器"] = "rbxassetid://7734045155",
 	["垂直结束对齐"] = "rbxassetid://8997380907",
@@ -3356,10 +3362,16 @@ function Library:Windowxgo(setup)
         "rbxassetid://94012779929465"
     }
 
-    local currentIndex = 1
-    local isForward = true
-    local slideDuration = 1.5
-    local interval = 13.5
+    math.randomseed(tick())
+    local function shuffle(t)
+        for i = #t, 2, -1 do
+            local j = math.random(i)
+            t[i], t[j] = t[j], t[i]
+        end
+        return t
+    end
+    local queue      = shuffle(table.clone(images))
+    local queuePtr   = 1
 
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
@@ -3373,12 +3385,11 @@ function Library:Windowxgo(setup)
     preloader.Parent = ScreenGui
 
     local function initBackgrounds()
-        local first = images[currentIndex]
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = first
+        BackgroundImage1.Image = queue[queuePtr]
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3387,54 +3398,29 @@ function Library:Windowxgo(setup)
         BackgroundImage2.BackgroundTransparency = 1
         BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = first
+        BackgroundImage2.Image = queue[queuePtr]
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ZIndex = 2
     end
 
-    local function getNextIndex(idx, fwd)
-        if fwd then
-            return idx == #images and #images - 1 or idx + 1
-        else
-            return idx == 1 and 2 or idx - 1
-        end
-    end
-    
-    task.spawn(function()
-        while true do
-            readyToLoad.Event:Wait()
-            local target = getNextIndex(currentIndex, isForward)
-            if (isForward and currentIndex == #images) or (not isForward and currentIndex == 1) then
-                isForward = not isForward
-                target = getNextIndex(currentIndex, isForward)
-            end
-            preloader.Image = images[target]
-            readyToLoad:Fire()
-            task.wait()
-        end
-    end)
+    local slideDuration = 1.5
+    local interval = 13.5
 
     local function slideSwitch()
-        local nextIndex = getNextIndex(currentIndex, isForward)
-        BackgroundImage2.Image = images[nextIndex]
-
-        local startPos = UDim2.new(1, 0, 0, 0)
-        local endPos   = UDim2.new(0, 0, 0, 0)
-        local oldEndPos= UDim2.new(-1, 0, 0, 0)
-        if not isForward then
-            startPos = UDim2.new(-1, 0, 0, 0)
-            oldEndPos= UDim2.new(1, 0, 0, 0)
+        queuePtr = queuePtr + 1
+        if queuePtr > #queue then
+            queue    = shuffle(table.clone(images))
+            queuePtr = 1
         end
+        BackgroundImage2.Image = queue[queuePtr]
 
-        BackgroundImage2.Position = startPos
-
-        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = endPos}, slideDuration)
-        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = oldEndPos}, slideDuration)
+        BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
+        Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0, 0, 0, 0)}, slideDuration)
+        Library:Tween(BackgroundImage1, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(-1, 0, 0, 0)}, slideDuration)
 
         task.wait(slideDuration)
 
-        currentIndex = nextIndex
         BackgroundImage1.Image = BackgroundImage2.Image
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
@@ -5718,17 +5704,17 @@ end;
 			setup.Default = setup.Default or false;
 			setup.Callback = setup.Callback or function() end;
 			
-		    local ToggleBlock = Instance.new("Frame") -- 切换按钮的外框
-		    local DropShadow = Instance.new("ImageLabel") -- 用于创建阴影效果图标签
-		    local UIStroke = Instance.new("UIStroke") -- UI边框
-		    local TextLabel = Instance.new("TextLabel") -- 文本标签
+		    local ToggleBlock = Instance.new("Frame")
+		    local DropShadow = Instance.new("ImageLabel")
+		    local UIStroke = Instance.new("UIStroke")
+		    local TextLabel = Instance.new("TextLabel")
 		    local Content = Instance.new("TextLabel")
-		    local Block = Instance.new("Frame") -- 背景框
-		    local UIStroke_2 = Instance.new("UIStroke") -- 背景框的边框
-		    local UICorner = Instance.new("UICorner") -- 用于创建圆角效果
-		    local ValueBlock = Instance.new("Frame") -- 值框
-		    local UICorner_2 = Instance.new("UICorner") -- 值框的圆角效果
-		    local Button = Instance.new("TextButton") -- 按钮
+		    local Block = Instance.new("Frame")
+		    local UIStroke_2 = Instance.new("UIStroke")
+		    local UICorner = Instance.new("UICorner")
+		    local ValueBlock = Instance.new("Frame")
+		    local UICorner_2 = Instance.new("UICorner")
+		    local Button = Instance.new("TextButton")
 		    
 			ToggleBlock.Name = "ToggleBlock"
 			ToggleBlock.Parent = ScrollingFrame
@@ -6027,7 +6013,6 @@ end;
 			UICorner.CornerRadius = UDim.new(5, 100)
 			UICorner.Parent = Block			
 
-            -- 设置ValueBlock的属性
             ValueBlock.Name = "ValueBlock"
             ValueBlock.Parent = Block
             ValueBlock.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -6038,9 +6023,8 @@ end;
             ValueBlock.Position = UDim2.new(0.75, 0, 0.5, 0)
             ValueBlock.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
             ValueBlock.SizeConstraint = Enum.SizeConstraint.RelativeYY
-            ValueBlock.ZIndex = 16  -- 关键修改：层级提升至16（高于阴影9）
+            ValueBlock.ZIndex = 16 
     
-
             TriangleImage.Name = "Triangle"
             TriangleImage.Parent = ValueBlock
             TriangleImage.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -6051,7 +6035,7 @@ end;
             TriangleImage.Image = "rbxassetid://102797584513959"
             TriangleImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
             TriangleImage.ScaleType = Enum.ScaleType.Fit
-            TriangleImage.ZIndex = 17  -- 关键修改：层级提升至17（高于父容器16，确保在最上层）
+            TriangleImage.ZIndex = 17
             
             UICorner_2.CornerRadius = UDim.new(1, 0)
             UICorner_2.Parent = TriangleImage
@@ -6262,7 +6246,7 @@ end;
             ValueBlock.Position = UDim2.new(0.75, 0, 0.5, 0)
             ValueBlock.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
             ValueBlock.SizeConstraint = Enum.SizeConstraint.RelativeYY
-            ValueBlock.ZIndex = 16  -- 关键修改：层级提升至16（高于阴影9）
+            ValueBlock.ZIndex = 16
     
             
             StateImage.Name = "StateImage"
@@ -6275,7 +6259,7 @@ end;
             StateImage.Image = "rbxassetid://123698784885744"
             StateImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
             StateImage.ScaleType = Enum.ScaleType.Fit
-            StateImage.ZIndex = 17  -- 关键修改：层级提升至17（高于父容器16，确保在最上层）
+            StateImage.ZIndex = 17
 
             UICorner_2.CornerRadius = UDim.new(1, 0)
             UICorner_2.Parent = StateImage
@@ -7144,12 +7128,10 @@ end;
 		end;
 ------ // 下拉菜单组件完整版   [脚本认准XGOHUB] ----------------------------------------------------------------------------------------
 function Root:Dropdown(setup)
-    -- 基础配置项
     setup = setup or {};
     setup.Title = setup.Title or "下拉菜单";
     setup.Content = setup.Content or "";
     setup.Values = setup.Values or {};
-    -- 新增：选项显示状态配置（键=选项值，值=true显示/false隐藏，默认未配置项显示）
     setup.OptionVisible = setup.OptionVisible or setmetatable({}, {
         __index = function(t, k) return true end
     });
@@ -7158,7 +7140,6 @@ function Root:Dropdown(setup)
     setup.MaxMulti = setup.MaxMulti or math.huge;
     setup.Callback = setup.Callback or function() end;
 
-    -- 辅助函数：格式化选中值为字符串（多选转逗号分隔，单选直接转字符串）
     local Fconcat = function(a)
         if typeof(a) ~= 'table' then
             return tostring(a);
@@ -7178,7 +7159,6 @@ function Root:Dropdown(setup)
         return table.concat(std,' , ')
     end;
 
-    -- 创建UI层级：下拉菜单容器
     local DropdownBlock = Instance.new("Frame")
     local DropShadow = Instance.new("ImageLabel")
     local UIStroke = Instance.new("UIStroke")
@@ -7190,7 +7170,6 @@ function Root:Dropdown(setup)
     local Button = Instance.new("TextButton")
     local ValueText = Instance.new("TextLabel")
 
-    -- 容器基础属性
     DropdownBlock.Name = "DropdownBlock"
     DropdownBlock.Parent = ScrollingFrame
     DropdownBlock.BackgroundColor3 = Library.Colors.Default
@@ -7200,7 +7179,6 @@ function Root:Dropdown(setup)
     DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
     DropdownBlock.ZIndex = 10
 
-    -- 阴影效果
     DropShadow.Name = "DropShadow"
     DropShadow.Parent = DropdownBlock
     DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -7216,12 +7194,10 @@ function Root:Dropdown(setup)
     DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
     DropShadow.SliceScale = 0.050
 
-    -- 容器边框
     UIStroke.Transparency = 0.850
     UIStroke.Color = Color3.fromRGB(156, 156, 156)
     UIStroke.Parent = DropdownBlock
 
-    -- 标题文本
     TextLabel.Parent = DropdownBlock
     TextLabel.AnchorPoint = Vector2.new(0, 0.5)
     TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -7242,7 +7218,6 @@ function Root:Dropdown(setup)
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
     TextLabel.RichText = true
 
-    -- 补充说明文本
     Content.Name = "Content"
     Content.Parent = DropdownBlock
     Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -7265,7 +7240,6 @@ function Root:Dropdown(setup)
     Content.TextYAlignment = Enum.TextYAlignment.Top
     Content.RichText = true
 
-    -- 选中值显示容器
     Block.Name = "Block"
     Block.Parent = DropdownBlock
     Block.AnchorPoint = Vector2.new(1, 0.5)
@@ -7277,16 +7251,13 @@ function Root:Dropdown(setup)
     Block.Size = UDim2.new(0, 75, 0.600000024, 0)
     Block.ZIndex = 14
 
-    -- 选中值容器边框
     UIStroke_2.Transparency = 0.850
     UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
     UIStroke_2.Parent = Block
 
-    -- 选中值容器圆角
     UICorner.CornerRadius = UDim.new(0.200000003, 0)
     UICorner.Parent = Block
 
-    -- 下拉触发按钮
     Button.Name = "Button"
     Button.Parent = Block
     Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -7300,7 +7271,6 @@ function Root:Dropdown(setup)
     Button.TextSize = 14.000
     Button.TextTransparency = 1.000
 
-    -- 选中值文本
     ValueText.Name = "ValueText"
     ValueText.Parent = Block
     ValueText.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -7320,16 +7290,13 @@ function Root:Dropdown(setup)
     ValueText.TextStrokeTransparency = 0.950
     ValueText.TextWrapped = true
 
-    -- 外部库样式配置（依赖Library）
     Library:MakeDrop(DropdownBlock , UIStroke , Library.Colors.Hightlight)
     Library:MakeDrop(Block,UIStroke_2,Library.Colors.Hightlight);
 
-    -- 提示文本（依赖WindowLibrary）
     if setup.Tip then
         WindowLibrary:AddToolTip(DropdownBlock , tostring(setup.Tip));
     end;
 
-    -- 选中值容器尺寸自适应
     local UpdateSize = function()
         local size = Library:GetTextSize(ValueText.Text,ValueText.TextSize,ValueText.Font)
         pcall(function()
@@ -7339,7 +7306,6 @@ function Root:Dropdown(setup)
         end)
     end;
 
-    -- 选择值变化回调（更新显示+触发外部回调）
     local OnCallback = function(a)
         ValueText.Text = (setup.Multi and Fconcat(a)) or tostring(a);
         setup.Default = a;
@@ -7347,10 +7313,8 @@ function Root:Dropdown(setup)
         setup.Callback(a)
     end;
 
-    -- 初始尺寸适配
     UpdateSize();
 
-    -- 新增：过滤隐藏选项的核心函数（仅返回显示状态为true的选项）
     local getVisibleValues = function()
         local visibleVals = {};
         for _, val in ipairs(setup.Values) do
@@ -7361,12 +7325,10 @@ function Root:Dropdown(setup)
         return visibleVals;
     end;
 
-    -- 下拉按钮点击事件（打开过滤后的选项列表）
     Button.MouseButton1Click:Connect(function()
         UpdateSize();
         WindowLibrary:ClearDropdown();
 
-        -- 关键：传入过滤后的可见选项
         local visibleValues = getVisibleValues();
         if setup.Multi then
             WindowLibrary:SetDropdownValues(0, visibleValues, {
@@ -7380,7 +7342,6 @@ function Root:Dropdown(setup)
         WindowLibrary:OpenDropdown(Block);
     end)
 
-    -- 菜单整体尺寸自适应
     local UpdateBlock = function()
         local TitleSize = TextLabel.TextSize
         local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
@@ -7401,23 +7362,19 @@ function Root:Dropdown(setup)
 
         DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
     end
-    UpdateBlock() -- 初始调用设置尺寸
+    UpdateBlock()
 
-    -- 下拉菜单操作API（新增SetOptionVisible控制选项显示/隐藏）
     local RootSkid = {};
 
-    -- 获取当前选中值
     function RootSkid:GetValue()
         return setup.Default;
     end;
 
-    -- 更新补充说明文本
     function RootSkid:Content(Setup)
         Content.Text = Setup
         UpdateBlock()
     end;
 
-    -- 手动设置选中值
     function RootSkid:Value(SetupR)
         setup.Default = SetupR;
         ValueText.Text = (setup.Multi and Fconcat(SetupR)) or tostring(SetupR);
@@ -7426,10 +7383,8 @@ function Root:Dropdown(setup)
         UpdateBlock()
     end;
 
-    -- 更新选项列表（新增选项默认显示）
     function RootSkid:SetValue(data)
         setup.Values = data;
-        -- 新选项默认配置为显示状态
         for _, val in ipairs(data) do
             if setup.OptionVisible[val] == nil then
                 setup.OptionVisible[val] = true;
@@ -7437,16 +7392,11 @@ function Root:Dropdown(setup)
         end
     end;
 
-    -- 控制菜单整体显示/隐藏
     function RootSkid:Visible(value)
         DropdownBlock.Visible = value;
     end;
 
-    -- 新增：控制单个选项的显示/隐藏（核心API）
-    -- 参数1：option - 要控制的选项值（如"值2"）
-    -- 参数2：isVisible - 布尔值（true显示，false隐藏）
     function RootSkid:SetOptionVisible(option, isVisible)
-        -- 验证选项是否存在于选项列表中
         local isOptionValid = false;
         for _, val in ipairs(setup.Values) do
             if val == option then
@@ -7459,7 +7409,6 @@ function Root:Dropdown(setup)
             return;
         end
 
-        -- 更新选项状态
         setup.OptionVisible[option] = isVisible;
     end;
 
@@ -7767,7 +7716,7 @@ end;
 			setup = setup or {};
 
 			setup.Title = setup.Title or "\91\32\45\88\71\79\45\72\85\66\45\32\93";
-            setup.Content = setup.Content or "\91\32\45\88\71\79\45\72\85\66\45\32\93"; -- 允许外部传入内容 -- 新增的子标题默认值
+            setup.Content = setup.Content or "\91\32\45\88\71\79\45\72\85\66\45\32\93";
 			setup.Buttons = setup.Buttons or {
 				{
 					Title = "是",
@@ -7883,7 +7832,7 @@ end;
             Content.Size = UDim2.new(0.899999976, 0, 0, 30)
             Content.ZIndex = 275
             Content.Font = Enum.Font.Gotham
-            Content.Text = setup.Content; -- 使用外部传入的内容
+            Content.Text = setup.Content;
             Content.TextColor3 = Library.Colors.TextColor
             Content.TextScaled = true
             Content.TextSize = 14.000
@@ -7978,7 +7927,6 @@ end;
 				Library:Tween(UIStroke,Library.TweenLibrary.SmallEffect,{
 					Transparency = 1
 				})
-                -- 立即开始标题和内容标签的消失动画
 				Library:Tween(Title,Library.TweenLibrary.SmallEffect,{
 					TextStrokeTransparency = 1,
 					TextTransparency = 1
