@@ -3249,7 +3249,7 @@ end;
         wait(2.5)
         blurEffect:Destroy()
     end))
-------------------------------//    UI.标题设置    //-------------------------------------------------------------------------------------
+------// UI.标题设置 [图片太难搞了，我都封了十几个号了(还浪费我时间) 本来是想带点颜色图片，但是太能封号了，就不搞了]   //-------------------------------------------------------------------------------------
 function Library:Windowxgo(setup)
     setup = setup or {};
     setup.Title = setup.Title or "Window";
@@ -3368,28 +3368,73 @@ function Library:Windowxgo(setup)
         "rbxassetid://92696377732743",
         "rbxassetid://130172199019796",
         "rbxassetid://82973093488258",
-        "rbxassetid://121839671049241",
-        "rbxassetid://113622527786179",
-        "rbxassetid://91565537240037",
-        "rbxassetid://139764052643220",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
-        "rbxassetid://",
+        "rbxassetid://112015821138471",
+        "rbxassetid://106309267111813",
+        "rbxassetid://133651749360024",
+        "rbxassetid://125782190205971",
+        "rbxassetid://128380863807712",
+        "rbxassetid://118455934351458",
+        "rbxassetid://122027031695528",
+        "rbxassetid://105338484595056",
+        "rbxassetid://108356962585041",
+        "rbxassetid://94727756963238",
+        "rbxassetid://113369060406991",
+        "rbxassetid://113055700957332",
+        "rbxassetid://133933401543170",
+        "rbxassetid://101200437987764",
+        "rbxassetid://102653297586366",
+        "rbxassetid://107740168905807",
+        "rbxassetid://88737575142626",
+        "rbxassetid://113517553044113",
+        "rbxassetid://121228817458631",
+        "rbxassetid://140445692483001",
+        "rbxassetid://97012657684546",
+        "rbxassetid://109770441736776",
+        "rbxassetid://139654589284248",
+        "rbxassetid://114899818362023",
+        "rbxassetid://94168650195717",
+        "rbxassetid://74708237561928",
+        "rbxassetid://75220063478126",
+        "rbxassetid://89442009784136",
+        "rbxassetid://81363371302614",
+        "rbxassetid://95090127115921",
+        "rbxassetid://94878761352866",
+        "rbxassetid://82649085151065",
+        "rbxassetid://124416711850893",
+        "rbxassetid://71541255764950",
+        "rbxassetid://92209087296658",
+        "rbxassetid://73571655606342",
+        "rbxassetid://102206003630031",
+        "rbxassetid://125872498375333",
+        "rbxassetid://70537644787136",
+        "rbxassetid://108141030464504",
+        "rbxassetid://130832323012705",
+        "rbxassetid://115780740644704",
+        "rbxassetid://107295158179635",
+        "rbxassetid://116751947898355",
+        "rbxassetid://132823720486657",
+        "rbxassetid://81355674663745",
+        "rbxassetid://86901429245502",
+        "rbxassetid://126080756779973",
+        "rbxassetid://138383310224168",
+        "rbxassetid://76134729494740",
+        "rbxassetid://72802464061362",
+        "rbxassetid://73405041245010",
+        "rbxassetid://86394372063922",
+        "rbxassetid://79115724459093",
+        "rbxassetid://84892452493812",
+        "rbxassetid://96632550808361",
+        "rbxassetid://111291297728859",
+        "rbxassetid://71088729747878",
+        "rbxassetid://94127212697054",
+        "rbxassetid://94670853484450",
+        "rbxassetid://84501277764876",
+        "rbxassetid://114562666643192",
+        "rbxassetid://128148926071071",
+        "rbxassetid://107276323783937",
+        "rbxassetid://123536850708087",
+        "rbxassetid://133973741652591",
+        "rbxassetid://110262168733075",
         "rbxassetid://94012779929465"
     }
 
@@ -3415,35 +3460,12 @@ function Library:Windowxgo(setup)
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
-    local function isInvalidId(assetId)
-        return not assetId
-               or assetId == ""
-               or string.match(assetId, "^rbxassetid://$")
-               or not string.match(assetId, "%d")
-    end
-
-    local function getNextValidId()
-        local startPtr = queuePtr
-        repeat
-            local id = queue[queuePtr]
-            if not isInvalidId(id) then
-                return id
-            end
-            queuePtr = queuePtr + 1
-            if queuePtr > #queue then
-                queue    = shuffle(table.clone(images))
-                queuePtr = 1
-            end
-        until queuePtr == startPtr
-        return nil
-    end
-
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = getNextValidId() or ""
+        BackgroundImage1.Image = queue[queuePtr]
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3452,7 +3474,7 @@ function Library:Windowxgo(setup)
         BackgroundImage2.BackgroundTransparency = 1
         BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = getNextValidId() or ""
+        BackgroundImage2.Image = queue[queuePtr]
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ZIndex = 2
@@ -3462,9 +3484,12 @@ function Library:Windowxgo(setup)
     local interval = 13.5
 
     local function slideSwitch()
-        local nextId = getNextValidId()
-        if not nextId then return end
-        BackgroundImage2.Image = nextId
+        queuePtr = queuePtr + 1
+        if queuePtr > #queue then
+            queue    = shuffle(table.clone(images))
+            queuePtr = 1
+        end
+        BackgroundImage2.Image = queue[queuePtr]
 
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
         Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0, 0, 0, 0)}, slideDuration)
