@@ -4076,7 +4076,7 @@ MinimizeButton.BackgroundTransparency = 1
 MinimizeButton.BorderSizePixel = 0
 UICorner:Destroy()
 UIStroke:Destroy()
-MinimizeButton.Image = "rbxassetid://6764437152"
+MinimizeButton.Image = "rbxassetid://7734068321"
 MinimizeButton.ScaleType = Enum.ScaleType.Fit
 MinimizeButton.ImageColor3 = Color3.fromRGB(80, 255, 71) --绿色星星
 
@@ -4084,7 +4084,7 @@ MaxisizweButton.BackgroundTransparency = 1
 MaxisizweButton.BorderSizePixel = 0
 UICorner_2:Destroy()
 UIStroke_2:Destroy()
-MaxisizweButton.Image = "rbxassetid://6764437152"
+MaxisizweButton.Image = "rbxassetid://7734068321"
 MaxisizweButton.ScaleType = Enum.ScaleType.Fit
 MaxisizweButton.ImageColor3 = Color3.fromRGB(255, 249, 85) --黄色星星
 
@@ -4092,7 +4092,7 @@ CloseButton.BackgroundTransparency = 1
 CloseButton.BorderSizePixel = 0
 UICorner_3:Destroy()
 UIStroke_3:Destroy()
-CloseButton.Image = "rbxassetid://6764437152"
+CloseButton.Image = "rbxassetid://7734068321"
 CloseButton.ScaleType = Enum.ScaleType.Fit
 CloseButton.ImageColor3 = Color3.fromRGB(255, 88, 91) --红色星星
 
