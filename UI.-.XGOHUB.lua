@@ -993,7 +993,7 @@ local function playSound(audioId)
     sound:Play()
 end
 
-Library.Icons = { -- 图片/常用图片
+Library.Icons = {
     ["手"] = "rbxassetid://7733955740",     ["家"] = "rbxassetid://7733960981",
     ["锚"] = "rbxassetid://7733911490",      ["票"] = "rbxassetid://7734086558",
 	["列"] = "rbxassetid://7733757178",      ["秤"] = "rbxassetid://7734052454",
@@ -3368,6 +3368,28 @@ function Library:Windowxgo(setup)
         "rbxassetid://92696377732743",
         "rbxassetid://130172199019796",
         "rbxassetid://82973093488258",
+        "rbxassetid://121839671049241",
+        "rbxassetid://113622527786179",
+        "rbxassetid://91565537240037",
+        "rbxassetid://139764052643220",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
+        "rbxassetid://",
         "rbxassetid://94012779929465"
     }
 
@@ -3393,12 +3415,35 @@ function Library:Windowxgo(setup)
     preloader.Visible = false
     preloader.Parent = ScreenGui
 
+    local function isInvalidId(assetId)
+        return not assetId
+               or assetId == ""
+               or string.match(assetId, "^rbxassetid://$")
+               or not string.match(assetId, "%d")
+    end
+
+    local function getNextValidId()
+        local startPtr = queuePtr
+        repeat
+            local id = queue[queuePtr]
+            if not isInvalidId(id) then
+                return id
+            end
+            queuePtr = queuePtr + 1
+            if queuePtr > #queue then
+                queue    = shuffle(table.clone(images))
+                queuePtr = 1
+            end
+        until queuePtr == startPtr
+        return nil
+    end
+
     local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage1.Position = UDim2.new(0, 0, 0, 0)
-        BackgroundImage1.Image = queue[queuePtr]
+        BackgroundImage1.Image = getNextValidId() or ""
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
         BackgroundImage1.ZIndex = 1
@@ -3407,7 +3452,7 @@ function Library:Windowxgo(setup)
         BackgroundImage2.BackgroundTransparency = 1
         BackgroundImage2.Size = UDim2.new(1, 0, 1, 0)
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
-        BackgroundImage2.Image = queue[queuePtr]
+        BackgroundImage2.Image = getNextValidId() or ""
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage2.ZIndex = 2
@@ -3417,12 +3462,9 @@ function Library:Windowxgo(setup)
     local interval = 13.5
 
     local function slideSwitch()
-        queuePtr = queuePtr + 1
-        if queuePtr > #queue then
-            queue    = shuffle(table.clone(images))
-            queuePtr = 1
-        end
-        BackgroundImage2.Image = queue[queuePtr]
+        local nextId = getNextValidId()
+        if not nextId then return end
+        BackgroundImage2.Image = nextId
 
         BackgroundImage2.Position = UDim2.new(1, 0, 0, 0)
         Library:Tween(BackgroundImage2, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0, 0, 0, 0)}, slideDuration)
