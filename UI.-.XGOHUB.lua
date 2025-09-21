@@ -4072,29 +4072,43 @@ WindowLibrary.Status = 'Show';
 WindowLibrary.Toggle = true;
 WindowLibrary.SectionTab = {};
 
+local starId = "rbxassetid://7734068321"
+local function spiral(b)
+	local t = 0
+	game:GetService("RunService").Heartbeat:Connect(function(dt)
+		t = t + dt
+		local r = 2 * math.sin(t * 2)
+		b.Position = UDim2.new(0.5, r * math.cos(t * 4), 0.5, r * math.sin(t * 4))
+		b.Rotation = t * 180 / math.pi * 2
+	end)
+end
+
 MinimizeButton.BackgroundTransparency = 1
 MinimizeButton.BorderSizePixel = 0
 UICorner:Destroy()
 UIStroke:Destroy()
-MinimizeButton.Image = "rbxassetid://7734068321"
+MinimizeButton.Image = starId
 MinimizeButton.ScaleType = Enum.ScaleType.Fit
-MinimizeButton.ImageColor3 = Color3.fromRGB(80, 255, 71) --绿色星星
+MinimizeButton.ImageColor3 = Color3.fromRGB(80, 255, 71)
+spiral(MinimizeButton)
 
 MaxisizweButton.BackgroundTransparency = 1
 MaxisizweButton.BorderSizePixel = 0
 UICorner_2:Destroy()
 UIStroke_2:Destroy()
-MaxisizweButton.Image = "rbxassetid://7734068321"
+MaxisizweButton.Image = starId
 MaxisizweButton.ScaleType = Enum.ScaleType.Fit
-MaxisizweButton.ImageColor3 = Color3.fromRGB(255, 249, 85) --黄色星星
+MaxisizweButton.ImageColor3 = Color3.fromRGB(255, 249, 85)
+spiral(MaxisizweButton)
 
 CloseButton.BackgroundTransparency = 1
 CloseButton.BorderSizePixel = 0
 UICorner_3:Destroy()
 UIStroke_3:Destroy()
-CloseButton.Image = "rbxassetid://7734068321"
+CloseButton.Image = starId
 CloseButton.ScaleType = Enum.ScaleType.Fit
-CloseButton.ImageColor3 = Color3.fromRGB(255, 88, 91) --红色星星
+CloseButton.ImageColor3 = Color3.fromRGB(255, 88, 91)
+spiral(CloseButton)
 
 local InitDropdown = function()
 	local DropdownLibrary = {};
@@ -4271,7 +4285,7 @@ local InitDropdown = function()
 	end;
 
 	function WindowLibrary:SetDropdownValues(Type,Table,Default,Callback)
-		if Type == 1 then -- Normal
+		if Type == 1 then
 			local OldButton = nil;
 
 			for i,v in pairs(Table) do
@@ -4376,7 +4390,7 @@ local InitDropdown = function()
 			end;
 		end;
 	end;
-do
+end
 -----// 水印 ---------------------------------------------------------------------------------------------------------------------------------------------
 			local Watermark = Instance.new("Frame")
 			local UIListLayout = Instance.new("UIListLayout")
