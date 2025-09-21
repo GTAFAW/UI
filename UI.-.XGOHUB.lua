@@ -1,9 +1,7 @@
-
-
 -- 此源码不加密 | 也尽量保持更新 | UI.XGO修改更新 | 以内置独家水印 --
 -- UI版本: v2
 
--- 
+--
 --  懒得更
 
 local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
@@ -986,6 +984,15 @@ local Library = {
 	xpcall = xpcall,
 };
 
+local function playSound(audioId)
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. audioId
+    sound.Volume = 3
+    sound.Pitch = 1
+    sound.Parent = game.Workspace
+    sound:Play()
+end
+
 Library.Icons = { -- 图片/常用图片
     ["手"] = "rbxassetid://7733955740",     ["家"] = "rbxassetid://7733960981",
     ["锚"] = "rbxassetid://7733911490",      ["票"] = "rbxassetid://7734086558",
@@ -1357,21 +1364,15 @@ Library.Icons = { -- 图片/常用图片
 	["暂停-八边形"] = "rbxassetid://7734021827",
 	["向下-双箭头"] = "rbxassetid://7733720604",
 	["向左-双箭头"] = "rbxassetid://7733720701",
-    ["XGO1"] = "rbxassetid://123698784885744",
-    ["XGO2"] = "rbxassetid://88666635012556",
-    ["XGO3"] = "rbxassetid://102797584513959",
-    ["XGO4"] = "rbxassetid://96996396016819",
-    ["XGO5"] = "rbxassetid://128885038925647",
-    ["XGO6"] = "rbxassetid://120611289434746",
-    ["XGO7"] = "rbxassetid://86451637909512",
-    ["XGO8"] = "rbxassetid://109948306798374",
-    ["XGO9"] = "rbxassetid://92630758837243",
-    ["XGOA"] = "rbxassetid://123841629074044",
-    ["XGOB"] = "rbxassetid://116659429137594",
-    ["XGOC"] = "rbxassetid://114637828840342",
-    ["XGOD"] = "rbxassetid://105061267460765",
-    ["XGOE"] = "rbxassetid://94515694400442",
-    ["XGOF"] = "rbxassetid://77486522529796",
+    ["XGO1"]= "rbxassetid://123698784885744",
+	["XGO2"]= "rbxassetid://88666635012556",
+	["XGO3"]= "rbxassetid://102797584513959",
+	["XGO4"]= "rbxassetid://96996396016819",
+	["XGO5"]= "rbxassetid://128885038925647",
+	["XGO6"]= "rbxassetid://120611289434746",
+	["XGO7"]= "rbxassetid://86451637909512",
+	["XGO8"]= "rbxassetid://109948306798374",
+	["XGO9"]= "rbxassetid://92630758837243",
 	["向下箭头-圆形"] = "rbxassetid://7733671763",
 	["收音机-接收器"] = "rbxassetid://7734045155",
 	["垂直结束对齐"] = "rbxassetid://8997380907",
@@ -3269,91 +3270,26 @@ function Library:Windowxgo(setup)
 	
     local images = {
         "rbxassetid://113180426865309",
-        "rbxassetid://127110756366496",
         "rbxassetid://131471211520335",
-        "rbxassetid://102428625138886",
-        "rbxassetid://137332235358973",
-        "rbxassetid://109520199976167",
-        "rbxassetid://122958225353990",
-        "rbxassetid://140434608197988",
-        "rbxassetid://124568548523146",
-        "rbxassetid://76544783777123",
-        "rbxassetid://117347134697321",
-        "rbxassetid://98554545052070",
-        "rbxassetid://131266490485584",
-        "rbxassetid://131496206276220",
-        "rbxassetid://109752539854084",
-        "rbxassetid://70869793345513",
-        "rbxassetid://81618536870963",
-        "rbxassetid://96996068161496",
-        "rbxassetid://92875796313338",
-        "rbxassetid://89067121877834",
-        "rbxassetid://113186601959200",
+	    "rbxassetid://109520199976167",
+	    "rbxassetid://122958225353990",
         "rbxassetid://73164000772284",
-        "rbxassetid://101305557601423",
-        "rbxassetid://104067029112641",
+	    "rbxassetid://101305557601423",
         "rbxassetid://110630445580007",
         "rbxassetid://108644687915512",
-        "rbxassetid://86540442133927",
         "rbxassetid://107018855884545",
         "rbxassetid://112966984941036",
-        "rbxassetid://80598426066070",
         "rbxassetid://108391089326665",
         "rbxassetid://138013328013091",
         "rbxassetid://110990525726887",
-        "rbxassetid://72760885562855",
-        "rbxassetid://82117275977223",
-        "rbxassetid://80695281901172",
-        "rbxassetid://123238115911519",
-        "rbxassetid://135035617747628",
-        "rbxassetid://74297023080665",
-        "rbxassetid://84550607098866",
-        "rbxassetid://132992677171078",
-        "rbxassetid://126722695077251",
-        "rbxassetid://82915814593812",
-        "rbxassetid://105485276493469",
-        "rbxassetid://107983351429754",
-        "rbxassetid://121439238665385",
-        "rbxassetid://135083937747387",
-        "rbxassetid://130643405858214",
-        "rbxassetid://102409437463046",
-        "rbxassetid://87780505852956",
-        "rbxassetid://137945894459284",
-        "rbxassetid://101196101249400",
-        "rbxassetid://73934456979168",
-        "rbxassetid://124323332173934",
-        "rbxassetid://71240399712190",
-        "rbxassetid://127390304118462",
-        "rbxassetid://131409006813490",
-        "rbxassetid://80253796704859",
-        "rbxassetid://129206776380514",
-        "rbxassetid://121697617411442",
-        "rbxassetid://129410104830757",
-        "rbxassetid://71101554362190",
-        "rbxassetid://117937637678090",
-        "rbxassetid://89768207500333",
-        "rbxassetid://136363102949077",
-        "rbxassetid://74648780628027",
-        "rbxassetid://103232778626018",
-        "rbxassetid://76127155963189",
-        "rbxassetid://118305240093538",
-        "rbxassetid://112630176374798",
-        "rbxassetid://74804451529535",
-        "rbxassetid://115691043156297",
-        "rbxassetid://100980082510772",
-        "rbxassetid://135027711714247",
-        "rbxassetid://124541797505196",
-        "rbxassetid://136302622336157",
-        "rbxassetid://74234951901491",
-        "rbxassetid://76489725657019",
-        "rbxassetid://77202377271252",
-        "rbxassetid://81630003819439",
-        "rbxassetid://134782997900491",
-        "rbxassetid://101854737639056",
-        "rbxassetid://88726485475708",
-        "rbxassetid://124568043722207",
-        "rbxassetid://113389633674712",
-        "rbxassetid://94012779929465"
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB",
+--        "rbxassetid://脚本认准XGOHUB"
     }
     
     local currentIndex = 1
@@ -3487,7 +3423,316 @@ function Library:Windowxgo(setup)
 
 		Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = Library.SizeLibrary.Auth})
 
-		task.wait(1);
+		task.wait(1);       
+------ // 卡密系统设置    ----------------------------------------------------------------------------------------
+
+		local AuthFunction = Instance.new("Frame")
+		local Title = Instance.new("TextLabel")
+		local TextBox = Instance.new("TextBox")
+		local DropShadow = Instance.new("ImageLabel")
+		local UIStroke = Instance.new("UIStroke") -- 边框
+		local UIStroke_2 = Instance.new("UIStroke")
+		local GetButton = Instance.new("Frame")
+		local DropShadow_2 = Instance.new("ImageLabel")
+		local UIStroke_3 = Instance.new("UIStroke")
+		local GTitle = Instance.new("TextLabel")
+		local GButton = Instance.new("TextButton")
+		local LoginButton = Instance.new("Frame")
+		local DropShadow_3 = Instance.new("ImageLabel")
+		local UIStroke_4 = Instance.new("UIStroke")
+		local LTitle = Instance.new("TextLabel")
+		local LButton = Instance.new("TextButton")
+        local CloseButton = Instance.new("TextButton")
+        local Workspace = game:GetService("Workspace")
+        local CloseSound = Instance.new("Sound")
+       
+        AuthFunction.Name = "AuthFunction"
+		AuthFunction.Parent = MainFrame
+		AuthFunction.Active = true
+		AuthFunction.AnchorPoint = Vector2.new(0.5, 0.5)
+		AuthFunction.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		AuthFunction.BackgroundTransparency = 1.000
+		AuthFunction.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		AuthFunction.BorderSizePixel = 0
+		AuthFunction.Position = UDim2.new(0.5, 0, -1.5, 0)
+		AuthFunction.Size = UDim2.new(1, 0, 1, 0)
+
+		Library:Tween(AuthFunction , Library.TweenLibrary.SmallEffect,{Position = UDim2.new(0.5, 0, 0.5, 0)})
+          
+		Title.Name = "Title"
+		Title.Parent = AuthFunction
+		Title.AnchorPoint = Vector2.new(0.5, 0.5)
+		Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Title.BackgroundTransparency = 1.000
+		Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Title.BorderSizePixel = 0
+		Title.Position = UDim2.new(0.5, 0, 0.100000001, 0)
+		Title.Size = UDim2.new(0.899999976, 0, 0.100000001, 0)
+		Title.Font = Enum.Font.Gotham
+		Title.Text = setup.KeySystemInfo.Title
+		Title.TextColor3 = Library.Colors.TextColor
+		Title.TextScaled = true
+		Title.TextSize = 14.000
+		Title.TextStrokeColor3 = Library.Colors.TextColor
+		Title.TextStrokeTransparency = 0.950
+		Title.TextWrapped = true
+		Title.RichText = true;
+
+		TextBox.Parent = AuthFunction
+		TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
+		TextBox.BackgroundColor3 = Library.Colors.Default
+		TextBox.BackgroundTransparency = 0.250
+		TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		TextBox.BorderSizePixel = 0
+		TextBox.Position = UDim2.new(0.5, 0, 0.349999994, 0)
+		TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
+		TextBox.ZIndex = 5
+		TextBox.ClearTextOnFocus = false
+		TextBox.Font = Enum.Font.SourceSans
+		TextBox.PlaceholderText = "请输入卡密"
+		TextBox.Text = ""
+		TextBox.TextColor3 = Library.Colors.TextColor
+		TextBox.TextSize = 13.000
+		TextBox.TextStrokeColor3 = Library.Colors.TextColor
+		TextBox.TextStrokeTransparency = 0.950
+		TextBox.TextTransparency = 0.250
+		TextBox.TextWrapped = true
+
+		DropShadow.Name = "DropShadow"
+		DropShadow.Parent = TextBox
+		DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		DropShadow.BackgroundTransparency = 1.000
+		DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+		DropShadow.Position = UDim2.new(0, -5, 0, -5)
+		DropShadow.Size = UDim2.new(1, 10, 1, 10)
+		DropShadow.ZIndex = 4
+		DropShadow.Image = "rbxassetid://297694300"  --2
+		DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+		DropShadow.ImageTransparency = 0.500
+		DropShadow.ScaleType = Enum.ScaleType.Slice
+		DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+		DropShadow.SliceScale = 0.050
+
+		UIStroke.Transparency = 0.850
+		UIStroke.Color = Color3.fromRGB(156, 156, 156)
+		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		UIStroke.Parent = TextBox
+
+		UIStroke_2.Transparency = 0.850
+		UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+		UIStroke_2.Parent = AuthFunction
+
+		GetButton.Name = "GetButton"
+		GetButton.Parent = AuthFunction
+		GetButton.AnchorPoint = Vector2.new(0.5, 0.5)
+		GetButton.BackgroundColor3 = Library.Colors.Default
+		GetButton.BackgroundTransparency = 0.250
+		GetButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		GetButton.BorderSizePixel = 0
+		GetButton.Position = UDim2.new(0.25, 0, 0.649999976, 0)
+		GetButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
+		GetButton.ZIndex = 5
+
+		DropShadow_2.Name = "DropShadow"
+		DropShadow_2.Parent = GetButton
+		DropShadow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		DropShadow_2.BackgroundTransparency = 1.000
+		DropShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
+		DropShadow_2.Position = UDim2.new(0, -5, 0, -5)
+		DropShadow_2.Size = UDim2.new(1, 10, 1, 10)
+		DropShadow_2.ZIndex = 4
+		DropShadow_2.Image = "rbxassetid://297694300"  --3
+		DropShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
+		DropShadow_2.ImageTransparency = 0.500
+		DropShadow_2.ScaleType = Enum.ScaleType.Slice
+		DropShadow_2.SliceCenter = Rect.new(95, 103, 894, 902)
+		DropShadow_2.SliceScale = 0.050
+
+		UIStroke_3.Transparency = 0.850
+		UIStroke_3.Color = Color3.fromRGB(156, 156, 156)
+		UIStroke_3.Parent = GetButton
+
+		GTitle.Name = "GTitle"
+		GTitle.Parent = GetButton
+		GTitle.AnchorPoint = Vector2.new(0.5, 0.5)
+		GTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		GTitle.BackgroundTransparency = 1.000
+		GTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		GTitle.BorderSizePixel = 0
+		GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
+		GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
+		GTitle.ZIndex = 6
+		GTitle.Font = Enum.Font.Gotham
+		GTitle.Text = "链接"
+		GTitle.TextColor3 = Library.Colors.TextColor
+		GTitle.TextScaled = true
+		GTitle.TextSize = 14.000
+		GTitle.TextStrokeColor3 = Library.Colors.TextColor
+		GTitle.TextStrokeTransparency = 0.950
+		GTitle.TextWrapped = true
+		
+		GButton.Name = "GButton"
+		GButton.Parent = GetButton
+		GButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		GButton.BackgroundTransparency = 1.000
+		GButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		GButton.BorderSizePixel = 0
+		GButton.Size = UDim2.new(1, 0, 1, 0)
+		GButton.ZIndex = 15
+		GButton.Font = Enum.Font.SourceSans
+		GButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+		GButton.TextSize = 14.000
+		GButton.TextTransparency = 1.000
+		
+		LoginButton.Name = "LoginButton"
+		LoginButton.Parent = AuthFunction
+		LoginButton.AnchorPoint = Vector2.new(0.5, 0.5)
+		LoginButton.BackgroundColor3 = Library.Colors.Default
+		LoginButton.BackgroundTransparency = 0.250
+		LoginButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		LoginButton.BorderSizePixel = 0
+		LoginButton.Position = UDim2.new(0.75, 0, 0.649999976, 0)
+		LoginButton.Size = UDim2.new(0.349999994, 0, 0.185000002, 0)
+		LoginButton.ZIndex = 5
+
+		DropShadow_3.Name = "DropShadow"
+		DropShadow_3.Parent = LoginButton
+		DropShadow_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		DropShadow_3.BackgroundTransparency = 1.000
+		DropShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
+		DropShadow_3.Position = UDim2.new(0, -5, 0, -5)
+		DropShadow_3.Size = UDim2.new(1, 10, 1, 10)
+		DropShadow_3.ZIndex = 4
+		DropShadow_3.Image = "rbxassetid://297694300"  --4
+		DropShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
+		DropShadow_3.ImageTransparency = 0.500
+		DropShadow_3.ScaleType = Enum.ScaleType.Slice
+		DropShadow_3.SliceCenter = Rect.new(95, 103, 894, 902)
+		DropShadow_3.SliceScale = 0.050
+
+		UIStroke_4.Transparency = 0.850
+		UIStroke_4.Color = Color3.fromRGB(156, 156, 156)
+		UIStroke_4.Parent = LoginButton
+
+		LTitle.Name = "LTitle"
+		LTitle.Parent = LoginButton
+		LTitle.AnchorPoint = Vector2.new(0.5, 0.5)
+		LTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		LTitle.BackgroundTransparency = 1.000
+		LTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		LTitle.BorderSizePixel = 0
+		LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
+		LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
+		LTitle.ZIndex = 6
+		LTitle.Font = Enum.Font.Gotham
+		LTitle.Text = "确认"
+		LTitle.TextColor3 = Library.Colors.TextColor
+		LTitle.TextScaled = true
+		LTitle.TextSize = 14.000
+		LTitle.TextStrokeColor3 = Library.Colors.TextColor
+		LTitle.TextStrokeTransparency = 0.950
+		LTitle.TextWrapped = true
+
+		LButton.Name = "LButton"
+		LButton.Parent = LoginButton
+		LButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		LButton.BackgroundTransparency = 1.000
+		LButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		LButton.BorderSizePixel = 0
+		LButton.Size = UDim2.new(1, 0, 1, 0)
+		LButton.ZIndex = 15
+		LButton.Font = Enum.Font.SourceSans
+		LButton.Text = "确认"
+		LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+		LButton.TextSize = 14.000
+		LButton.TextTransparency = 1.000
+		
+		CloseSound.Name = "CloseSound"
+        CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
+        CloseSound.Volume = 1.0
+        CloseSound.PlayOnRemove = false
+        CloseSound.Parent = Workspace
+
+        CloseButton.Name = "CloseButton"
+        CloseButton.Parent = AuthFunction
+        CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
+        CloseButton.BackgroundTransparency = 1 
+        CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+        CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+        CloseButton.Font = Enum.Font.GothamSemibold
+        CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        CloseButton.Text = "X"
+        CloseButton.TextSize = 14
+        CloseButton.MouseButton1Click:Connect(function()
+            CloseSound:Play()  
+            Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
+            task.wait(0.5)
+            ScreenGui:Destroy()
+            task.spawn(function()
+                while CloseSound.Playing do task.wait(0.05) end
+                CloseSound:Destroy()
+            end)
+        end)
+
+        Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
+		Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
+		Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
+		setup.KeySystemInfo.CodeId = game:GetService('HttpService'):GenerateGUID(false);
+        setup.KeySystemInfo.AntiSpam = false;
+
+		LButton.MouseButton1Click:Connect(function()
+		    if setup.KeySystemInfo.AntiSpam then return end;
+		    setup.KeySystemInfo.AntiSpam = true;
+		    
+		    if TextBox.Text == "" then
+		        TextBox.PlaceholderText = "你没有填入卡密"
+		        task.wait(1.5)
+		        TextBox.PlaceholderText = "请输入卡密"
+		    else
+		        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
+		        if verify then
+		            setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
+		            
+		            CloseButton.Visible = false;
+		            return TextBox.Text;
+		        else
+		            task.wait(0.1)
+		            TextBox.Text = ""
+		            TextBox.PlaceholderText = "你输入的卡密错误"
+		            task.wait(1.5)
+		            TextBox.PlaceholderText = "请重新输入卡密"
+		        end;
+		    end;
+		    setup.KeySystemInfo.AntiSpam = false;
+		end)
+	    
+		GButton.MouseButton1Click:Connect(setup.KeySystemInfo.OnGetKey)
+
+		function setup:CancelLogin()
+			setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
+		end;
+
+		while true do 
+			local this = setup.KeySystemInfo.Finished.Event:Wait();
+
+			if this == setup.KeySystemInfo.CodeId then
+				break;
+			end;
+		end;
+
+		TextBox.TextEditable = false;
+
+		Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)});
+
+		task.wait(0.5)
+	else
+		repeat task.wait(1.5) until game:IsLoaded();		
+	end;
+
+	Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
+	Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
+	
+
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 	local WindowLibrary = {};
 	local OpenDelay = tick();
@@ -4673,11 +4918,13 @@ function Library:Windowxgo(setup)
 
 			return RootSkid;
 		end;
------- // 颜色选择器   ----------------------------------------------------------------------------------------------
+------ // 颜色选择器   ----------------------------------------------------------------------------------------
+-- 补充颜色打包工具函数（适配配置保存）
 local function PackColor(color)
     return {R = color.R * 255, G = color.G * 255, B = color.B * 255}
 end
 
+-- 配置保存函数（适配原UI库）
 local function SaveConfiguration()
     if not CEnabled then return end
     local HttpService = game:GetService("HttpService")
@@ -4716,6 +4963,7 @@ local function SaveConfiguration()
     end
 end
 
+-- 修复版：按钮触发式颜色选择器（确保颜色可选择）
 function Root:ColorPickerButton(setup)
     setup = setup or {}
     local cfg = {
@@ -4726,6 +4974,7 @@ function Root:ColorPickerButton(setup)
         FrameSize = setup.FrameSize or UDim2.new(0, 300, 0, 220)
     }
 
+    -- ===================== 1. 颜色选择按钮（基础组件） =====================
     local ColorBtn = Instance.new("Frame")
     ColorBtn.Name = "ColorPickerButton"
     ColorBtn.Parent = ScrollingFrame
@@ -4774,6 +5023,7 @@ function Root:ColorPickerButton(setup)
     BtnClick.TextTransparency = 1
     BtnClick.ZIndex = 15
 
+    -- ===================== 2. 颜色选择框架（修复交互核心） =====================
     local ColorFrame = Instance.new("Frame")
     ColorFrame.Name = "ColorPickerFrame"
     ColorFrame.Parent = ScrollingFrame
@@ -4784,6 +5034,7 @@ function Root:ColorPickerButton(setup)
     ColorFrame.ZIndex = 15
     ColorFrame.Visible = false
     ColorFrame.ClipsDescendants = true
+    -- 关键修复：确保框架可交互
     ColorFrame.Active = true
 
     local FrameShadow = Instance.new("ImageLabel")
@@ -4817,6 +5068,7 @@ function Root:ColorPickerButton(setup)
     FrameTitle.TextStrokeColor3 = Library.Colors.TextColor
     FrameTitle.TextStrokeTransparency = 0.95
 
+    -- ===================== 3. 颜色选择核心（修复拖动和坐标） =====================
     local TweenService = game:GetService("TweenService")
     local UserInputService = game:GetService("UserInputService")
     local RunService = game:GetService("RunService")
@@ -4824,18 +5076,21 @@ function Root:ColorPickerButton(setup)
     local LocalPlayer = Players.LocalPlayer
     local mouse = LocalPlayer:GetMouse()
 
+    -- 3.1 颜色预览区
     local Preview = Instance.new("Frame")
     Preview.Parent = ColorFrame
     Preview.Position = UDim2.new(0.02, 0, 0, 40)
     Preview.Size = UDim2.new(0.96, 0, 0, 30)
     Preview.BackgroundColor3 = cfg.DefaultColor
     Preview.BorderSizePixel = 0
+    -- 增加预览区边框，让颜色更明显
     local PreviewStroke = Instance.new("UIStroke")
     PreviewStroke.Parent = Preview
     PreviewStroke.Color = Color3.fromRGB(255,255,255)
     PreviewStroke.Transparency = 0.5
     PreviewStroke.Thickness = 1
 
+    -- 3.2 色相滑块（修复拖动检测）
     local HueSlider = Instance.new("Frame")
     HueSlider.Name = "HueSlider"
     HueSlider.Parent = ColorFrame
@@ -4843,6 +5098,7 @@ function Root:ColorPickerButton(setup)
     HueSlider.Size = UDim2.new(0.96, 0, 0, 8)
     HueSlider.BackgroundColor3 = Color3.fromRGB(0,0,0)
     HueSlider.BackgroundTransparency = 0.1
+    -- 关键修复：滑块可交互
     HueSlider.Active = true
 
     local HueGradient = Instance.new("UIGradient")
@@ -4862,12 +5118,13 @@ function Root:ColorPickerButton(setup)
     HuePoint.Parent = HueSlider
     HuePoint.Size = UDim2.new(0, 16, 0, 16)
     HuePoint.AnchorPoint = Vector2.new(0.5, 0.5)
-    HuePoint.Position = UDim2.new(0, 0, 0.5, 0)
+    HuePoint.Position = UDim2.new(0, 0, 0.5, 0) -- 初始位置
     HuePoint.BackgroundTransparency = 1
     HuePoint.Image = "rbxassetid://7733710700"
     HuePoint.ImageColor3 = Color3.fromRGB(255,255,255)
     HuePoint.ZIndex = 20
 
+    -- 3.3 饱和度/明度面板（修复坐标计算）
     local SvPanel = Instance.new("Frame")
     SvPanel.Name = "SvPanel"
     SvPanel.Parent = ColorFrame
@@ -4875,8 +5132,10 @@ function Root:ColorPickerButton(setup)
     SvPanel.Size = UDim2.new(0.6, 0, 0, 80)
     SvPanel.BackgroundColor3 = Color3.fromRGB(0,0,0)
     SvPanel.BackgroundTransparency = 0.1
+    -- 关键修复：面板可交互
     SvPanel.Active = true
 
+    -- 修复SV面板背景（增加饱和度-明度渐变，确保颜色显示正常）
     local SvSatGradient = Instance.new("UIGradient")
     SvSatGradient.Parent = SvPanel
     SvSatGradient.Color = ColorSequence.new({
@@ -4898,12 +5157,13 @@ function Root:ColorPickerButton(setup)
     SvPoint.Parent = SvPanel
     SvPoint.Size = UDim2.new(0, 14, 0, 14)
     SvPoint.AnchorPoint = Vector2.new(0.5, 0.5)
-    SvPoint.Position = UDim2.new(1, 0, 0, 0)
+    SvPoint.Position = UDim2.new(1, 0, 0, 0) -- 初始位置（100%饱和度，100%明度）
     SvPoint.BackgroundTransparency = 1
     SvPoint.Image = "rbxassetid://7733710700"
     SvPoint.ImageColor3 = Color3.fromRGB(255,255,255)
     SvPoint.ZIndex = 20
 
+    -- 3.4 RGB输入区（修复数值同步）
     local RgbContainer = Instance.new("Frame")
     RgbContainer.Parent = ColorFrame
     RgbContainer.Position = UDim2.new(0.65, 0, 0, 100)
@@ -4947,6 +5207,7 @@ function Root:ColorPickerButton(setup)
         InputBox.TextColor3 = Library.Colors.TextColor
         InputBox.TextSize = 12
         InputBox.TextXAlignment = Enum.TextXAlignment.Center
+        -- 修复：只允许输入数字
         InputBox:GetPropertyChangedSignal("Text"):Connect(function()
             InputBox.Text = InputBox.Text:gsub("[^0-9]", "")
             if #InputBox.Text > 3 then InputBox.Text = InputBox.Text:sub(1, 3) end
@@ -4955,6 +5216,7 @@ function Root:ColorPickerButton(setup)
         table.insert(RgbInputs, InputBox)
     end
 
+    -- 3.5 确认按钮
     local ConfirmBtn = Instance.new("Frame")
     ConfirmBtn.Parent = ColorFrame
     ConfirmBtn.Position = UDim2.new(0.02, 0, 0, 190)
@@ -4981,35 +5243,46 @@ function Root:ColorPickerButton(setup)
     ConfirmClick.BackgroundTransparency = 1
     ConfirmClick.TextTransparency = 1
     ConfirmClick.ZIndex = 20
-    
+
+    -- ===================== 4. 修复颜色选择逻辑 =====================
     local isFrameOpen = false
     local h, s, v = cfg.DefaultColor:ToHSV()
     local currentColor = cfg.DefaultColor
-    
+
+    -- 修复：初始化UI（确保坐标和数值正确）
     local function updateColorUI()
+        -- 1. 更新预览色
         Preview.BackgroundColor3 = currentColor
+        -- 2. 更新色相滑块（关键：用绝对坐标计算，避免相对坐标错误）
         local huePointX = math.clamp(h * HueSlider.AbsoluteSize.X, 0, HueSlider.AbsoluteSize.X)
         HuePoint.Position = UDim2.new(0, huePointX, 0.5, 0)
+        -- 3. 更新SV面板（关键：修复饱和度/明度对应的坐标）
         local svPointX = math.clamp(s * SvPanel.AbsoluteSize.X, 0, SvPanel.AbsoluteSize.X)
         local svPointY = math.clamp((1 - v) * SvPanel.AbsoluteSize.Y, 0, SvPanel.AbsoluteSize.Y)
         SvPoint.Position = UDim2.new(0, svPointX, 0, svPointY)
+        -- 4. 更新RGB输入框
         local r = math.floor(currentColor.R * 255)
         local g = math.floor(currentColor.G * 255)
         local b = math.floor(currentColor.B * 255)
+        -- 避免输入框频繁刷新导致闪烁
         if RgbInputs[1].Text ~= tostring(r) then RgbInputs[1].Text = tostring(r) end
         if RgbInputs[2].Text ~= tostring(g) then RgbInputs[2].Text = tostring(g) end
         if RgbInputs[3].Text ~= tostring(b) then RgbInputs[3].Text = tostring(b) end
+        -- 5. 更新SV面板的色相叠加（让面板显示当前色相的饱和度-明度变化）
         SvSatGradient.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromHSV(h, 0, 1)),
             ColorSequenceKeypoint.new(1, Color3.fromHSV(h, 1, 1))
         })
     end
+    -- 初始执行一次，确保UI正确
     updateColorUI()
 
+    -- 修复：按钮点击展开/收起
     BtnClick.MouseButton1Click:Connect(function()
         isFrameOpen = not isFrameOpen
         if isFrameOpen then
             ColorFrame.Visible = true
+            -- 确保框架在按钮下方（用绝对位置避免滚动后错位）
             local btnBottomY = ColorBtn.AbsolutePosition.Y + ColorBtn.AbsoluteSize.Y
             ColorFrame.Position = UDim2.new(0, ColorBtn.AbsolutePosition.X, 0, btnBottomY + 10)
             TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
@@ -5026,20 +5299,26 @@ function Root:ColorPickerButton(setup)
         end
     end)
 
+    -- 修复：色相滑块拖动（增加InputBegan/InputEnded直接绑定到滑块）
     local isHueDragging = false
+    -- 用InputBegan替代MouseButton1Down，兼容触摸和鼠标
     HueSlider.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isHueDragging = true
+            -- 拖动时立即更新一次，避免延迟
             local sliderX = math.clamp(input.Position.X - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
             h = sliderX / HueSlider.AbsoluteSize.X
             currentColor = Color3.fromHSV(h, s, v)
             updateColorUI()
         end
     end)
+
+    -- 修复：SV面板拖动
     local isSvDragging = false
     SvPanel.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isSvDragging = true
+            -- 拖动时立即更新
             local panelX = math.clamp(input.Position.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
             local panelY = math.clamp(input.Position.Y - SvPanel.AbsolutePosition.Y, 0, SvPanel.AbsoluteSize.Y)
             s = panelX / SvPanel.AbsoluteSize.X
@@ -5049,15 +5328,21 @@ function Root:ColorPickerButton(setup)
         end
     end)
 
+    -- 修复：输入结束后取消拖动状态
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isHueDragging = false
             isSvDragging = false
         end
     end)
+
+    -- 修复：实时拖动更新（用RenderStepped确保流畅）
     RunService.RenderStepped:Connect(function()
-        if not isFrameOpen then return end
+        if not isFrameOpen then return end -- 框架关闭时不执行
+
+        -- 1. 色相拖动更新
         if isHueDragging then
+            -- 用鼠标绝对位置计算，避免InputChanged延迟
             local mouseX = UserInputService:GetMouseLocation().X
             local sliderX = math.clamp(mouseX - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
             h = sliderX / HueSlider.AbsoluteSize.X
@@ -5065,6 +5350,7 @@ function Root:ColorPickerButton(setup)
             updateColorUI()
         end
 
+        -- 2. SV拖动更新
         if isSvDragging then
             local mousePos = UserInputService:GetMouseLocation()
             local panelX = math.clamp(mousePos.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
@@ -5075,7 +5361,8 @@ function Root:ColorPickerButton(setup)
             updateColorUI()
         end
     end)
-    
+
+    -- 修复：RGB输入框更新颜色
     local function updateColorFromRGB()
         local r = tonumber(RgbInputs[1].Text) or 255
         local g = tonumber(RgbInputs[2].Text) or 255
@@ -5084,23 +5371,29 @@ function Root:ColorPickerButton(setup)
         g = math.clamp(g, 0, 255)
         b = math.clamp(b, 0, 255)
         currentColor = Color3.fromRGB(r, g, b)
+        -- 同步色相/饱和度/明度，确保滑块和面板同步
         h, s, v = currentColor:ToHSV()
         updateColorUI()
     end
+    -- 给每个输入框绑定失去焦点事件
     for _, box in ipairs(RgbInputs) do
         box.FocusLost:Connect(updateColorFromRGB)
+        -- 增加回车确认（优化体验）
         box.Focused:Connect(function()
             box.Changed:Connect(function(property)
                 if property == "Text" then
+                    -- 输入时实时更新（可选，优化体验）
                     updateColorFromRGB()
                 end
             end)
         end)
     end
 
+    -- 确认按钮逻辑
     ConfirmClick.MouseButton1Click:Connect(function()
         cfg.Callback(currentColor)
         SaveConfiguration()
+        -- 收起框架
         isFrameOpen = false
         TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
             BackgroundTransparency = 1
@@ -5110,6 +5403,7 @@ function Root:ColorPickerButton(setup)
         BtnStroke.Transparency = 0.85
     end)
 
+    -- ===================== 5. 外部接口 =====================
     local api = {}
     function api:SetColor(color)
         currentColor = color
@@ -5337,7 +5631,7 @@ end;
 			setup.Callback = setup.Callback or function() end;
 			
 		    local ToggleBlock = Instance.new("Frame") -- 切换按钮的外框
-		    local DropShadow = Instance.new("ImageLabel")
+		    local DropShadow = Instance.new("ImageLabel") -- 用于创建阴影效果图标签
 		    local UIStroke = Instance.new("UIStroke") -- UI边框
 		    local TextLabel = Instance.new("TextLabel") -- 文本标签
 		    local Content = Instance.new("TextLabel")
@@ -6513,7 +6807,6 @@ end;
 
 			return RootSkid;
 		end;
-	
 ------ // 按钮绑定键<快捷键>   ----------------------------------------------------------------------------------------
 		function Root:Keybind(setup)
 			setup = setup or {};
@@ -6939,13 +7232,16 @@ function Root:Dropdown(setup)
     ValueText.TextStrokeTransparency = 0.950
     ValueText.TextWrapped = true
 
+    -- 外部库样式配置（依赖Library）
     Library:MakeDrop(DropdownBlock , UIStroke , Library.Colors.Hightlight)
     Library:MakeDrop(Block,UIStroke_2,Library.Colors.Hightlight);
 
+    -- 提示文本（依赖WindowLibrary）
     if setup.Tip then
         WindowLibrary:AddToolTip(DropdownBlock , tostring(setup.Tip));
     end;
 
+    -- 选中值容器尺寸自适应
     local UpdateSize = function()
         local size = Library:GetTextSize(ValueText.Text,ValueText.TextSize,ValueText.Font)
         pcall(function()
@@ -6955,6 +7251,7 @@ function Root:Dropdown(setup)
         end)
     end;
 
+    -- 选择值变化回调（更新显示+触发外部回调）
     local OnCallback = function(a)
         ValueText.Text = (setup.Multi and Fconcat(a)) or tostring(a);
         setup.Default = a;
@@ -6962,8 +7259,10 @@ function Root:Dropdown(setup)
         setup.Callback(a)
     end;
 
+    -- 初始尺寸适配
     UpdateSize();
 
+    -- 新增：过滤隐藏选项的核心函数（仅返回显示状态为true的选项）
     local getVisibleValues = function()
         local visibleVals = {};
         for _, val in ipairs(setup.Values) do
@@ -6974,10 +7273,12 @@ function Root:Dropdown(setup)
         return visibleVals;
     end;
 
+    -- 下拉按钮点击事件（打开过滤后的选项列表）
     Button.MouseButton1Click:Connect(function()
         UpdateSize();
         WindowLibrary:ClearDropdown();
 
+        -- 关键：传入过滤后的可见选项
         local visibleValues = getVisibleValues();
         if setup.Multi then
             WindowLibrary:SetDropdownValues(0, visibleValues, {
@@ -6991,6 +7292,7 @@ function Root:Dropdown(setup)
         WindowLibrary:OpenDropdown(Block);
     end)
 
+    -- 菜单整体尺寸自适应
     local UpdateBlock = function()
         local TitleSize = TextLabel.TextSize
         local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
@@ -7011,19 +7313,23 @@ function Root:Dropdown(setup)
 
         DropdownBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
     end
-    UpdateBlock()
+    UpdateBlock() -- 初始调用设置尺寸
 
+    -- 下拉菜单操作API（新增SetOptionVisible控制选项显示/隐藏）
     local RootSkid = {};
 
+    -- 获取当前选中值
     function RootSkid:GetValue()
         return setup.Default;
     end;
 
+    -- 更新补充说明文本
     function RootSkid:Content(Setup)
         Content.Text = Setup
         UpdateBlock()
     end;
 
+    -- 手动设置选中值
     function RootSkid:Value(SetupR)
         setup.Default = SetupR;
         ValueText.Text = (setup.Multi and Fconcat(SetupR)) or tostring(SetupR);
@@ -7031,9 +7337,11 @@ function Root:Dropdown(setup)
         setup.Callback(SetupR)
         UpdateBlock()
     end;
-    
+
+    -- 更新选项列表（新增选项默认显示）
     function RootSkid:SetValue(data)
         setup.Values = data;
+        -- 新选项默认配置为显示状态
         for _, val in ipairs(data) do
             if setup.OptionVisible[val] == nil then
                 setup.OptionVisible[val] = true;
@@ -7041,11 +7349,16 @@ function Root:Dropdown(setup)
         end
     end;
 
+    -- 控制菜单整体显示/隐藏
     function RootSkid:Visible(value)
         DropdownBlock.Visible = value;
     end;
 
+    -- 新增：控制单个选项的显示/隐藏（核心API）
+    -- 参数1：option - 要控制的选项值（如"值2"）
+    -- 参数2：isVisible - 布尔值（true显示，false隐藏）
     function RootSkid:SetOptionVisible(option, isVisible)
+        -- 验证选项是否存在于选项列表中
         local isOptionValid = false;
         for _, val in ipairs(setup.Values) do
             if val == option then
@@ -7058,6 +7371,7 @@ function Root:Dropdown(setup)
             return;
         end
 
+        -- 更新选项状态
         setup.OptionVisible[option] = isVisible;
     end;
 
@@ -7365,7 +7679,7 @@ end;
 			setup = setup or {};
 
 			setup.Title = setup.Title or "\91\32\45\88\71\79\45\72\85\66\45\32\93";
-            setup.Content = setup.Content or "\91\32\45\88\71\79\45\72\85\66\45\32\93";
+            setup.Content = setup.Content or "\91\32\45\88\71\79\45\72\85\66\45\32\93"; -- 允许外部传入内容 -- 新增的子标题默认值
 			setup.Buttons = setup.Buttons or {
 				{
 					Title = "是",
@@ -7391,7 +7705,7 @@ end;
 			local UIStroke = Instance.new("UIStroke")
 			local UIGradient = Instance.new("UIGradient")
 			local Title = Instance.new("TextLabel")
-            local Content = Instance.new("TextLabel")
+            local Content = Instance.new("TextLabel") -- 新增的内容标签
 			local Buttons = Instance.new("Frame")
 			local UIListLayout = Instance.new("UIListLayout")
 
@@ -7481,7 +7795,7 @@ end;
             Content.Size = UDim2.new(0.899999976, 0, 0, 30)
             Content.ZIndex = 275
             Content.Font = Enum.Font.Gotham
-            Content.Text = setup.Content;
+            Content.Text = setup.Content; -- 使用外部传入的内容
             Content.TextColor3 = Library.Colors.TextColor
             Content.TextScaled = true
             Content.TextSize = 14.000
@@ -7786,6 +8100,7 @@ end;
 			}
 		})
 	end)
+	
 	
 	local ToggleButton = Library:InputButton(Ico);
 
