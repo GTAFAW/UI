@@ -3267,26 +3267,21 @@ function Library:Windowxgo(setup)
     end
 
     local TweenService = game:GetService("TweenService")
-    -- 新增：上层动态效果配置
     local TopEffectConfig = {
-        -- 顶层涂层配置
         TopLayerColor = Color3.fromRGB(15, 17, 20),
         TopLayerTransparency = 0.6,
         TopLayerBlurSize = 8,
-        -- 闪电/二进制雨颜色配置
         LightningBaseColor = Color3.fromRGB(0, 255, 70),
         BinaryTextColor = Color3.fromRGB(0, 255, 70)
     }
-    -- 主题颜色（控制闪电动态变色）
     local currentTheme = {
         lightningColor = TopEffectConfig.LightningBaseColor
     }
 
-    -- 原有：动态图片轮播相关代码（完全保留）
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
-    local BackgroundImage1 = Instance.new("ImageLabel") -- 轮播图1（底层）
-    local BackgroundImage2 = Instance.new("ImageLabel") -- 轮播图2（滑动层）
+    local BackgroundImage1 = Instance.new("ImageLabel")
+    local BackgroundImage2 = Instance.new("ImageLabel")
     local DropShadow = Instance.new("ImageLabel")
     local Ico = Instance.new("ImageLabel")
 
@@ -3440,7 +3435,7 @@ function Library:Windowxgo(setup)
         "rbxassetid://86394372063922",
         "rbxassetid://79115724459093",
         "rbxassetid://84892452493812",
-                "rbxassetid://96632550808361",
+        "rbxassetid://96632550808361",
         "rbxassetid://111291297728859",
         "rbxassetid://71088729747878",
         "rbxassetid://94127212697054",
@@ -3525,7 +3520,6 @@ function Library:Windowxgo(setup)
         "rbxassetid://110959984143843"
     }
 
-    -- 原有：图片轮播逻辑（完全保留）
     math.randomseed(tick())
     local function shuffle(t)
         for i = #t, 2, -1 do
@@ -3534,8 +3528,8 @@ function Library:Windowxgo(setup)
         end
         return t
     end
-    local queue      = shuffle(table.clone(images))
-    local queuePtr   = 1
+    local queue = shuffle(table.clone(images))
+    local queuePtr = 1
 
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
@@ -3556,7 +3550,7 @@ function Library:Windowxgo(setup)
         BackgroundImage1.Image = queue[queuePtr]
         BackgroundImage1.ScaleType = Enum.ScaleType.Stretch
         BackgroundImage1.ImageTransparency = 0
-        BackgroundImage1.ZIndex = 1 -- 轮播图ZIndex设为1（底层）
+        BackgroundImage1.ZIndex = 1
 
         BackgroundImage2.Parent = MainFrame
         BackgroundImage2.BackgroundTransparency = 1
@@ -3565,7 +3559,7 @@ function Library:Windowxgo(setup)
         BackgroundImage2.Image = queue[queuePtr]
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage2.ZIndex = 1 -- 轮播图同层
+        BackgroundImage2.ZIndex = 1
     end
 
     local slideDuration = 1.5
@@ -3574,7 +3568,7 @@ function Library:Windowxgo(setup)
     local function slideSwitch()
         queuePtr = queuePtr + 1
         if queuePtr > #queue then
-            queue    = shuffle(table.clone(images))
+            queue = shuffle(table.clone(images))
             queuePtr = 1
         end
         BackgroundImage2.Image = queue[queuePtr]
@@ -3591,6 +3585,7 @@ function Library:Windowxgo(setup)
 
         readyToLoad:Fire()
     end
+
     local topGradient = Instance.new("UIGradient")
     topGradient.Name = "TopGradient"
     topGradient.Color = ColorSequence.new({
@@ -3598,38 +3593,34 @@ function Library:Windowxgo(setup)
         ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 37, 41):ToTransparent(0.9))
     })
     topGradient.Rotation = 90
-    topGradient.ZIndex = 2 -- 高于轮播图（1）
+    topGradient.ZIndex = 2
     topGradient.Parent = MainFrame
 
-    -- 2. 闪电特效层（在轮播图和渐变之上）
     local lightningFX = Instance.new("Frame")
     lightningFX.Name = "LightningFX"
     lightningFX.Size = UDim2.new(1, 0, 1, 0)
     lightningFX.BackgroundTransparency = 1
-    lightningFX.ClipsDescendants = true -- 限制在窗口内
-    lightningFX.ZIndex = 3 -- 高于渐变（2）
+    lightningFX.ClipsDescendants = true
+    lightningFX.ZIndex = 3
     lightningFX.Parent = MainFrame
 
-    -- 3. 二进制雨动画层（在闪电之上）
     local binaryOverlay = Instance.new("Frame")
     binaryOverlay.Name = "BinaryOverlay"
     binaryOverlay.Size = UDim2.new(1, 0, 1, 0)
     binaryOverlay.BackgroundTransparency = 1
     binaryOverlay.ClipsDescendants = true
-    binaryOverlay.ZIndex = 4 -- 高于闪电（3）
+    binaryOverlay.ZIndex = 4
     binaryOverlay.Parent = MainFrame
 
-    -- 4. 顶层涂层（最上层，覆盖所有效果）
     local TopLayer = Instance.new("Frame")
     TopLayer.Name = "TopOverlayLayer"
     TopLayer.Size = UDim2.new(1, 0, 1, 0)
     TopLayer.Position = UDim2.new(0, 0, 0, 0)
     TopLayer.BackgroundColor3 = TopEffectConfig.TopLayerColor
     TopLayer.BackgroundTransparency = TopEffectConfig.TopLayerTransparency
-    TopLayer.ZIndex = 5 -- 最高层，确保在所有动态效果之上
+    TopLayer.ZIndex = 5
     TopLayer.Parent = MainFrame
 
-    -- 涂层模糊+渐变（增强质感）
     local layerBlur = Instance.new("UIGaussianBlur", TopLayer)
     layerBlur.Size = TopEffectConfig.TopLayerBlurSize
     local layerGradient = Instance.new("UIGradient", TopLayer)
@@ -3639,7 +3630,6 @@ function Library:Windowxgo(setup)
     })
     layerGradient.Rotation = 180
 
-    -- 原有：ScreenGui 和 MainFrame 基础配置（保留）
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ResetOnSpawn = false
     ScreenGui.IgnoreGuiInset = false
@@ -3652,14 +3642,12 @@ function Library:Windowxgo(setup)
     MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     MainFrame.BackgroundTransparency = 0.250
     MainFrame.BorderSizePixel = 0
-    MainFrame.ClipsDescendants = true -- 确保所有层不超出窗口
+    MainFrame.ClipsDescendants = true
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Size = UDim2.fromScale(0, 0)
 
-    -- 原有：初始化轮播图（保留）
     initBackgrounds()
 
-    -- 原有：轮播动画循环（保留）
     task.spawn(function()
         while true do
             task.wait(interval)
@@ -3671,7 +3659,6 @@ function Library:Windowxgo(setup)
 
     local BlurEle = Library.UIBlur.new(MainFrame, true)
 
-    -- 原有：DropShadow 和 Ico 配置（保留，调整Ico的ZIndex确保在顶层）
     DropShadow.Name = "DropShadow"
     DropShadow.Parent = MainFrame
     DropShadow.BackgroundTransparency = 1.000
@@ -3693,15 +3680,14 @@ function Library:Windowxgo(setup)
     Ico.BorderSizePixel = 0
     Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
     Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
-        Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
+    Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
     Ico.Image = setup.Logo
     Ico.ImageTransparency = 1.000
-    Ico.ZIndex = 6 -- 确保Logo在顶层涂层之上，显示更清晰
+    Ico.ZIndex = 6
 
-    -- 原有：窗口和Logo动画（保留）
     Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
     Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
-    
+
     task.spawn(function()
         local colorIndex = 1
         local gradientColorList = {
@@ -3718,7 +3704,7 @@ function Library:Windowxgo(setup)
                 ColorSequenceKeypoint.new(1, Color3.fromRGB(32, 34, 38):ToTransparent(0.9))
             })
         }
-        while MainFrame.Parent do -- 窗口存在时才运行
+        while MainFrame.Parent do
             TweenService:Create(topGradient, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
                 Color = gradientColorList[colorIndex]
             }):Play()
@@ -3727,27 +3713,24 @@ function Library:Windowxgo(setup)
         end
     end)
 
-    -- 2. 闪电特效动画（垂直流光，在轮播图上层滚动）
     task.spawn(function()
         while lightningFX.Parent and MainFrame.Parent do
             local light = Instance.new("Frame", lightningFX)
             light.BackgroundTransparency = 0.7
             light.BackgroundColor3 = currentTheme.lightningColor
-            light.Size = UDim2.new(0, math.random(1, 3), 1, 0) -- 高度填满窗口
-            light.Position = UDim2.new(math.random(), 0, -1, 0) -- 从窗口顶部外生成
-            light.ZIndex = 3 -- 与闪电层一致
-            -- 流光下落动画
+            light.Size = UDim2.new(0, math.random(1, 3), 1, 0)
+            light.Position = UDim2.new(math.random(), 0, -1, 0)
+            light.ZIndex = 3
             local tween = TweenService:Create(light, TweenInfo.new(math.random(0.3, 0.8), Enum.EasingStyle.Linear), {
                 Position = UDim2.new(light.Position.X.Scale, 0, 1, 0),
                 BackgroundTransparency = 1
             })
             tween:Play()
             tween.Completed:Connect(function() light:Destroy() end)
-            task.wait(math.random() / 2) -- 随机间隔生成，避免密集
+            task.wait(math.random() / 2)
         end
     end)
 
-    -- 3. 二进制雨动画（在闪电层之上，模拟代码流效果）
     task.spawn(function()
         while binaryOverlay.Parent and MainFrame.Parent do
             local rainLine = Instance.new("TextLabel", binaryOverlay)
@@ -3758,39 +3741,34 @@ function Library:Windowxgo(setup)
             rainLine.Font = Enum.Font.Code
             rainLine.TextSize = 12
             rainLine.TextWrapped = true
-            rainLine.ZIndex = 4 -- 与二进制层一致
-            -- 生成随机二进制文本（0和1组合）
+            rainLine.ZIndex = 4
             local binStr = ""
             for i = 1, 80 do
                 binStr = binStr .. math.random(0, 1) .. "\n"
             end
             rainLine.Text = binStr
-            -- 二进制雨下落动画
             local anim = TweenService:Create(rainLine, TweenInfo.new(math.random(4, 8), Enum.EasingStyle.Linear), {
                 Position = UDim2.new(rainLine.Position.X.Scale, 0, 1, 0),
                 TextTransparency = 1
             })
             anim:Play()
             anim.Completed:Connect(function() rainLine:Destroy() end)
-            task.wait(0.05) -- 高频生成，保证效果连贯
+            task.wait(0.05)
         end
     end)
 
-    -- 4. 主题颜色联动变化（闪电颜色随色相循环，动态感更强）
     task.spawn(function()
         local hue = 0
         while MainFrame.Parent do
-            hue = (hue + 0.001) % 1 -- 色相循环（0-1）
-            currentTheme.lightningColor = Color3.fromHSV(hue, 0.8, 1) -- 饱和度过高，色彩更鲜艳
-            -- 可选：让顶层涂层颜色随主题轻微变化，增强联动
+            hue = (hue + 0.001) % 1
+            currentTheme.lightningColor = Color3.fromHSV(hue, 0.8, 1)
             TweenService:Create(TopLayer, TweenInfo.new(0.5), {
-                BackgroundColor3 = currentTheme.lightningColor:ToDark() -- 主题色加深，避免遮挡轮播图
+                BackgroundColor3 = currentTheme.lightningColor:ToDark()
             }):Play()
             task.wait(0.01)
         end
     end)
 
-    -- 原有：密钥系统逻辑（保留，不做修改）
     if setup.KeySystem then
         setup.KeySystemInfo.Enabled = true
         setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
