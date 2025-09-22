@@ -3250,34 +3250,20 @@ end;
         blurEffect:Destroy()
     end))
 ------// UI.标题设置 [图片太难搞了，我都封了十几个号了(还浪费我时间) 本来是想带点颜色图片，但是太能封号了，就不搞了]   //-------------------------------------------------------------------------------------
-local TweenService = game:GetService("TweenService")
-local ContentProvider = game:GetService("ContentProvider")
-
-local Library = {}
-Library.SizeLibrary = {
-    Default   = UDim2.fromScale(0.6,0.7),
-    Loading   = UDim2.fromScale(0.4,0.22),
-    Auth      = UDim2.fromScale(0.4,0.28)
-}
-Library.TweenLibrary = {
-    SmallEffect   = TweenInfo.new(0.35,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),
-    WindowChanged = TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
-}
-function Library:Tween(obj,info,prop) TweenService:Create(obj,info,prop):Play() end
 function Library:Windowxgo(setup)
-    setup = setup or {}
-    setup.Title = setup.Title or "Window"
-    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl
-    setup.Size = setup.Size or Library.SizeLibrary.Default
-    setup.KeySystem = setup.KeySystem or false
-    setup.Logo = setup.Logo or "rbxassetid://7733920644"
-    setup.ToggleMethod = setup.ToggleMethod or "Application"
+    setup = setup or {};
+    setup.Title = setup.Title or "Window";
+    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
+    setup.Size = setup.Size or Library.SizeLibrary.Default;
+    setup.KeySystem = setup.KeySystem or false;
+    setup.Logo = setup.Logo or "rbxassetid://7733920644";
+    setup.ToggleMethod = setup.ToggleMethod or "Application";
 
     if setup.KeySystem then
-        setup.KeySystemInfo = setup.KeySystemInfo or {}
-        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System"
-        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end
-        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end
+        setup.KeySystemInfo = setup.KeySystemInfo or {};
+        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
+        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
+        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
     end
 
     local ScreenGui = Instance.new("ScreenGui")
@@ -3519,6 +3505,15 @@ function Library:Windowxgo(setup)
         "rbxassetid://84232108971708",
         "rbxassetid://82346289970840",
         "rbxassetid://128026533554414",
+        "rbxassetid://133304887576911",
+        "rbxassetid://115596943057489",
+        "rbxassetid://126166617256345",
+        "rbxassetid://102390024228083",
+        "rbxassetid://123144913127816",
+        "rbxassetid://79239446982187",
+        "rbxassetid://82946948263565",
+        "rbxassetid://103978538129672",
+        "rbxassetid://109910690533379",
         "rbxassetid://110959984143843"
     }
 
@@ -3532,6 +3527,7 @@ function Library:Windowxgo(setup)
     end
     local queue      = shuffle(table.clone(images))
     local queuePtr   = 1
+
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
 
