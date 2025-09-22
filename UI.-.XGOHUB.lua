@@ -3250,33 +3250,35 @@ end;
         blurEffect:Destroy()
     end))
 ------// UI.标题设置 [图片太难搞了，我都封了十几个号了(还浪费我时间) 本来是想带点颜色图片，但是太能封号了，就不搞了]   //-------------------------------------------------------------------------------------
+local TweenService = game:GetService("TweenService")
+local ContentProvider = game:GetService("ContentProvider")
+
+local Library = {}
+Library.SizeLibrary = {
+    Default   = UDim2.fromScale(0.6,0.7),
+    Loading   = UDim2.fromScale(0.4,0.22),
+    Auth      = UDim2.fromScale(0.4,0.28)
+}
+Library.TweenLibrary = {
+    SmallEffect   = TweenInfo.new(0.35,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),
+    WindowChanged = TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+}
+function Library:Tween(obj,info,prop) TweenService:Create(obj,info,prop):Play() end
 function Library:Windowxgo(setup)
-    setup = setup or {};
-    setup.Title = setup.Title or "Window";
-    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
-    setup.Size = setup.Size or Library.SizeLibrary.Default;
-    setup.KeySystem = setup.KeySystem or false;
-    setup.Logo = setup.Logo or "rbxassetid://7733920644";
-    setup.ToggleMethod = setup.ToggleMethod or "Application";
+    setup = setup or {}
+    setup.Title = setup.Title or "Window"
+    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl
+    setup.Size = setup.Size or Library.SizeLibrary.Default
+    setup.KeySystem = setup.KeySystem or false
+    setup.Logo = setup.Logo or "rbxassetid://7733920644"
+    setup.ToggleMethod = setup.ToggleMethod or "Application"
 
     if setup.KeySystem then
-        setup.KeySystemInfo = setup.KeySystemInfo or {};
-        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
-        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
+        setup.KeySystemInfo = setup.KeySystemInfo or {}
+        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System"
+        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end
+        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end
     end
-
-    local TweenService = game:GetService("TweenService")
-    local TopEffectConfig = {
-        TopLayerColor = Color3.fromRGB(15, 17, 20),
-        TopLayerTransparency = 0.6,
-        TopLayerBlurSize = 8,
-        LightningBaseColor = Color3.fromRGB(0, 255, 70),
-        BinaryTextColor = Color3.fromRGB(0, 255, 70)
-    }
-    local currentTheme = {
-        lightningColor = TopEffectConfig.LightningBaseColor
-    }
 
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
@@ -3524,13 +3526,12 @@ function Library:Windowxgo(setup)
     local function shuffle(t)
         for i = #t, 2, -1 do
             local j = math.random(i)
-            t[i], t],] = t],], t[i]
+            t[i], t[j] = t[j], t[i]
         end
         return t
     end
-    local queue = shuffle(table.clone(images))
-    local queuePtr = 1
-
+    local queue      = shuffle(table.clone(images))
+    local queuePtr   = 1
     local readyToLoad = Instance.new("BindableEvent")
     local nextToPreload = 2
 
@@ -3559,7 +3560,7 @@ function Library:Windowxgo(setup)
         BackgroundImage2.Image = queue[queuePtr]
         BackgroundImage2.ImageTransparency = 0
         BackgroundImage2.ScaleType = Enum.ScaleType.Stretch
-        BackgroundImage2.ZIndex = 1
+        BackgroundImage2.ZIndex = 2
     end
 
     local slideDuration = 1.5
@@ -3568,7 +3569,7 @@ function Library:Windowxgo(setup)
     local function slideSwitch()
         queuePtr = queuePtr + 1
         if queuePtr > #queue then
-            queue = shuffle(table.clone(images))
+            queue    = shuffle(table.clone(images))
             queuePtr = 1
         end
         BackgroundImage2.Image = queue[queuePtr]
@@ -3585,50 +3586,6 @@ function Library:Windowxgo(setup)
 
         readyToLoad:Fire()
     end
-
-    local topGradient = Instance.new("UIGradient")
-    topGradient.Name = "TopGradient"
-    topGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(55, 57, 61):ToTransparent(0.7)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 37, 41):ToTransparent(0.9))
-    })
-    topGradient.Rotation = 90
-    topGradient.ZIndex = 2
-    topGradient.Parent = MainFrame
-
-    local lightningFX = Instance.new("Frame")
-    lightningFX.Name = "LightningFX"
-    lightningFX.Size = UDim2.new(1, 0, 1, 0)
-    lightningFX.BackgroundTransparency = 1
-    lightningFX.ClipsDescendants = true
-    lightningFX.ZIndex = 3
-    lightningFX.Parent = MainFrame
-
-    local binaryOverlay = Instance.new("Frame")
-    binaryOverlay.Name = "BinaryOverlay"
-    binaryOverlay.Size = UDim2.new(1, 0, 1, 0)
-    binaryOverlay.BackgroundTransparency = 1
-    binaryOverlay.ClipsDescendants = true
-    binaryOverlay.ZIndex = 4
-    binaryOverlay.Parent = MainFrame
-
-    local TopLayer = Instance.new("Frame")
-    TopLayer.Name = "TopOverlayLayer"
-    TopLayer.Size = UDim2.new(1, 0, 1, 0)
-    TopLayer.Position = UDim2.new(0, 0, 0, 0)
-    TopLayer.BackgroundColor3 = TopEffectConfig.TopLayerColor
-    TopLayer.BackgroundTransparency = TopEffectConfig.TopLayerTransparency
-    TopLayer.ZIndex = 5
-    TopLayer.Parent = MainFrame
-
-    local layerBlur = Instance.new("UIGaussianBlur", TopLayer)
-    layerBlur.Size = TopEffectConfig.TopLayerBlurSize
-    local layerGradient = Instance.new("UIGradient", TopLayer)
-    layerGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, TopEffectConfig.TopLayerColor:ToTransparent(0.2)),
-        ColorSequenceKeypoint.new(1, TopEffectConfig.TopLayerColor:ToTransparent(0.8))
-    })
-    layerGradient.Rotation = 180
 
     ScreenGui.Parent = game.CoreGui
     ScreenGui.ResetOnSpawn = false
@@ -3683,91 +3640,9 @@ function Library:Windowxgo(setup)
     Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
     Ico.Image = setup.Logo
     Ico.ImageTransparency = 1.000
-    Ico.ZIndex = 6
 
     Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
     Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
-
-    task.spawn(function()
-        local colorIndex = 1
-        local gradientColorList = {
-            ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(55, 57, 61):ToTransparent(0.7)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 37, 41):ToTransparent(0.9))
-            }),
-            ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(45, 47, 51):ToTransparent(0.7)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 29, 33):ToTransparent(0.9))
-            }),
-            ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 52, 56):ToTransparent(0.7)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(32, 34, 38):ToTransparent(0.9))
-            })
-        }
-        while MainFrame.Parent do
-            TweenService:Create(topGradient, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-                Color = gradientColorList[colorIndex]
-            }):Play()
-            colorIndex = colorIndex % #gradientColorList + 1
-            task.wait(3)
-        end
-    end)
-
-    task.spawn(function()
-        while lightningFX.Parent and MainFrame.Parent do
-            local light = Instance.new("Frame", lightningFX)
-            light.BackgroundTransparency = 0.7
-            light.BackgroundColor3 = currentTheme.lightningColor
-            light.Size = UDim2.new(0, math.random(1, 3), 1, 0)
-            light.Position = UDim2.new(math.random(), 0, -1, 0)
-            light.ZIndex = 3
-            local tween = TweenService:Create(light, TweenInfo.new(math.random(0.3, 0.8), Enum.EasingStyle.Linear), {
-                Position = UDim2.new(light.Position.X.Scale, 0, 1, 0),
-                BackgroundTransparency = 1
-            })
-            tween:Play()
-            tween.Completed:Connect(function() light:Destroy() end)
-            task.wait(math.random() / 2)
-        end
-    end)
-
-    task.spawn(function()
-        while binaryOverlay.Parent and MainFrame.Parent do
-            local rainLine = Instance.new("TextLabel", binaryOverlay)
-            rainLine.Size = UDim2.new(0, 12, 1, 0)
-            rainLine.Position = UDim2.new(math.random(), 0, -1, 0)
-            rainLine.BackgroundTransparency = 1
-            rainLine.TextColor3 = TopEffectConfig.BinaryTextColor
-            rainLine.Font = Enum.Font.Code
-            rainLine.TextSize = 12
-            rainLine.TextWrapped = true
-            rainLine.ZIndex = 4
-            local binStr = ""
-            for i = 1, 80 do
-                binStr = binStr .. math.random(0, 1) .. "\n"
-            end
-            rainLine.Text = binStr
-            local anim = TweenService:Create(rainLine, TweenInfo.new(math.random(4, 8), Enum.EasingStyle.Linear), {
-                Position = UDim2.new(rainLine.Position.X.Scale, 0, 1, 0),
-                TextTransparency = 1
-            })
-            anim:Play()
-            anim.Completed:Connect(function() rainLine:Destroy() end)
-            task.wait(0.05)
-        end
-    end)
-
-    task.spawn(function()
-        local hue = 0
-        while MainFrame.Parent do
-            hue = (hue + 0.001) % 1
-            currentTheme.lightningColor = Color3.fromHSV(hue, 0.8, 1)
-            TweenService:Create(TopLayer, TweenInfo.new(0.5), {
-                BackgroundColor3 = currentTheme.lightningColor:ToDark()
-            }):Play()
-            task.wait(0.01)
-        end
-    end)
 
     if setup.KeySystem then
         setup.KeySystemInfo.Enabled = true
