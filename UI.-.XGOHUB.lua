@@ -3472,7 +3472,30 @@ function Library:Windowxgo(setup)
         "rbxassetid://124654545008108",
         "rbxassetid://107543563766576",
         "rbxassetid://140470105657328",
-        "rbxassetid://94012779929465"
+        "rbxassetid://127156369853054",
+        "rbxassetid://139231861561162",
+        "rbxassetid://107998598717671",
+        "rbxassetid://111897067138898",
+        "rbxassetid://116877712033558",
+        "rbxassetid://116620023248466",
+        "rbxassetid://86460781810387",
+        "rbxassetid://73975551091315",
+        "rbxassetid://117709550322697",
+        "rbxassetid://116165310785038",
+        "rbxassetid://94012779929465",
+        "rbxassetid://133736556529411",
+        "rbxassetid://94809076430989",
+        "rbxassetid://115310146111153",
+        "rbxassetid://125302086691409",
+        "rbxassetid://101380046568181",
+        "rbxassetid://106150411139616",
+        "rbxassetid://137038400436863",
+        "rbxassetid://73207447927464",
+        "rbxassetid://98145179912744",
+        "rbxassetid://96305522672800",
+        "rbxassetid://138700398520302",
+        "rbxassetid://110227632017153",
+        "rbxassetid://110959984143843"
     }
 
     math.randomseed(tick())
