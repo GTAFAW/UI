@@ -3250,278 +3250,184 @@ end;
         blurEffect:Destroy()
     end))
 ------// UI.标题设置 [图片太难搞了，我都封了十几个号了(还浪费我时间) 本来是想带点颜色图片，但是太能封号了，就不搞了]   //-------------------------------------------------------------------------------------
+--[[=================  完整 Windowxgo（带 MP4 启动背景）  =================]]
 function Library:Windowxgo(setup)
-    setup = setup or {};
-    setup.Title = setup.Title or "Window";
-    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl;
-    setup.Size = setup.Size or Library.SizeLibrary.Default;
-    setup.KeySystem = setup.KeySystem or false;
-    setup.Logo = setup.Logo or "rbxassetid://7733920644";
-    setup.ToggleMethod = setup.ToggleMethod or "Application";
-    setup.VideoUrl = setup.VideoUrl or "https://github.com/GTAFAW/-/raw/main/背景.mp4?raw=true"
+    setup = setup or {}
+    setup.Title = setup.Title or "Window"
+    setup.Keybind = setup.Keybind or Enum.KeyCode.LeftControl
+    setup.Size = setup.Size or Library.SizeLibrary.Default
+    setup.KeySystem = setup.KeySystem or false
+    setup.Logo = setup.Logo or "rbxassetid://7733920644"
+    setup.ToggleMethod = setup.ToggleMethod or "Application"
 
     if setup.KeySystem then
-        setup.KeySystemInfo = setup.KeySystemInfo or {};
-        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System";
-        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end;
-        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end;
+        setup.KeySystemInfo = setup.KeySystemInfo or {}
+        setup.KeySystemInfo.Title = setup.KeySystemInfo.Title or "Key System"
+        setup.KeySystemInfo.OnGetKey = setup.KeySystemInfo.OnGetKey or function() end
+        setup.KeySystemInfo.OnLogin = setup.KeySystemInfo.OnLogin or function() wait(0.1) return true end
     end
 
+    ---------- 基础实例 ----------
     local ScreenGui = Instance.new("ScreenGui")
     local MainFrame = Instance.new("Frame")
-    local VideoFrame = Instance.new("VideoFrame")
     local BackgroundImage1 = Instance.new("ImageLabel")
     local BackgroundImage2 = Instance.new("ImageLabel")
     local DropShadow = Instance.new("ImageLabel")
     local Ico = Instance.new("ImageLabel")
 
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.IgnoreGuiInset = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = ScreenGui
+    MainFrame.Active = true
+    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    MainFrame.BackgroundTransparency = 0.25
+    MainFrame.BorderSizePixel = 0
+    MainFrame.ClipsDescendants = true
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.Size = UDim2.fromScale(0, 0)
+
+    ---------- MP4 启动背景 ----------
+    local function playMp4ThenStartOldLogic(onDone)
+        local vid = Instance.new("VideoFrame")
+        vid.Name = "StartupVideo"
+        vid.Size = UDim2.new(1, 0, 1, 0)
+        vid.Position = UDim2.new(0, 0, 0, 0)
+        vid.BackgroundTransparency = 1
+        vid.ZIndex = 999
+        vid.Parent = MainFrame
+
+        local url = "https://github.com/GTAFAW/-/raw/main/背景.mp4?raw=true"
+        local ts = game:GetService("TweenService")
+        local cp = game:GetService("ContentProvider")
+
+        task.spawn(function()
+            local ok, bin = pcall(game.HttpGet, game, url, true)
+            if not ok then
+                warn("视频下载失败，直接进图片轮播")
+                vid:Destroy()
+                onDone()
+                return
+            end
+            local writeOk, writeErr = pcall(writefile, "temp_start_bg.mp4", bin)
+            if not writeOk then
+                warn("无法写入临时文件:", writeErr)
+                vid:Destroy()
+                onDone()
+                return
+            end
+
+            vid.Video = "rbxasset://temp_start_bg.mp4"
+            cp:PreloadAsync({vid})
+
+            -- 淡入+播放
+            vid.ImageTransparency = 1
+            ts:Create(vid, TweenInfo.new(0.6), {ImageTransparency = 0}):Play()
+            vid:Play()
+
+            -- 等待结束或 15 s 超时
+            local done = false
+            vid.Ended:Connect(function() done = true end)
+            local t = 0
+            while not done and t < 15 do task.wait(0.1); t = t + 0.1 end
+
+            -- 淡出
+            local fade = ts:Create(vid, TweenInfo.new(0.6), {ImageTransparency = 1})
+            fade.Completed:Connect(function() vid:Destroy() end)
+            fade:Play()
+
+            onDone()
+        end)
+    end
+
+    ---------- 原图片轮播逻辑 ----------
     local images = {
-        "rbxassetid://113180426865309",
-        "rbxassetid://127110756366496",
-        "rbxassetid://131471211520335",
-        "rbxassetid://102428625138886",
-        "rbxassetid://137332235358973",
-        "rbxassetid://109520199976167",
-        "rbxassetid://122958225353990",
-        "rbxassetid://140434608197988",
-        "rbxassetid://124568548523146",
-        "rbxassetid://76544783777123",
-        "rbxassetid://117347134697321",
-        "rbxassetid://98554545052070",
-        "rbxassetid://131266490485584",
-        "rbxassetid://131496206276220",
-        "rbxassetid://109752539854084",
-        "rbxassetid://70869793345513",
-        "rbxassetid://81618536870963",
-        "rbxassetid://96996068161496",
-        "rbxassetid://92875796313338",
-        "rbxassetid://89067121877834",
-        "rbxassetid://113186601959200",
-        "rbxassetid://73164000772284",
-        "rbxassetid://101305557601423",
-        "rbxassetid://104067029112641",
-        "rbxassetid://110630445580007",
-        "rbxassetid://108644687915512",
-        "rbxassetid://86540442133927",
-        "rbxassetid://107018855884545",
-        "rbxassetid://112966984941036",
-        "rbxassetid://80598426066070",
-        "rbxassetid://108391089326665",
-        "rbxassetid://138013328013091",
-        "rbxassetid://110990525726887",
-        "rbxassetid://72760885562855",
-        "rbxassetid://82117275977223",
-        "rbxassetid://80695281901172",
-        "rbxassetid://123238115911519",
-        "rbxassetid://135035617747628",
-        "rbxassetid://74297023080665",
-        "rbxassetid://84550607098866",
-        "rbxassetid://132992677171078",
-        "rbxassetid://126722695077251",
-        "rbxassetid://82915814593812",
-        "rbxassetid://105485276493469",
-        "rbxassetid://107983351429754",
-        "rbxassetid://121439238665385",
-        "rbxassetid://135083937747387",
-        "rbxassetid://130643405858214",
-        "rbxassetid://102409437463046",
-        "rbxassetid://87780505852956",
-        "rbxassetid://137945894459284",
-        "rbxassetid://101196101249400",
-        "rbxassetid://73934456979168",
-        "rbxassetid://124323332173934",
-        "rbxassetid://71240399712190",
-        "rbxassetid://127390304118462",
-        "rbxassetid://131409006813490",
-        "rbxassetid://80253796704859",
-        "rbxassetid://129206776380514",
-        "rbxassetid://121697617411442",
-        "rbxassetid://129410104830757",
-        "rbxassetid://71101554362190",
-        "rbxassetid://117937637678090",
-        "rbxassetid://89768207500333",
-        "rbxassetid://136363102949077",
-        "rbxassetid://74648780628027",
-        "rbxassetid://103232778626018",
-        "rbxassetid://76127155963189",
-        "rbxassetid://118305240093538",
-        "rbxassetid://112630176374798",
-        "rbxassetid://74804451529535",
-        "rbxassetid://115691043156297",
-        "rbxassetid://100980082510772",
-        "rbxassetid://135027711714247",
-        "rbxassetid://124541797505196",
-        "rbxassetid://136302622336157",
-        "rbxassetid://74234951901491",
-        "rbxassetid://76489725657019",
-        "rbxassetid://77202377271252",
-        "rbxassetid://81630003819439",
-        "rbxassetid://134782997900491",
-        "rbxassetid://101854737639056",
-        "rbxassetid://88726485475708",
-        "rbxassetid://124568043722207",
-        "rbxassetid://113389633674712",
-        "rbxassetid://71709407546541",
-        "rbxassetid://74810011141203",
-        "rbxassetid://106797147237700",
-        "rbxassetid://116081430548815",
-        "rbxassetid://112444706829621",
-        "rbxassetid://134571872103628",
-        "rbxassetid://92696377732743",
-        "rbxassetid://130172199019796",
-        "rbxassetid://82973093488258",
-        "rbxassetid://112015821138471",
-        "rbxassetid://106309267111813",
-        "rbxassetid://133651749360024",
-        "rbxassetid://125782190205971",
-        "rbxassetid://128380863807712",
-        "rbxassetid://118455934351458",
-        "rbxassetid://122027031695528",
-        "rbxassetid://105338484595056",
-        "rbxassetid://108356962585041",
-        "rbxassetid://94727756963238",
-        "rbxassetid://113369060406991",
-        "rbxassetid://113055700957332",
-        "rbxassetid://133933401543170",
-        "rbxassetid://101200437987764",
-        "rbxassetid://102653297586366",
-        "rbxassetid://107740168905807",
-        "rbxassetid://88737575142626",
-        "rbxassetid://113517553044113",
-        "rbxassetid://121228817458631",
-        "rbxassetid://140445692483001",
-        "rbxassetid://97012657684546",
-        "rbxassetid://109770441736776",
-        "rbxassetid://139654589284248",
-        "rbxassetid://114899818362023",
-        "rbxassetid://94168650195717",
-        "rbxassetid://74708237561928",
-        "rbxassetid://75220063478126",
-        "rbxassetid://89442009784136",
-        "rbxassetid://81363371302614",
-        "rbxassetid://95090127115921",
-        "rbxassetid://94878761352866",
-        "rbxassetid://82649085151065",
-        "rbxassetid://124416711850893",
-        "rbxassetid://71541255764950",
-        "rbxassetid://92209087296658",
-        "rbxassetid://73571655606342",
-        "rbxassetid://102206003630031",
-        "rbxassetid://125872498375333",
-        "rbxassetid://70537644787136",
-        "rbxassetid://108141030464504",
-        "rbxassetid://130832323012705",
-        "rbxassetid://115780740644704",
-        "rbxassetid://107295158179635",
-        "rbxassetid://116751947898355",
-        "rbxassetid://132823720486657",
-        "rbxassetid://81355674663745",
-        "rbxassetid://86901429245502",
-        "rbxassetid://126080756779973",
-        "rbxassetid://138383310224168",
-        "rbxassetid://76134729494740",
-        "rbxassetid://72802464061362",
-        "rbxassetid://73405041245010",
-        "rbxassetid://86394372063922",
-        "rbxassetid://79115724459093",
-        "rbxassetid://84892452493812",
-        "rbxassetid://96632550808361",
-        "rbxassetid://111291297728859",
-        "rbxassetid://71088729747878",
-        "rbxassetid://94127212697054",
-        "rbxassetid://94670853484450",
-        "rbxassetid://84501277764876",
-        "rbxassetid://114562666643192",
-        "rbxassetid://128148926071071",
-        "rbxassetid://107276323783937",
-        "rbxassetid://123536850708087",
-        "rbxassetid://133973741652591",
-        "rbxassetid://110262168733075",
-        "rbxassetid://99789427813459",
-        "rbxassetid://99161375032581",
-        "rbxassetid://84104871915173",
-        "rbxassetid://106230457114489",
-        "rbxassetid://103723728627500",
-        "rbxassetid://94099932651901",
-        "rbxassetid://71739369133999",
-        "rbxassetid://80208998151441",
-        "rbxassetid://115102242642298",
-        "rbxassetid://109237906599032",
-        "rbxassetid://102037877532355",
-        "rbxassetid://104449436840656",
-        "rbxassetid://83867199796687",
-        "rbxassetid://82305053286251",
-        "rbxassetid://86823824398022",
-        "rbxassetid://108446068418020",
-        "rbxassetid://94124608866451",
-        "rbxassetid://95796471721634",
-        "rbxassetid://116293176150668",
-        "rbxassetid://106566765380951",
-        "rbxassetid://98952218855010",
-        "rbxassetid://79123917378703",
-        "rbxassetid://117851300780884",
-        "rbxassetid://121423323859594",
-        "rbxassetid://112633911945609",
-        "rbxassetid://120900166533466",
-        "rbxassetid://90941887059454",
-        "rbxassetid://135856219822004",
-        "rbxassetid://129092998323189",
-        "rbxassetid://76153019426226",
-        "rbxassetid://105863376128836",
-        "rbxassetid://101612120099624",
-        "rbxassetid://128842054892093",
-        "rbxassetid://91679037471961",
-        "rbxassetid://124654545008108",
-        "rbxassetid://107543563766576",
-        "rbxassetid://140470105657328",
-        "rbxassetid://127156369853054",
-        "rbxassetid://139231861561162",
-        "rbxassetid://107998598717671",
-        "rbxassetid://111897067138898",
-        "rbxassetid://116877712033558",
-        "rbxassetid://116620023248466",
-        "rbxassetid://86460781810387",
-        "rbxassetid://73975551091315",
-        "rbxassetid://117709550322697",
-        "rbxassetid://116165310785038",
-        "rbxassetid://94012779929465",
-        "rbxassetid://133736556529411",
-        "rbxassetid://94809076430989",
-        "rbxassetid://115310146111153",
-        "rbxassetid://125302086691409",
-        "rbxassetid://101380046568181",
-        "rbxassetid://106150411139616",
-        "rbxassetid://137038400436863",
-        "rbxassetid://73207447927464",
-        "rbxassetid://98145179912744",
-        "rbxassetid://96305522672800",
-        "rbxassetid://138700398520302",
-        "rbxassetid://110227632017153",
-        "rbxassetid://117159041948047",
-        "rbxassetid://99118578473360",
-        "rbxassetid://109946960265463",
-        "rbxassetid://72857962777831",
-        "rbxassetid://105045186567254",
-        "rbxassetid://104325173765974",
-        "rbxassetid://122991333146056",
-        "rbxassetid://84232108971708",
-        "rbxassetid://82346289970840",
-        "rbxassetid://128026533554414",
-        "rbxassetid://133304887576911",
-        "rbxassetid://115596943057489",
-        "rbxassetid://126166617256345",
-        "rbxassetid://102390024228083",
-        "rbxassetid://123144913127816",
-        "rbxassetid://79239446982187",
-        "rbxassetid://82946948263565",
-        "rbxassetid://103978538129672",
-        "rbxassetid://109910690533379",
-        "rbxassetid://102758966602051",
-        "rbxassetid://89176731754122",
-        "rbxassetid://91724363419315",
-        "rbxassetid://83870387504302",
-        "rbxassetid://111060921599915",
-        "rbxassetid://116604936921153",
+        "rbxassetid://113180426865309", "rbxassetid://127110756366496", "rbxassetid://131471211520335",
+        "rbxassetid://102428625138886", "rbxassetid://137332235358973", "rbxassetid://109520199976167",
+        "rbxassetid://122958225353990", "rbxassetid://140434608197988", "rbxassetid://124568548523146",
+        "rbxassetid://76544783777123", "rbxassetid://117347134697321", "rbxassetid://98554545052070",
+        "rbxassetid://131266490485584", "rbxassetid://131496206276220", "rbxassetid://109752539854084",
+        "rbxassetid://70869793345513", "rbxassetid://81618536870963", "rbxassetid://96996068161496",
+        "rbxassetid://92875796313338", "rbxassetid://89067121877834", "rbxassetid://113186601959200",
+        "rbxassetid://73164000772284", "rbxassetid://101305557601423", "rbxassetid://104067029112641",
+        "rbxassetid://110630445580007", "rbxassetid://108644687915512", "rbxassetid://86540442133927",
+        "rbxassetid://107018855884545", "rbxassetid://112966984941036", "rbxassetid://80598426066070",
+        "rbxassetid://108391089326665", "rbxassetid://138013328013091", "rbxassetid://110990525726887",
+        "rbxassetid://72760885562855", "rbxassetid://82117275977223", "rbxassetid://80695281901172",
+        "rbxassetid://123238115911519", "rbxassetid://135035617747628", "rbxassetid://74297023080665",
+        "rbxassetid://84550607098866", "rbxassetid://132992677171078", "rbxassetid://126722695077251",
+        "rbxassetid://82915814593812", "rbxassetid://105485276493469", "rbxassetid://107983351429754",
+        "rbxassetid://121439238665385", "rbxassetid://135083937747387", "rbxassetid://130643405858214",
+        "rbxassetid://102409437463046", "rbxassetid://87780505852956", "rbxassetid://137945894459284",
+        "rbxassetid://101196101249400", "rbxassetid://73934456979168", "rbxassetid://124323332173934",
+        "rbxassetid://71240399712190", "rbxassetid://127390304118462", "rbxassetid://131409006813490",
+        "rbxassetid://80253796704859", "rbxassetid://129206776380514", "rbxassetid://121697617411442",
+        "rbxassetid://129410104830757", "rbxassetid://71101554362190", "rbxassetid://117937637678090",
+        "rbxassetid://89768207500333", "rbxassetid://136363102949077", "rbxassetid://74648780628027",
+        "rbxassetid://103232778626018", "rbxassetid://76127155963189", "rbxassetid://118305240093538",
+        "rbxassetid://112630176374798", "rbxassetid://74804451529535", "rbxassetid://115691043156297",
+        "rbxassetid://100980082510772", "rbxassetid://135027711714247", "rbxassetid://124541797505196",
+        "rbxassetid://136302622336157", "rbxassetid://74234951901491", "rbxassetid://76489725657019",
+        "rbxassetid://77202377271252", "rbxassetid://81630003819439", "rbxassetid://134782997900491",
+        "rbxassetid://101854737639056", "rbxassetid://88726485475708", "rbxassetid://124568043722207",
+        "rbxassetid://113389633674712", "rbxassetid://71709407546541", "rbxassetid://74810011141203",
+        "rbxassetid://106797147237700", "rbxassetid://116081430548815", "rbxassetid://112444706829621",
+        "rbxassetid://134571872103628", "rbxassetid://92696377732743", "rbxassetid://130172199019796",
+        "rbxassetid://82973093488258", "rbxassetid://112015821138471", "rbxassetid://106309267111813",
+        "rbxassetid://133651749360024", "rbxassetid://125782190205971", "rbxassetid://128380863807712",
+        "rbxassetid://118455934351458", "rbxassetid://122027031695528", "rbxassetid://105338484595056",
+        "rbxassetid://108356962585041", "rbxassetid://94727756963238", "rbxassetid://113369060406991",
+        "rbxassetid://113055700957332", "rbxassetid://133933401543170", "rbxassetid://101200437987764",
+        "rbxassetid://102653297586366", "rbxassetid://107740168905807", "rbxassetid://88737575142626",
+        "rbxassetid://113517553044113", "rbxassetid://121228817458631", "rbxassetid://140445692483001",
+        "rbxassetid://97012657684546", "rbxassetid://109770441736776", "rbxassetid://139654589284248",
+        "rbxassetid://114899818362023", "rbxassetid://94168650195717", "rbxassetid://74708237561928",
+        "rbxassetid://75220063478126", "rbxassetid://89442009784136", "rbxassetid://81363371302614",
+        "rbxassetid://95090127115921", "rbxassetid://94878761352866", "rbxassetid://82649085151065",
+        "rbxassetid://124416711850893", "rbxassetid://71541255764950", "rbxassetid://92209087296658",
+        "rbxassetid://73571655606342", "rbxassetid://102206003630031", "rbxassetid://125872498375333",
+        "rbxassetid://70537644787136", "rbxassetid://108141030464504", "rbxassetid://130832323012705",
+        "rbxassetid://115780740644704", "rbxassetid://107295158179635", "rbxassetid://116751947898355",
+        "rbxassetid://132823720486657", "rbxassetid://81355674663745", "rbxassetid://86901429245502",
+        "rbxassetid://126080756779973", "rbxassetid://138383310224168", "rbxassetid://76134729494740",
+        "rbxassetid://72802464061362", "rbxassetid://73405041245010", "rbxassetid://86394372063922",
+        "rbxassetid://79115724459093", "rbxassetid://84892452493812", "rbxassetid://96632550808361",
+        "rbxassetid://111291297728859", "rbxassetid://71088729747878", "rbxassetid://94127212697054",
+        "rbxassetid://94670853484450", "rbxassetid://84501277764876", "rbxassetid://114562666643192",
+        "rbxassetid://128148926071071", "rbxassetid://107276323783937", "rbxassetid://123536850708087",
+        "rbxassetid://133973741652591", "rbxassetid://110262168733075", "rbxassetid://99789427813459",
+        "rbxassetid://99161375032581", "rbxassetid://84104871915173", "rbxassetid://106230457114489",
+        "rbxassetid://103723728627500", "rbxassetid://94099932651901", "rbxassetid://71739369133999",
+        "rbxassetid://80208998151441", "rbxassetid://115102242642298", "rbxassetid://109237906599032",
+        "rbxassetid://102037877532355", "rbxassetid://104449436840656", "rbxassetid://83867199796687",
+        "rbxassetid://82305053286251", "rbxassetid://86823824398022", "rbxassetid://108446068418020",
+        "rbxassetid://94124608866451", "rbxassetid://95796471721634", "rbxassetid://116293176150668",
+        "rbxassetid://106566765380951", "rbxassetid://98952218855010", "rbxassetid://79123917378703",
+        "rbxassetid://117851300780884", "rbxassetid://121423323859594", "rbxassetid://112633911945609",
+        "rbxassetid://120900166533466", "rbxassetid://90941887059454", "rbxassetid://135856219822004",
+        "rbxassetid://129092998323189", "rbxassetid://76153019426226", "rbxassetid://105863376128836",
+        "rbxassetid://101612120099624", "rbxassetid://128842054892093", "rbxassetid://91679037471961",
+        "rbxassetid://124654545008108", "rbxassetid://107543563766576", "rbxassetid://140470105657328",
+        "rbxassetid://127156369853054", "rbxassetid://139231861561162", "rbxassetid://107998598717671",
+        "rbxassetid://111897067138898", "rbxassetid://116877712033558", "rbxassetid://116620023248466",
+        "rbxassetid://86460781810387", "rbxassetid://73975551091315", "rbxassetid://117709550322697",
+        "rbxassetid://116165310785038", "rbxassetid://94012779929465", "rbxassetid://133736556529411",
+        "rbxassetid://94809076430989", "rbxassetid://115310146111153", "rbxassetid://125302086691409",
+        "rbxassetid://101380046568181", "rbxassetid://106150411139616", "rbxassetid://137038400436863",
+        "rbxassetid://73207447927464", "rbxassetid://98145179912744", "rbxassetid://96305522672800",
+        "rbxassetid://138700398520302", "rbxassetid://110227632017153", "rbxassetid://117159041948047",
+        "rbxassetid://99118578473360", "rbxassetid://109946960265463", "rbxassetid://72857962777831",
+        "rbxassetid://105045186567254", "rbxassetid://104325173765974", "rbxassetid://122991333146056",
+        "rbxassetid://84232108971708", "rbxassetid://82346289970840", "rbxassetid://128026533554414",
+        "rbxassetid://133304887576911", "rbxassetid://115596943057489", "rbxassetid://126166617256345",
+        "rbxassetid://102390024228083", "rbxassetid://123144913127816", "rbxassetid://79239446982187",
+        "rbxassetid://82946948263565", "rbxassetid://103978538129672", "rbxassetid://109910690533379",
+        "rbxassetid://102758966602051", "rbxassetid://89176731754122", "rbxassetid://91724363419315",
+        "rbxassetid://83870387504302", "rbxassetid://111060921599915", "rbxassetid://116604936921153",
         "rbxassetid://110959984143843"
     }
 
@@ -3529,45 +3435,16 @@ function Library:Windowxgo(setup)
     local function shuffle(t)
         for i = #t, 2, -1 do
             local j = math.random(i)
-            t[i], t],] = t],], t[i]
+            t[i], t[j] = t[j], t[i]
         end
         return t
     end
-    local queue      = shuffle(table.clone(images))
-    local queuePtr   = 1
-    local isVideoPlayed = false
+    local queue    = shuffle(table.clone(images))
+    local queuePtr = 1
 
     local readyToLoad = Instance.new("BindableEvent")
-    local nextToPreload = 2
 
-    task.spawn(function()
-        game:GetService("ContentProvider"):PreloadAsync({setup.VideoUrl})
-        game:GetService("ContentProvider"):PreloadAsync(images)
-    end)
-
-    local preloader = Instance.new("ImageLabel")
-    preloader.Visible = false
-    preloader.Parent = ScreenGui
-
-    local function initVideoBackground()
-        VideoFrame.Parent = MainFrame
-        VideoFrame.BackgroundTransparency = 1
-        VideoFrame.Size = UDim2.new(1, 0, 1, 0)
-        VideoFrame.Position = UDim2.new(0, 0, 0, 0)
-        VideoFrame.Video = setup.VideoUrl
-        VideoFrame.Looped = false
-        VideoFrame.Playing = true
-        VideoFrame.ZIndex = 1
-
-        VideoFrame.Ended:Connect(function()
-            isVideoPlayed = true
-            VideoFrame.Visible = false
-            initImageBackgrounds()
-            slideSwitch()
-        end)
-    end
-
-    local function initImageBackgrounds()
+    local function initBackgrounds()
         BackgroundImage1.Parent = MainFrame
         BackgroundImage1.BackgroundTransparency = 1
         BackgroundImage1.Size = UDim2.new(1, 0, 1, 0)
@@ -3588,10 +3465,9 @@ function Library:Windowxgo(setup)
     end
 
     local slideDuration = 1.5
-    local interval = 13.5
+    local interval      = 13.5
 
     local function slideSwitch()
-        if not isVideoPlayed then return end
         queuePtr = queuePtr + 1
         if queuePtr > #queue then
             queue    = shuffle(table.clone(images))
@@ -3612,68 +3488,52 @@ function Library:Windowxgo(setup)
         readyToLoad:Fire()
     end
 
-    ScreenGui.Parent = game.CoreGui
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.IgnoreGuiInset = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-
-    MainFrame.Name = "MainFrame"
-    MainFrame.Parent = ScreenGui
-    MainFrame.Active = true
-    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    MainFrame.BackgroundTransparency = 0.250
-    MainFrame.BorderSizePixel = 0
-    MainFrame.ClipsDescendants = true
-    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    MainFrame.Size = UDim2.fromScale(0, 0)
-
-    initVideoBackground()
-
-    task.spawn(function()
-        while true do
-            task.wait(interval)
-            if isVideoPlayed then
+    -- 启动视频 → 图片轮播
+    playMp4ThenStartOldLogic(MainFrame, function()
+        initBackgrounds()
+        task.spawn(function()
+            while true do
+                task.wait(interval)
                 slideSwitch()
             end
-        end
+        end)
+        readyToLoad:Fire()
     end)
 
-    readyToLoad:Fire()
-
+    ---------- 其余 UI ----------
     local BlurEle = Library.UIBlur.new(MainFrame, true)
 
     DropShadow.Name = "DropShadow"
     DropShadow.Parent = MainFrame
-    DropShadow.BackgroundTransparency = 1.000
+    DropShadow.BackgroundTransparency = 1
     DropShadow.Position = UDim2.new(0, -5, 0, -5)
-    DropShadow.Rotation = 0.010
+    DropShadow.Rotation = 0.01
     DropShadow.Size = UDim2.new(1, 10, 1, 10)
     DropShadow.ZIndex = -5
     DropShadow.Image = "rbxassetid://297694300"
     DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    DropShadow.ImageTransparency = 0.500
+    DropShadow.ImageTransparency = 0.5
     DropShadow.ScaleType = Enum.ScaleType.Slice
     DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-    DropShadow.SliceScale = 0.050
+    DropShadow.SliceScale = 0.05
 
     Ico.Name = "Ico"
     Ico.Parent = MainFrame
     Ico.AnchorPoint = Vector2.new(0.5, 0.5)
-    Ico.BackgroundTransparency = 1.000
+    Ico.BackgroundTransparency = 1
     Ico.BorderSizePixel = 0
     Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Ico.Size = UDim2.new(0.600000024, 0, 0.600000024, 0)
+    Ico.Size = UDim2.new(0.6, 0, 0.6, 0)
     Ico.SizeConstraint = Enum.SizeConstraint.RelativeYY
     Ico.Image = setup.Logo
-    Ico.ImageTransparency = 1.000
+    Ico.ImageTransparency = 1
 
     Library:Tween(MainFrame, Library.TweenLibrary.SmallEffect, {Size = Library.SizeLibrary.Loading})
     Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 0.25})
 
     if setup.KeySystem then
         setup.KeySystemInfo.Enabled = true
-        setup.KeySystemInfo.Finished = Instance.new('BindableEvent')
+        setup.KeySystemInfo.Finished = Instance.new("BindableEvent")
 
         task.wait(1)
 
