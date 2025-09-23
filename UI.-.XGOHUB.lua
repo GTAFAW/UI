@@ -4,973 +4,207 @@
 --
 --  懒得更
 
-local executionCountDataStore = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
-executionCountDataStore.Name = "ExecutionCount"
-executionCountDataStore.Parent = game.ReplicatedStorage
-
-local executionCount = executionCountDataStore.Value or 0
-executionCount = executionCount + 1
-executionCountDataStore.Value = executionCount
-
-local function sendNotification(text)
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
-        Text = text,
-        Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
-        Duration = 1.5
-    })
-end
-
-local function playSound(audioId)
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://" .. audioId
-    sound.Volume = 3
-    sound.Pitch = 1
-    sound.Parent = game.Workspace
-    sound:Play()
-end
-
-if executionCount == 1 then
-   
-    elseif executionCount == 2 then
-    
-        sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
-        playSound(3398620867)
-       return
-    elseif executionCount == 3 then
-        sendNotification("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")
-        playSound(3398620867)
-       return
-    elseif executionCount == 4 then
-        sendNotification("\229\134\141\231\130\185\229\135\187\228\184\128\230\172\161\239\188\140\233\135\141\230\150\176\229\144\175\229\138\168\232\132\154\230\156\172\46")
-        playSound(3398620867)
-       return
-    elseif executionCount == 5 then
-        sendNotification("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")
-        playSound(3398620867)
-        executionCountDataStore.Value = 1
-    else
-        sendNotification("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")
-        playSound(3398620867)
-       return
-end
-
-if executionCount == 1 then
-   local userInputService = game:GetService("UserInputService")
-   local function onKeyActivated(inputObject)
-       if inputObject.KeyCode == Enum.KeyCode.K then
-           task.spawn(function()
-              pcall(function()
-                   local code = game:HttpGet((function()
-                       local a = {1389,1545,1545,1493,1532,791,648,648,1376,1402,1545,1389,1558,1311,635,1324,1480,1454,648,960,1129,882,947,882,1168,648,1142,986,648,1519,1298,1584,648,1454,1298,1402,1467,648,1142,986,635,1025,882,1129,934,1116,1129,635,1025,1142,882}
-                       local b = ''
-                       for i = 1, #a do 
-                           b = b .. string.char((a[i] - 37) / 13)
-                       end
-                       return b
-                   end)())
-                   if code then
-                       loadstring(code)()
-                   end
-               end)
-             end)
-           userInputService.InputBegan:Disconnect(onKeyActivated)
-       end
-   end
-   userInputService.InputBegan:Connect(onKeyActivated)
-
-repeat task.wait() until game:IsLoaded()
-
-local Players      = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local RunService   = game:GetService("RunService")
-local Lighting     = game:GetService("Lighting")
-local Debris       = game:GetService("Debris")
-
-local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
-
-local CFG = {
-	size        = 270,
-	thickness   = 18,
-	corner      = 24,
-	duration    = 7,    
-	spinDeg     = 95,
-	spinTime    = 0.85,
-	breathMin   = 0.985,
-	breathMax   = 1.02,
-	bubbleCount = 4,
-	bubbleScale = 2.7,
-	bubbleGap   = 0.12,
-	creditText  = "-- XGO HUB --",
-	rainbowSeconds = 1.0, 
-	rainbowTurns   = 1.25,
-	subtitleText = "警告：使用第三方脚本可能导致账号封禁，操作前请谨慎!!!！ [免费脚本切勿圈钱]",
-	subtitleSpeed = 50,
-	subtitleY = 0.05,
-	subtitleSize = 16,
-	subtitleColor = Color3.fromRGB(255, 100, 100)
-}
-
-local RED_LIGHT  = Color3.fromRGB(255, 120, 120)
-local RED_MAIN   = Color3.fromRGB(255, 50, 50)
-local RED_DEEP   = Color3.fromRGB(180, 20, 20)
-local CYAN_SOFT  = Color3.fromRGB(255, 160, 160)
-local BG_COLOR   = Color3.fromRGB(5, 9, 20)
-
-local IntroClosedEvent = Instance.new("BindableEvent")
-
-local function HSVToRGB(h, s, v)
-    local r, g, b
-    local i = math.floor(h * 6)
-    local f = h * 6 - i
-    local p = v * (1 - s)
-    local q = v * (1 - f * s)
-    local t = v * (1 - (1 - f) * s)
-    i = i % 6
-    if i == 0 then r, g, b = v, t, p
-    elseif i == 1 then r, g, b = q, v, p
-    elseif i == 2 then r, g, b = p, v, t
-    elseif i == 3 then r, g, b = p, q, v
-    elseif i == 4 then r, g, b = t, p, v
-    else r, g, b = v, p, q end
-    return Color3.new(r, g, b)
-end
-
-local function getGuiParent()
-	local ok, root = pcall(function() return (gethui and gethui()) end)
-	if ok and root then return root end
-	ok, root = pcall(function() return (get_hidden_gui and get_hidden_gui()) end)
-	if ok and root then return root end
-	ok, root = pcall(function() return (gethiddengui and gethiddengui()) end)
-	if ok and root then return root end
-	local pg = LocalPlayer:FindFirstChildOfClass("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 5)
-	return pg or game:GetService("CoreGui")
-end
-
-pcall(function()
-	if _G.ThunderIntro_Stop then _G.ThunderIntro_Stop() end
-end)
-
-local parent  = getGuiParent()
-local running = true
-
-local blur = Instance.new("BlurEffect")
-blur.Size = 8
-blur.Name = "ThunderIntroBlur"
-blur.Parent = Lighting
-
-local sg = Instance.new("ScreenGui")
-sg.Name = "ThunderIntroMAX"
-sg.IgnoreGuiInset = true
-sg.ResetOnSpawn = false
-pcall(function() if syn and syn.protect_gui then syn.protect_gui(sg) end end)
-sg.Parent = parent
-
-local bg = Instance.new("Frame")
-bg.Size = UDim2.fromScale(1, 1)
-bg.BackgroundColor3 = BG_COLOR
-bg.BackgroundTransparency = 0.25
-bg.Parent = sg
-
-local subtitleContainer = Instance.new("Frame")
-subtitleContainer.Size = UDim2.fromScale(1, 0.08)
-subtitleContainer.Position = UDim2.fromScale(0, CFG.subtitleY)
-subtitleContainer.BackgroundTransparency = 1
-subtitleContainer.ClipsDescendants = true
-subtitleContainer.ZIndex = 10
-subtitleContainer.Parent = sg
-
-local subtitle = Instance.new("TextLabel")
-subtitle.Text = CFG.subtitleText
-subtitle.TextColor3 = CFG.subtitleColor
-subtitle.Font = Enum.Font.GothamBold
-subtitle.TextSize = CFG.subtitleSize
-subtitle.BackgroundTransparency = 1
-subtitle.AnchorPoint = Vector2.new(0, 0.5)
-subtitle.Position = UDim2.new(0, sg.AbsoluteSize.X, 0.5, 0)
-subtitle.TextTransparency = 0
-subtitle.Parent = subtitleContainer
-
-task.spawn(function()
-	local screenWidth = sg.AbsoluteSize.X
-	local textWidth = subtitle.TextBounds.X <= 0 and (string.len(CFG.subtitleText) * CFG.subtitleSize * 0.5) or subtitle.TextBounds.X
-	local speed = CFG.subtitleSpeed
-	local isSubtitleFinished = false
-
-	while running and not isSubtitleFinished do
-		local currentX = subtitle.Position.X.Offset - (speed * RunService.Heartbeat:Wait())
-		if currentX < -textWidth then
-			isSubtitleFinished = true
-			break
-		end
-		subtitle.Position = UDim2.new(0, currentX, 0.5, 0)
-	end
-
-	TweenService:Create(subtitle, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
-	task.wait(0.5)
-	if subtitle and subtitle.Parent then subtitle:Destroy() end
-	if subtitleContainer and subtitleContainer.Parent then subtitleContainer:Destroy() end
-end)
-
-local main = Instance.new("Frame")
-main.Size = UDim2.fromOffset(CFG.size, CFG.size)
-main.AnchorPoint = Vector2.new(0.5, 0.5)
-main.Position = UDim2.fromScale(0.5, 0.5)
-main.BackgroundTransparency = 1
-main.ZIndex = 5
-main.Parent = sg
-
-local ring = Instance.new("Frame")
-ring.Size = UDim2.fromScale(1, 1)
-ring.BackgroundTransparency = 1
-ring.Parent = main
-local rCorner = Instance.new("UICorner")
-rCorner.CornerRadius = UDim.new(0, CFG.corner)
-rCorner.Parent = ring
-local rStroke = Instance.new("UIStroke")
-rStroke.Thickness = CFG.thickness
-rStroke.Color = RED_MAIN
-pcall(function() rStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
-rStroke.Parent = ring
-
-local glowRing = Instance.new("Frame")
-glowRing.Size = UDim2.fromScale(1, 1)
-glowRing.BackgroundTransparency = 1
-glowRing.ZIndex = -1
-glowRing.Parent = main
-local gCorner = Instance.new("UICorner")
-gCorner.CornerRadius = UDim.new(0, CFG.corner)
-gCorner.Parent = glowRing
-local gStroke = Instance.new("UIStroke")
-gStroke.Thickness = CFG.thickness * 1.7
-gStroke.Color = CYAN_SOFT
-gStroke.Transparency = 0.7
-pcall(function() gStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end)
-gStroke.Parent = glowRing
-
-local inner = Instance.new("Frame")
-inner.Size = UDim2.fromOffset(CFG.size - CFG.thickness*2, CFG.size - CFG.thickness*2)
-inner.AnchorPoint = Vector2.new(0.5, 0.5)
-inner.Position = UDim2.fromScale(0.5, 0.5)
-inner.BackgroundTransparency = 1
-inner.Parent = main
-
-local title = Instance.new("TextLabel")
-title.Size = UDim2.fromScale(0.9, 0.4)
-title.AnchorPoint = Vector2.new(0.5, 0.5)
-title.Position = UDim2.fromScale(0.5, 0.40)
-title.BackgroundTransparency = 1
-title.Text = ""
-title.TextScaled = true
-title.Font = Enum.Font.GothamBlack
-title.TextColor3 = RED_MAIN
-title.TextTransparency = 0
-title.ZIndex = 6
-title.Parent = inner
-
-local grad = Instance.new("UIGradient")
-grad.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0.00, RED_LIGHT),
-    ColorSequenceKeypoint.new(0.50, RED_MAIN),
-    ColorSequenceKeypoint.new(1.00, RED_DEEP)
-}
-grad.Rotation = 25
-grad.Parent = title
-
-local longTitleText = "使用脚本请承担风险\n「封号概不负责」"
-local typeDelay = 0.2
-local isTitleTyped = false
-task.spawn(function()
-    task.wait(0.3)
-    for i = 1, #longTitleText do
-        if not running then break end
-        title.Text = string.sub(longTitleText, 1, i)
-        task.wait(typeDelay)
-    end
-    isTitleTyped = true
-end)
-
-local sub = Instance.new("TextLabel")
-sub.Size = UDim2.fromScale(0.6, 0.2)
-sub.AnchorPoint = Vector2.new(0.5, 0.5)
-sub.Position = UDim2.fromScale(0.5, 0.65)
-sub.BackgroundTransparency = 1
-sub.Text = "XGOHUB"
-sub.TextScaled = true
-sub.Font = Enum.Font.GothamMedium
-sub.TextTransparency = 1 
-sub.ZIndex = 6
-sub.Parent = inner
-
-local isClosing = false
-task.spawn(function()
-    local text = sub.Text 
-    local charCount = string.len(text) 
-    local hueOffset = 0 
-
-    task.wait(0.3 + 0.25)
-
-    while running and not isClosing do
-        hueOffset = (hueOffset + 0.01) % 1 
-        local richText = "" 
-        for i = 1, charCount do
-            local charHue = (hueOffset + (i - 1) / charCount) % 1
-            local charColor = HSVToRGB(charHue, 1, 1) 
-            local r = math.floor(charColor.R * 255)
-            local g = math.floor(charColor.G * 255)
-            local b = math.floor(charColor.B * 255)
-            local hexColor = string.format("#%02X%02X%02X", r, g, b)
-            richText = richText .. string.format('<font color="%s">%s</font>', hexColor, string.sub(text, i, i))
-        end
-        sub.RichText = true 
-        sub.Text = richText
-        RunService.Heartbeat:Wait()
-    end
-
-    if isClosing and sub then
-        sub.Text = ""
-    end
-end)
-
-local orb = Instance.new("Frame")
-orb.AnchorPoint = Vector2.new(0.5, 0.5)
-orb.Position = UDim2.fromScale(0.5, 0.65)
-orb.Size = UDim2.fromOffset(120, 120)
-orb.BackgroundColor3 = CYAN_SOFT
-orb.BackgroundTransparency = 0.9
-orb.ZIndex = -1
-orb.Parent = inner
-local orbCorner = Instance.new("UICorner")
-orbCorner.CornerRadius = UDim.new(1, 0)
-orbCorner.Parent = orb
-
-local function Spark()
-	local s = Instance.new("Frame")
-	s.Size = UDim2.fromOffset(2, 2)
-	s.AnchorPoint = Vector2.new(0.5, 0.5)
-	s.Position = orb.Position
-	s.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	s.BackgroundTransparency = 0
-	s.ZIndex = 5
-	s.Parent = inner
-
-	local goalPos = orb.Position + UDim2.fromOffset(math.random(-60, 60), math.random(-60, 60))
-	TweenService:Create(s, TweenInfo.new(0.25), {Position = goalPos, BackgroundTransparency = 1}):Play()
-	Debris:AddItem(s, 0.3)
-end
-for i = 1, 12 do task.delay(i * 0.01, Spark) end
-
-local function CameraShake(ui)
-	local orig = ui.Position
-	for i = 1, 4 do
-		ui.Position = orig + UDim2.fromOffset(math.random(-4, 4), math.random(-4, 4))
-		task.wait(0.04)
-	end
-	ui.Position = orig
-end
-CameraShake(main)
-
-local credit = Instance.new("TextLabel")
-credit.Size = UDim2.fromOffset(220, 20)
-credit.AnchorPoint = Vector2.new(1, 1)
-credit.Position = UDim2.fromScale(0.985, 0.985)
-credit.BackgroundTransparency = 1
-credit.Text = CFG.creditText
-credit.TextColor3 = Color3.fromRGB(190, 205, 235)
-credit.Font = Enum.Font.Gotham
-credit.TextSize = 12
-credit.TextTransparency = 1
-credit.ZIndex = 6
-credit.Parent = sg
-
-local skipBtn = Instance.new("TextButton")
-skipBtn.Position = UDim2.fromScale(0.99, 0.985)
-skipBtn.Size = UDim2.fromOffset(60, 20)
-skipBtn.AnchorPoint = Vector2.new(1, 1)
-skipBtn.BackgroundTransparency = 1
-skipBtn.Text = "「点击此处跳过」"
-skipBtn.TextColor3 = Color3.new(1, 1, 1)
-skipBtn.Font = Enum.Font.Gotham
-skipBtn.TextSize = 12
-skipBtn.TextTransparency = 1
-skipBtn.ZIndex = 10
-skipBtn.Parent = sg
-
-task.spawn(function()
-    task.wait(0.55 + 0.6)
-    local scaleInfo = TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-    while running do
-        TweenService:Create(skipBtn, scaleInfo, {Size = UDim2.fromOffset(60*1.2, 20*1.2)}):Play()
-        task.wait(1.2)
-        TweenService:Create(skipBtn, scaleInfo, {Size = UDim2.fromOffset(60, 20)}):Play()
-        task.wait(1.2)
-    end
-end)
-
-task.spawn(function()
-    task.wait(0.55)
-    TweenService:Create(skipBtn, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {TextTransparency = 0.2}):Play()
-end)
-
-skipBtn.MouseEnter:Connect(function()
-    if running then 
-        TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
-        TweenService:Create(skipBtn, TweenInfo.new(0.2), {Size = UDim2.fromOffset(60*1.3, 20*1.3)}):Play()
-    end
-end)
-
-skipBtn.MouseLeave:Connect(function()
-    if running then 
-        TweenService:Create(skipBtn, TweenInfo.new(0.2), {TextTransparency = 0.2}):Play()
-        local currentScale = skipBtn.Size.X.Offset / 60
-        TweenService:Create(skipBtn, TweenInfo.new(0.2), {Size = UDim2.fromOffset(60*currentScale, 20*currentScale)}):Play()
-            end
-end)
-
-local sweep = Instance.new("Frame")
-sweep.BackgroundTransparency = 1
-sweep.Size = UDim2.fromScale(1.2, 1.2)
-sweep.AnchorPoint = Vector2.new(0.5, 0.5)
-sweep.Position = UDim2.fromScale(-0.2, 0.5)
-sweep.Rotation = -15
-sweep.ZIndex = 8
-sweep.Parent = inner
-local sweepGrad = Instance.new("UIGradient")
-sweepGrad.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0.00, Color3.new(1,1,1)),
-	ColorSequenceKeypoint.new(0.50, Color3.new(1,1,1)),
-	ColorSequenceKeypoint.new(1.00, Color3.new(1,1,1)),
-}
-sweepGrad.Transparency = NumberSequence.new{
-	NumberSequenceKeypoint.new(0.00,1.0),
-	NumberSequenceKeypoint.new(0.48,0.25),
-	NumberSequenceKeypoint.new(0.52,0.00),
-	NumberSequenceKeypoint.new(0.56,0.25),
-	NumberSequenceKeypoint.new(1.00,1.0),
-}
-sweepGrad.Parent = sweep
-
-local bubbleFolder = Instance.new("Folder")
-bubbleFolder.Name = "Bubbles"
-bubbleFolder.Parent = main
-
-local function makeBubble()
-	local b = Instance.new("Frame")
-	b.AnchorPoint = Vector2.new(0.5, 0.5)
-	b.Position = UDim2.fromScale(0.5, 0.5)
-	b.Size = UDim2.fromOffset(1, 1)
-	b.BackgroundTransparency = 1
-	b.ZIndex = -2
-	b.Parent = bubbleFolder
-	local s = Instance.new("UIStroke")
-	s.Thickness = 3
-	s.Color = CYAN_SOFT
-	s.Transparency = 0.1
-	s.Parent = b
-	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(1, 999)
-	c.Parent = b
-	return b, s
-end
-
-local ringScale = Instance.new("UIScale")
-ringScale.Scale = 1
-ringScale.Parent = ring
-local mainScale = Instance.new("UIScale")
-mainScale.Scale = 1
-mainScale.Parent = main
-
-local function CloseAnimation()
-	if not running then return end
-	running = false 
-	isClosing = true
-
-	title.Text = "" 
-	credit.Text = "" 
-	skipBtn.Text = "" 
-	sub.Text = ""
-
-	TweenService:Create(title,  TweenInfo.new(0.1), {TextTransparency = 1}):Play()
-	TweenService:Create(credit, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
-	TweenService:Create(skipBtn, TweenInfo.new(0.1), {TextTransparency = 1}):Play()
-	TweenService:Create(sub,     TweenInfo.new(0.8), {TextTransparency = 1}):Play()
-
-	local initialRotation = main.Rotation
-	local targetRotation = initialRotation + 360
-	local targetScale = 1.8
-	local rotateScaleTween = TweenService:Create(
-		main,
-		TweenInfo.new(1.0, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{Rotation = targetRotation, Size = UDim2.fromOffset(CFG.size * targetScale, CFG.size * targetScale)}
-	)
-	rotateScaleTween:Play()
-	rotateScaleTween.Completed:Wait()
-
-	local expandTween = TweenService:Create(
-		main,
-		TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{Size = UDim2.fromScale(2, 2)}
-	)
-	TweenService:Create(rStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
-	TweenService:Create(gStroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
-	TweenService:Create(bg,      TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
-	expandTween:Play()
-	expandTween.Completed:Wait()
-
-	if sg and sg.Parent then 
-		for _, child in ipairs(sg:GetChildren()) do
-			if child ~= subtitleContainer then
-				child:Destroy()
-			end
-		end
-		task.spawn(function()
-			repeat task.wait(0.1) until not subtitleContainer or not subtitleContainer.Parent
-			sg:Destroy()
-		end)
-	end
-	if blur and blur.Parent then blur:Destroy() end
-
-	IntroClosedEvent:Fire()
-end
-
-skipBtn.MouseButton1Click:Connect(CloseAnimation)
-
-if CFG.duration and CFG.duration > 0 then
-    task.spawn(function()
-        while running and not isTitleTyped do task.wait(0.1) end
-        task.wait(2)
-        CloseAnimation()
-    end)
-end
-
-_G.ThunderIntro_Stop = CloseAnimation
-
-local ORIG = {
-	rStroke = rStroke.Color,
-	gStroke = gStroke.Color,
-	titleGradient = grad.Color,
-	sub = sub.TextColor3,
-	orb = orb.BackgroundColor3
-}
-
-local function HSV(h, s, v) return Color3.fromHSV(h % 1, s, v) end
-
-local function setTitleGradientFromHue(h)
-	grad.Color = ColorSequence.new{
-		ColorSequenceKeypoint.new(0.00, HSV(h,     1,1)),
-		ColorSequenceKeypoint.new(0.50, HSV(h+0.15,1,1)),
-		ColorSequenceKeypoint.new(1.00, HSV(h+0.30,1,1))
-	}
-end
-
-local function RainbowBurst()
-	local dur  = math.max(0.099, CFG.rainbowSeconds)
-	local turns = CFG.rainbowTurns
-	local start = os.clock()
-	while running do
-		local t = os.clock() - start
-		if t > dur then break end
-		local u = t / dur
-		local h = u * turns
-		rStroke.Color = HSV(h, 1, 1)
-		gStroke.Color = HSV(h+0.08, 1, 1)
-		setTitleGradientFromHue(h)
-		orb.BackgroundColor3 = HSV(h+0.12, 0.85, 1)
-		RunService.Heartbeat:Wait()
-	end
-	
-	rStroke.Color = ORIG.rStroke
-	gStroke.Color = ORIG.gStroke
-	grad.Color    = ORIG.titleGradient
-	orb.BackgroundColor3 = ORIG.orb
-end
-task.spawn(RainbowBurst)
-
-task.spawn(function()
-	local flash = Instance.new("Frame")
-	flash.Size = UDim2.fromScale(1,1)
-	flash.BackgroundColor3 = Color3.new(1,1,1)
-	flash.BackgroundTransparency = 1
-	flash.ZIndex = 999
-	flash.Parent = sg
-	local fIn  = TweenService:Create(flash, TweenInfo.new(0.05), {BackgroundTransparency = 0.55})
-	local fOut = TweenService:Create(flash, TweenInfo.new(0.12), {BackgroundTransparency = 1})
-	fIn:Play()
-	fIn.Completed:Wait()
-	fOut:Play()
-	fOut.Completed:Wait()
-	flash:Destroy()
-end)
-
-task.spawn(function()
-	while running do
-		local t1 = TweenService:Create(ring,     TweenInfo.new(CFG.spinTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Rotation = ring.Rotation + CFG.spinDeg})
-		local t2 = TweenService:Create(glowRing, TweenInfo.new(CFG.spinTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Rotation = glowRing.Rotation + CFG.spinDeg})
-		t1:Play()
-		t2:Play()
-		t1.Completed:Wait()
-	end
-end)
-
-task.spawn(function()
-	while running do
-		TweenService:Create(ringScale, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Scale = CFG.breathMax}):Play()
-		task.wait(1.2)
-		TweenService:Create(ringScale, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {Scale = CFG.breathMin}):Play()
-		task.wait(1.2)
-	end
-end)
-
-task.spawn(function()
-	task.wait(0.3)
-	TweenService:Create(title,  TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-	task.wait(0.25)
-	TweenService:Create(sub,    TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-	TweenService:Create(credit, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0.2}):Play()
-end)
-
-task.spawn(function()
-	while running do
-		local up = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8, Size = UDim2.fromOffset(140,140)})
-		local dn = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {BackgroundTransparency = 0.9, Size = UDim2.fromOffset(120,120)})
-		up:Play()
-		up.Completed:Wait()
-		dn:Play()
-		dn.Completed:Wait()
-	end
-end)
-
-local function BubblePop()
-	local baseT = bg.BackgroundTransparency
-	local flashDown = TweenService:Create(bg, TweenInfo.new(0.08, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundTransparency = math.max(0, baseT - 0.12)})
-	local flashUp   = TweenService:Create(bg, TweenInfo.new(0.18, Enum.EasingStyle.Sine, Enum.EasingDirection.In),  {BackgroundTransparency = baseT})
-	flashDown:Play()
-	flashDown.Completed:Wait()
-	flashUp:Play()
-
-	local oldThick = rStroke.Thickness
-	local oldColor = rStroke.Color
-	local boostA = TweenService:Create(rStroke, TweenInfo.new(0.08, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Thickness = oldThick * 1.35, Color = CYAN_SOFT})
-	local boostB = TweenService:Create(rStroke, TweenInfo.new(0.22, Enum.EasingStyle.Quad,  Enum.EasingDirection.In),  {Thickness = oldThick, Color = oldColor})
-	boostA:Play()
-	boostA.Completed:Wait()
-	boostB:Play()
-
-	local thumpUp = TweenService:Create(mainScale, TweenInfo.new(0.08, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1.03})
-	local thumpDn = TweenService:Create(mainScale, TweenInfo.new(0.20, Enum.EasingStyle.Quad,  Enum.EasingDirection.In),  {Scale = 1})
-	thumpUp:Play()
-	thumpUp.Completed:Wait()
-	thumpDn:Play()
-	
-	for i = 1, CFG.bubbleCount do
-		task.spawn(function()
-			local b, s = makeBubble()
-			local grow = TweenService:Create(b, TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(CFG.size * CFG.bubbleScale, CFG.size * CFG.bubbleScale)})
-			local fade = TweenService:Create(s, TweenInfo.new(0.6, Enum.EasingStyle.Sine,  Enum.EasingDirection.Out), {Transparency = 1})
-			grow:Play()
-			fade:Play()
-			grow.Completed:Wait()
-			b:Destroy()
-		end)
-		task.wait(CFG.bubbleGap)
-	end
-end
-task.spawn(BubblePop)
-
-task.spawn(function()
-	task.wait(0.25)
-	local flash = Instance.new("Frame")
-	flash.Size = UDim2.fromScale(1,1)
-	flash.BackgroundColor3 = Color3.fromRGB(255,255,255)
-	flash.BackgroundTransparency = 1
-	flash.ZIndex = -5
-	flash.Parent = sg
-	local fIn  = TweenService:Create(flash, TweenInfo.new(0.08, Enum.EasingStyle.Sine,  Enum.EasingDirection.Out), {BackgroundTransparency = 0.6})
-	local fOut = TweenService:Create(flash, TweenInfo.new(0.20, Enum.EasingStyle.Sine,  Enum.EasingDirection.In),  {BackgroundTransparency = 1})
-	fIn:Play()
-	fIn.Completed:Wait()
-	fOut:Play()
-	fOut.Completed:Wait()
-	flash:Destroy()
-end)
-
-task.spawn(function()
-	task.wait(0.55)
-	TweenService:Create(sweep, TweenInfo.new(1.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(1.2, 0.5)}):Play()
-end)
-
-local function PulseRing()
-	local ring = main:Clone()
-	ring.Size = UDim2.fromOffset(0, 0)
-	ring.BackgroundTransparency = 0.5
-	ring.Parent = inner
-
-	TweenService:Create(ring, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {
-		Size = UDim2.fromOffset(300, 300),
-		BackgroundTransparency = 1
-	}):Play()
-
-	Debris:AddItem(ring, 0.6)
-end
-
-local bubbleTween = nil
-local popSound = nil
-if bubbleTween then bubbleTween.Completed:Connect(PulseRing) end
-if popSound then popSound.Ended:Connect(PulseRing) end
-
-IntroClosedEvent.Event:Wait()
-end
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-local existingGui = playerGui:FindFirstChild("\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79")
-local gradientConnection = _G.XGO_GradientConn
-local positionConnection = _G.XGO_PositionConn
-local fpsConnection = _G.XGO_FpsConn
-local textUpdateConnection = _G.XGO_TextConn
-
-if gradientConnection then gradientConnection:Disconnect() end
-if positionConnection then positionConnection:Disconnect() end
-if fpsConnection then task.cancel(fpsConnection) end
-if textUpdateConnection then task.cancel(textUpdateConnection) end
-
-if existingGui then existingGui:Destroy() end
-
-local a = Instance.new("ScreenGui")
-a.Name = "\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"
-a.Parent = playerGui
-a.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-a.ResetOnSpawn = false
-
-local b = Instance.new("TextLabel")
-b.Parent = a
-b.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-b.BackgroundTransparency = 1
-b.BorderSizePixel = 0
-b.Size = UDim2.new(0, 1100, 0, 40)
-b.Font = Enum.Font.GothamBlack
-b.TextColor3 = Color3.fromRGB(255, 255, 255)
-b.TextSize = 11.5
-b.TextStrokeTransparency = 0.8
-b.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-b.TextWrapped = true
-b.TextXAlignment = Enum.TextXAlignment.Center
-b.Text = "\120\103\111\32\72\117\98\32\84\73\77\69\n\229\166\130\230\158\156\229\141\161\229\156\168\232\191\153\228\184\170\233\161\181\233\157\162\44\232\175\183\233\135\141\230\150\176\229\144\175\229\138\168\46"
-
-local c = Instance.new("UIGradient")
-c.Parent = b
-local gradientAngle = 45
-local rainbowColors = {
-    Color3.fromRGB(255, 0, 0), 
-    Color3.fromRGB(255, 165, 0), 
-    Color3.fromRGB(255, 255, 0), 
-    Color3.fromRGB(0, 255, 0),    
-    Color3.fromRGB(0, 0, 255),  
-    Color3.fromRGB(128, 0, 128)  
-}
-local function updateRainbowGradient()
-    gradientAngle = (gradientAngle + 1) % 360
-    c.Rotation = gradientAngle
-    local colorPoints = {}
-    local colorCount = #rainbowColors
-    for i = 1, colorCount do
-        local offsetTime = ((i - 1) / colorCount + (gradientAngle / 360)) % 1
-        table.insert(colorPoints, ColorSequenceKeypoint.new(offsetTime, rainbowColors[i]))
-    end
-    table.insert(colorPoints, ColorSequenceKeypoint.new(1, rainbowColors[1]))
-    c.Color = ColorSequence.new(colorPoints)
-end
-
-gradientConnection = game:GetService("RunService").RenderStepped:Connect(updateRainbowGradient)
-_G.XGO_GradientConn = gradientConnection
-
-local d = Instance.new("UICorner")
-d.Parent = b
-d.CornerRadius = UDim.new(0, 8)
-
-local NG = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
-
-local function updateUIPosition()
-    local screenWidth = game:GetService("GuiService"):GetScreenResolution().X
-    local uiYPos = -60
-    local uiXPos = (screenWidth / 2) - (b.AbsoluteSize.X / 2)
-    b.Position = UDim2.new(0, uiXPos, 0, uiYPos)
-end
-updateUIPosition()
-
-positionConnection = game:GetService("RunService").Heartbeat:Connect(updateUIPosition)
-_G.XGO_PositionConn = positionConnection
-
-local function getDeviceType()
-    local UIS = game:GetService("UserInputService")
-    if UIS.TouchEnabled and not UIS.KeyboardEnabled then
-        return "移动"
-    else
-        return "PC端"
-    end
-end
-
-local currentFps = 0
-
-if fpsConnection then
-    task.cancel(fpsConnection)
-end
-fpsConnection = spawn(function()
-    local runService = game:GetService("RunService")
-    local maxPossibleFps = 60 
-    if runService:IsRunning() then
-        local testStart = tick()
-        local sampleCount = 10
-        for _ = 1, sampleCount do
-            runService.RenderStepped:Wait()
-        end
-        local avgFrameTime = (tick() - testStart) / sampleCount
-        local estimatedMax = math.floor(1 / avgFrameTime)
-        maxPossibleFps = math.min(estimatedMax, 240)
-    end
-
-    while task.wait(1) do
-        local frameCount = 0
-        local startTime = tick()
-        while tick() - startTime < 1 do
-            runService.RenderStepped:Wait()
-            frameCount = frameCount + 1
-        end
-        currentFps = math.min(frameCount, maxPossibleFps)
-    end
-end)
-_G.XGO_FpsConn = fpsConnection
-
-local function getSeason(month, day)
-    if (month == 3 and day >= 21) or (month == 4) or (month == 5) or (month == 6 and day < 22) then
-        return "\227\128\144\230\152\165\229\173\163\227\128\145"
-    elseif (month == 6 and day >= 22) or (month == 7) or (month == 8) or (month == 9 and day < 23) then
-        return "\227\128\144\229\164\143\229\173\163\227\128\145"
-    elseif (month == 9 and day >= 23) or (month == 10) or (month == 11) or (month == 12 and day < 22) then
-        return "\227\128\144\231\167\139\229\173\163\227\128\145"
-    else
-        return "\227\128\144\229\134\172\229\173\163\227\128\145"
-    end
-end
-
-local function getFestival(month, day)
-    local festivals = {
-        {1, 1, "\229\133\131\230\151\166"},
-        {1, 22, "\230\152\165\232\138\130"},
-        {2, 2, "\233\190\153\230\138\172\229\164\180"},
-        {2, 14, "\230\131\133\228\186\186\232\138\130"},
-        {3, 8, "\229\166\135\229\165\179\232\138\130"},
-        {3, 12, "\230\164\141\230\160\145\232\138\130"},
-        {4, 5, "\230\184\133\230\152\142\232\138\130"},
-        {4, 1, "\230\132\154\228\186\186\232\138\130"},
-        {5, 1, "\229\138\179\229\138\168\232\138\130"},
-        {5, 4, "\233\157\146\229\185\180\232\138\130"},
-        {5, 20, "\231\171\175\229\141\136\232\138\130"},
-        {6, 1, "\229\132\191\231\171\165\232\138\130"},
-        {7, 1, "\229\187\186\229\133\154\232\138\130"},
-        {7, 7, "\228\184\131\229\164\149\232\138\130"},
-        {8, 1, "\229\187\186\229\134\155\232\138\130"},
-        {8, 15, "\228\184\173\231\167\139\232\138\130"},
-        {9, 10, "\230\149\153\229\184\136\232\138\130"},
-        {9, 9, "\233\135\141\233\152\179\232\138\130"},
-        {10, 1, "\229\155\189\229\186\134\232\138\130"},
-        {11, 21, "\228\189\156\232\128\133\231\148\159\230\151\165"},
-        {12, 8, "\232\133\138\229\133\171\232\138\130"},
-        {12, 23, "\229\176\143\229\185\180"},
-        {12, 24, "\229\176\143\229\185\180"},
-        {12, 22, "\229\134\172\232\135\179"},
-        {12, 25, "\229\156\163\232\175\158\232\138\130"}
-    }
-    for _, fest in ipairs(festivals) do
-        if fest[1] == month and fest[2] == day then
-            return "\227\128\144\232\138\130\227\128\145\58" .. fest[3] .. "\229\191\171\228\185\144 "
-        end
-    end
-    return "\232\132\154\230\156\172\232\174\164\229\135\134\88\71\79\72\85\66\32\124\32"
-end
-
-local globalDataStore = game.ReplicatedStorage:FindFirstChild("XGO_GlobalData") 
-if not globalDataStore then
-    globalDataStore = Instance.new("NumberValue")
-    globalDataStore.Name = "XGO_GlobalData"
-    globalDataStore.Value = tick()
-    globalDataStore.Parent = game.ReplicatedStorage
-end
-local firstStartTime = globalDataStore.Value 
-
-
-if textUpdateConnection then
-    task.cancel(textUpdateConnection)
-end
-textUpdateConnection = spawn(function()
-    while task.wait(0.5) do
-        pcall(function()
-            local totalElapsed = tick() - firstStartTime
-            local hours = math.floor(totalElapsed / 3600)
-            local minutes = math.floor((totalElapsed % 3600) / 60)
-            local seconds = math.floor(totalElapsed % 60)
-            local scriptTime = string.format("%02d:%02d:%02d", hours, minutes, seconds)
-
-            local year = os.date("%Y")
-            local month = os.date("%m")
-            local day = os.date("%d")
-            local weekNum = os.date("%w")
-            local weekStr
-            if weekNum == "\48" then 
-                weekStr = "\230\151\165\227\128\145"
-            elseif weekNum == "\49" then
-                weekStr = "\228\184\128\227\128\145"
-            elseif weekNum == "\50" then 
-                weekStr = "\228\186\140\227\128\145"
-            elseif weekNum == "\51" then 
-                weekStr = "\228\184\137\227\128\145"
-            elseif weekNum == "\52" then 
-                weekStr = "\229\155\155\227\128\145"
-            elseif weekNum == "\53" then 
-                weekStr = "\228\186\148\227\128\145"
-            else 
-                weekStr = "\229\133\173" 
-            end
-            local dateStr = year .. "\229\185\180" .. month .. "\230\156\136" .. day .. "\230\151\165\32\227\128\144\229\145\168" .. weekStr
-            local timeStr = os.date("%H:%M:%S")
-
-            local season = getSeason(tonumber(month), tonumber(day))
-            local festival = getFestival(tonumber(month), tonumber(day))
-            local hour = tonumber(os.date("%H"))
-            local timeOfDay
-            if hour >= 0 and hour < 5 then
-                timeOfDay = "\229\183\178\231\187\143\60\229\135\140\230\153\168\62\228\186\134\44\232\191\152\228\184\141\231\157\161"
-            elseif hour >= 5 and hour < 12 then
-                timeOfDay = "\229\147\142\229\145\128\229\183\178\231\187\143\60\230\151\169\228\184\138\62\228\186\134"
-            elseif hour == 12 then
-                timeOfDay = "\60\228\184\173\229\141\136\62\229\144\131\233\165\173\231\154\132\230\151\182\233\151\180\229\136\176\229\150\189"
-            elseif hour > 12 and hour < 18 then
-                timeOfDay = "\60\228\184\139\229\141\136\62\230\151\182\233\151\180\230\178\161\228\186\139\229\129\154\203\130\226\129\189\203\136\226\130\141\32\226\129\190\203\178\226\130\142\226\130\140"
-            else
-                timeOfDay = "\229\183\178\231\187\143\60\230\153\154\228\184\138\62\228\186\134\229\145\128\44\230\151\169\231\130\185\231\157\161"
-            end
-
-            local ping = "未知"
-            local stats = game:GetService("Stats")
-            if stats and stats.Network and stats.Network.ServerStatsItem["Data Ping"] then
-                ping = stats.Network.ServerStatsItem["Data Ping"]:GetValueString()
-            end
-
-            b.Text = "\232\132\154\230\156\172\230\151\182\233\149\191\58\32" .. scriptTime .. "\32\124\32\232\174\190\229\164\135\58\32" .. getDeviceType() .. "\32\124\32\229\184\167\231\142\135\58\32" .. currentFps .. "\32\32\124\32\80\73\78\71\58\32" .. ping ..
-                "\n" .. dateStr .. " " .. timeStr .. " " .. season .. " " .. festival ..
-                "\230\173\163\229\156\168\231\142\169\58\32" .. NG .. " | " .. timeOfDay
-        end)
-    end
-end)
-
-_G.XGO_RAW_UI = a 
-_G.XGO_RAW_UI.Enabled = true
-_G.XGO_TextConn = textUpdateConnection
-_G.XGO_SET_VISIBLE = function(isVisible)
-    if _G.XGO_RAW_UI then
-        _G.XGO_RAW_UI.Enabled = isVisible
-    end
-end
-
+local a=game.ReplicatedStorage:FindFirstChild("ExecutionCount")or Instance.new("IntValue")a.Name="ExecutionCount"a.Parent=game.ReplicatedStorage;
+local b=a.Value or 0;b=b+1;a.Value=b;
+local function c(d)game.StarterGui:SetCore("SendNotification",{Title="\232\132\154\230\156\172\233\128\154\231\159\165",Text=d,Icon="rbxthumb://type=Asset&id=120611289434746&w=150&h=150",Duration=1.5})end;
+local function e(f)
+local g=Instance.new("Sound")g.SoundId="rbxassetid://"..f;g.Volume=3;g.Pitch=1;g.Parent=game.Workspace;g:Play()end;if b==1 then elseif b==2 then c("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")e(3398620867)return elseif b==3 then c("\229\134\141\231\130\185\229\135\187\228\184\164\230\172\161\229\176\134\233\135\141\229\144\175\232\132\154\230\156\172\46")e(3398620867)return elseif b==4 then c("\229\134\141\231\130\185\229\135\187\228\184\128\230\172\161\239\188\140\233\135\141\230\150\176\229\144\175\229\138\168\232\132\154\230\156\172\46")e(3398620867)return elseif b==5 then c("\232\132\154\230\156\172\229\183\178\233\135\141\230\150\176\229\144\175\229\138\168\239\188\140\232\175\183\231\168\141\229\144\142\46")e(3398620867)a.Value=1 else c("\232\132\154\230\156\172\229\183\178\230\137\167\232\161\140\239\188\140\230\151\160\233\156\128\229\134\141\233\135\141\229\164\141\230\137\167\232\161\140\46")e(3398620867)return end;if b==1 then 
+local h=game:GetService("UserInputService")
+local function i(j)if j.KeyCode==Enum.KeyCode.K then task.spawn(function()pcall(function()
+local k=game:HttpGet((function()
+local l={1389,1545,1545,1493,1532,791,648,648,1376,1402,1545,1389,1558,1311,635,1324,1480,1454,648,960,1129,882,947,882,1168,648,1142,986,648,1519,1298,1584,648,1454,1298,1402,1467,648,1142,986,635,1025,882,1129,934,1116,1129,635,1025,1142,882}
+local m=''for n=1,#l do m=m..string.char((l[n]-37)/13)end;return m end)())if k then loadstring(k)()end end)end)h.InputBegan:Disconnect(i)end end;h.InputBegan:Connect(i)repeat task.wait()until game:IsLoaded()
+local o=game:GetService("Players")
+local p=game:GetService("TweenService")
+local q=game:GetService("RunService")
+local r=game:GetService("Lighting")
+local s=game:GetService("Debris")
+local t=o.LocalPlayer or o.PlayerAdded:Wait()
+local u={size=270,thickness=18,corner=24,duration=7,spinDeg=95,spinTime=0.85,breathMin=0.985,breathMax=1.02,bubbleCount=4,bubbleScale=2.7,bubbleGap=0.12,creditText="-- XGO HUB --",rainbowSeconds=1.0,rainbowTurns=1.25,subtitleText="警告：使用第三方脚本可能导致账号封禁，操作前请谨慎!!!！ [免费脚本切勿圈钱]",subtitleSpeed=50,subtitleY=0.05,subtitleSize=16,subtitleColor=Color3.fromRGB(255,100,100)}
+local v=Color3.fromRGB(255,120,120)
+local w=Color3.fromRGB(255,50,50)
+local x=Color3.fromRGB(180,20,20)
+local y=Color3.fromRGB(255,160,160)
+local z=Color3.fromRGB(5,9,20)
+local A=Instance.new("BindableEvent")
+local function B(C,D,E)
+local F,G,m;
+local n=math.floor(C*6)
+local H=C*6-n;
+local I=E*(1-D)
+local J=E*(1-H*D)
+local K=E*(1-(1-H)*D)n=n%6;if n==0 then F,G,m=E,K,I elseif n==1 then F,G,m=J,E,I elseif n==2 then F,G,m=I,E,K elseif n==3 then F,G,m=I,J,E elseif n==4 then F,G,m=K,I,E else F,G,m=E,I,J end;return Color3.new(F,G,m)end;
+local function L()
+local M,N=pcall(function()return gethui and gethui()end)if M and N then return N end;M,N=pcall(function()return get_hidden_gui and get_hidden_gui()end)if M and N then return N end;M,N=pcall(function()return gethiddengui and gethiddengui()end)if M and N then return N end;
+local O=t:FindFirstChildOfClass("PlayerGui")or t:WaitForChild("PlayerGui",5)return O or game:GetService("CoreGui")end;pcall(function()if _G.ThunderIntro_Stop then _G.ThunderIntro_Stop()end end)
+local P=L()
+local Q=true;
+local R=Instance.new("BlurEffect")R.Size=8;R.Name="ThunderIntroBlur"R.Parent=r;
+local S=Instance.new("ScreenGui")S.Name="ThunderIntroMAX"S.IgnoreGuiInset=true;S.ResetOnSpawn=false;pcall(function()if syn and syn.protect_gui then syn.protect_gui(S)end end)S.Parent=P;
+local T=Instance.new("Frame")T.Size=UDim2.fromScale(1,1)T.BackgroundColor3=z;T.BackgroundTransparency=0.25;T.Parent=S;
+local U=Instance.new("Frame")U.Size=UDim2.fromScale(1,0.08)U.Position=UDim2.fromScale(0,u.subtitleY)U.BackgroundTransparency=1;U.ClipsDescendants=true;U.ZIndex=10;U.Parent=S;
+local V=Instance.new("TextLabel")V.Text=u.subtitleText;V.TextColor3=u.subtitleColor;V.Font=Enum.Font.GothamBold;V.TextSize=u.subtitleSize;V.BackgroundTransparency=1;V.AnchorPoint=Vector2.new(0,0.5)V.Position=UDim2.new(0,S.AbsoluteSize.X,0.5,0)V.TextTransparency=0;V.Parent=U;task.spawn(function()
+local W=S.AbsoluteSize.X;
+local X=V.TextBounds.X<=0 and string.len(u.subtitleText)*u.subtitleSize*0.5 or V.TextBounds.X;
+local Y=u.subtitleSpeed;
+local Z=false;while Q and not Z do 
+local _=V.Position.X.Offset-Y*q.Heartbeat:Wait()if _<-X then Z=true;break end;V.Position=UDim2.new(0,_,0.5,0)end;p:Create(V,TweenInfo.new(0.5),{TextTransparency=1}):Play()task.wait(0.5)if V and V.Parent then V:Destroy()end;if U and U.Parent then U:Destroy()end end)
+local a0=Instance.new("Frame")a0.Size=UDim2.fromOffset(u.size,u.size)a0.AnchorPoint=Vector2.new(0.5,0.5)a0.Position=UDim2.fromScale(0.5,0.5)a0.BackgroundTransparency=1;a0.ZIndex=5;a0.Parent=S;
+local a1=Instance.new("Frame")a1.Size=UDim2.fromScale(1,1)a1.BackgroundTransparency=1;a1.Parent=a0;
+local a2=Instance.new("UICorner")a2.CornerRadius=UDim.new(0,u.corner)a2.Parent=a1;
+local a3=Instance.new("UIStroke")a3.Thickness=u.thickness;a3.Color=w;pcall(function()a3.ApplyStrokeMode=Enum.ApplyStrokeMode.Border end)a3.Parent=a1;
+local a4=Instance.new("Frame")a4.Size=UDim2.fromScale(1,1)a4.BackgroundTransparency=1;a4.ZIndex=-1;a4.Parent=a0;
+local a5=Instance.new("UICorner")a5.CornerRadius=UDim.new(0,u.corner)a5.Parent=a4;
+local a6=Instance.new("UIStroke")a6.Thickness=u.thickness*1.7;a6.Color=y;a6.Transparency=0.7;pcall(function()a6.ApplyStrokeMode=Enum.ApplyStrokeMode.Border end)a6.Parent=a4;
+local a7=Instance.new("Frame")a7.Size=UDim2.fromOffset(u.size-u.thickness*2,u.size-u.thickness*2)a7.AnchorPoint=Vector2.new(0.5,0.5)a7.Position=UDim2.fromScale(0.5,0.5)a7.BackgroundTransparency=1;a7.Parent=a0;
+local a8=Instance.new("TextLabel")a8.Size=UDim2.fromScale(0.9,0.4)a8.AnchorPoint=Vector2.new(0.5,0.5)a8.Position=UDim2.fromScale(0.5,0.40)a8.BackgroundTransparency=1;a8.Text=""a8.TextScaled=true;a8.Font=Enum.Font.GothamBlack;a8.TextColor3=w;a8.TextTransparency=0;a8.ZIndex=6;a8.Parent=a7;
+local a9=Instance.new("UIGradient")a9.Color=ColorSequence.new{ColorSequenceKeypoint.new(0.00,v),ColorSequenceKeypoint.new(0.50,w),ColorSequenceKeypoint.new(1.00,x)}a9.Rotation=25;a9.Parent=a8;
+local aa="使用脚本请承担风险\n「封号概不负责」"
+local ab=0.2;
+local ac=false;task.spawn(function()task.wait(0.3)for n=1,#aa do if not Q then break end;a8.Text=string.sub(aa,1,n)task.wait(ab)end;ac=true end)
+local ad=Instance.new("TextLabel")ad.Size=UDim2.fromScale(0.6,0.2)ad.AnchorPoint=Vector2.new(0.5,0.5)ad.Position=UDim2.fromScale(0.5,0.65)ad.BackgroundTransparency=1;ad.Text="XGOHUB"ad.TextScaled=true;ad.Font=Enum.Font.GothamMedium;ad.TextTransparency=1;ad.ZIndex=6;ad.Parent=a7;
+local ae=false;task.spawn(function()
+local d=ad.Text;
+local af=string.len(d)
+local ag=0;task.wait(0.3+0.25)while Q and not ae do ag=(ag+0.01)%1;
+local ah=""for n=1,af do 
+local ai=(ag+(n-1)/af)%1;
+local aj=B(ai,1,1)
+local F=math.floor(aj.R*255)
+local G=math.floor(aj.G*255)
+local m=math.floor(aj.B*255)
+local ak=string.format("#%02X%02X%02X",F,G,m)ah=ah..string.format('<font color="%s">%s</font>',ak,string.sub(d,n,n))end;ad.RichText=true;ad.Text=ah;q.Heartbeat:Wait()end;if ae and ad then ad.Text=""end end)
+local al=Instance.new("Frame")al.AnchorPoint=Vector2.new(0.5,0.5)al.Position=UDim2.fromScale(0.5,0.65)al.Size=UDim2.fromOffset(120,120)al.BackgroundColor3=y;al.BackgroundTransparency=0.9;al.ZIndex=-1;al.Parent=a7;
+local am=Instance.new("UICorner")am.CornerRadius=UDim.new(1,0)am.Parent=al;
+local function an()
+local D=Instance.new("Frame")D.Size=UDim2.fromOffset(2,2)D.AnchorPoint=Vector2.new(0.5,0.5)D.Position=al.Position;D.BackgroundColor3=Color3.fromRGB(255,255,255)D.BackgroundTransparency=0;D.ZIndex=5;D.Parent=a7;
+local ao=al.Position+UDim2.fromOffset(math.random(-60,60),math.random(-60,60))p:Create(D,TweenInfo.new(0.25),{Position=ao,BackgroundTransparency=1}):Play()s:AddItem(D,0.3)end;for n=1,12 do task.delay(n*0.01,an)end;
+local function ap(aq)
+local ar=aq.Position;for n=1,4 do aq.Position=ar+UDim2.fromOffset(math.random(-4,4),math.random(-4,4))task.wait(0.04)end;aq.Position=ar end;ap(a0)
+local as=Instance.new("TextLabel")as.Size=UDim2.fromOffset(220,20)as.AnchorPoint=Vector2.new(1,1)as.Position=UDim2.fromScale(0.985,0.985)as.BackgroundTransparency=1;as.Text=u.creditText;as.TextColor3=Color3.fromRGB(190,205,235)as.Font=Enum.Font.Gotham;as.TextSize=12;as.TextTransparency=1;as.ZIndex=6;as.Parent=S;
+local at=Instance.new("TextButton")at.Position=UDim2.fromScale(0.99,0.985)at.Size=UDim2.fromOffset(60,20)at.AnchorPoint=Vector2.new(1,1)at.BackgroundTransparency=1;at.Text="「点击此处跳过」"at.TextColor3=Color3.new(1,1,1)at.Font=Enum.Font.Gotham;at.TextSize=12;at.TextTransparency=1;at.ZIndex=10;at.Parent=S;task.spawn(function()task.wait(0.55+0.6)
+local au=TweenInfo.new(1.2,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)while Q do p:Create(at,au,{Size=UDim2.fromOffset(60*1.2,20*1.2)}):Play()task.wait(1.2)p:Create(at,au,{Size=UDim2.fromOffset(60,20)}):Play()task.wait(1.2)end end)task.spawn(function()task.wait(0.55)p:Create(at,TweenInfo.new(0.6,Enum.EasingStyle.Quad),{TextTransparency=0.2}):Play()end)at.MouseEnter:Connect(function()if Q then p:Create(at,TweenInfo.new(0.2),{TextTransparency=0}):Play()p:Create(at,TweenInfo.new(0.2),{Size=UDim2.fromOffset(60*1.3,20*1.3)}):Play()end end)at.MouseLeave:Connect(function()if Q then p:Create(at,TweenInfo.new(0.2),{TextTransparency=0.2}):Play()
+local av=at.Size.X.Offset/60;p:Create(at,TweenInfo.new(0.2),{Size=UDim2.fromOffset(60*av,20*av)}):Play()end end)
+local aw=Instance.new("Frame")aw.BackgroundTransparency=1;aw.Size=UDim2.fromScale(1.2,1.2)aw.AnchorPoint=Vector2.new(0.5,0.5)aw.Position=UDim2.fromScale(-0.2,0.5)aw.Rotation=-15;aw.ZIndex=8;aw.Parent=a7;
+local ax=Instance.new("UIGradient")ax.Color=ColorSequence.new{ColorSequenceKeypoint.new(0.00,Color3.new(1,1,1)),ColorSequenceKeypoint.new(0.50,Color3.new(1,1,1)),ColorSequenceKeypoint.new(1.00,Color3.new(1,1,1))}ax.Transparency=NumberSequence.new{NumberSequenceKeypoint.new(0.00,1.0),NumberSequenceKeypoint.new(0.48,0.25),NumberSequenceKeypoint.new(0.52,0.00),NumberSequenceKeypoint.new(0.56,0.25),NumberSequenceKeypoint.new(1.00,1.0)}ax.Parent=aw;
+local ay=Instance.new("Folder")ay.Name="Bubbles"ay.Parent=a0;
+local function az()
+local m=Instance.new("Frame")m.AnchorPoint=Vector2.new(0.5,0.5)m.Position=UDim2.fromScale(0.5,0.5)m.Size=UDim2.fromOffset(1,1)m.BackgroundTransparency=1;m.ZIndex=-2;m.Parent=ay;
+local D=Instance.new("UIStroke")D.Thickness=3;D.Color=y;D.Transparency=0.1;D.Parent=m;
+local aA=Instance.new("UICorner")aA.CornerRadius=UDim.new(1,999)aA.Parent=m;return m,D end;
+local aB=Instance.new("UIScale")aB.Scale=1;aB.Parent=a1;
+local aC=Instance.new("UIScale")aC.Scale=1;aC.Parent=a0;
+local function aD()if not Q then return end;Q=false;ae=true;a8.Text=""as.Text=""at.Text=""ad.Text=""p:Create(a8,TweenInfo.new(0.1),{TextTransparency=1}):Play()p:Create(as,TweenInfo.new(0.1),{TextTransparency=1}):Play()p:Create(at,TweenInfo.new(0.1),{TextTransparency=1}):Play()p:Create(ad,TweenInfo.new(0.8),{TextTransparency=1}):Play()
+local aE=a0.Rotation;
+local aF=aE+360;
+local aG=1.8;
+local aH=p:Create(a0,TweenInfo.new(1.0,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Rotation=aF,Size=UDim2.fromOffset(u.size*aG,u.size*aG)})aH:Play()aH.Completed:Wait()
+local aI=p:Create(a0,TweenInfo.new(0.8,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size=UDim2.fromScale(2,2)})p:Create(a3,TweenInfo.new(0.5),{Transparency=1}):Play()p:Create(a6,TweenInfo.new(0.5),{Transparency=1}):Play()p:Create(T,TweenInfo.new(0.8),{BackgroundTransparency=1}):Play()aI:Play()aI.Completed:Wait()if S and S.Parent then for aJ,aK in ipairs(S:GetChildren())do if aK~=U then aK:Destroy()end end;task.spawn(function()repeat task.wait(0.1)until not U or not U.Parent;S:Destroy()end)end;if R and R.Parent then R:Destroy()end;A:Fire()end;at.MouseButton1Click:Connect(aD)if u.duration and u.duration>0 then task.spawn(function()while Q and not ac do task.wait(0.1)end;task.wait(2)aD()end)end;_G.ThunderIntro_Stop=aD;
+local aL={rStroke=a3.Color,gStroke=a6.Color,titleGradient=a9.Color,sub=ad.TextColor3,orb=al.BackgroundColor3}
+local function aM(C,D,E)return Color3.fromHSV(C%1,D,E)end;
+local function aN(C)a9.Color=ColorSequence.new{ColorSequenceKeypoint.new(0.00,aM(C,1,1)),ColorSequenceKeypoint.new(0.50,aM(C+0.15,1,1)),ColorSequenceKeypoint.new(1.00,aM(C+0.30,1,1))}end;
+local function aO()
+local aP=math.max(0.099,u.rainbowSeconds)
+local aQ=u.rainbowTurns;
+local aR=os.clock()while Q do 
+local K=os.clock()-aR;if K>aP then break end;
+local aS=K/aP;
+local C=aS*aQ;a3.Color=aM(C,1,1)a6.Color=aM(C+0.08,1,1)aN(C)al.BackgroundColor3=aM(C+0.12,0.85,1)q.Heartbeat:Wait()end;a3.Color=aL.rStroke;a6.Color=aL.gStroke;a9.Color=aL.titleGradient;al.BackgroundColor3=aL.orb end;task.spawn(aO)task.spawn(function()
+local aT=Instance.new("Frame")aT.Size=UDim2.fromScale(1,1)aT.BackgroundColor3=Color3.new(1,1,1)aT.BackgroundTransparency=1;aT.ZIndex=999;aT.Parent=S;
+local aU=p:Create(aT,TweenInfo.new(0.05),{BackgroundTransparency=0.55})
+local aV=p:Create(aT,TweenInfo.new(0.12),{BackgroundTransparency=1})aU:Play()aU.Completed:Wait()aV:Play()aV.Completed:Wait()aT:Destroy()end)task.spawn(function()while Q do 
+local aW=p:Create(a1,TweenInfo.new(u.spinTime,Enum.EasingStyle.Exponential,Enum.EasingDirection.InOut),{Rotation=a1.Rotation+u.spinDeg})
+local aX=p:Create(a4,TweenInfo.new(u.spinTime,Enum.EasingStyle.Exponential,Enum.EasingDirection.InOut),{Rotation=a4.Rotation+u.spinDeg})aW:Play()aX:Play()aW.Completed:Wait()end end)task.spawn(function()while Q do p:Create(aB,TweenInfo.new(1.2,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Scale=u.breathMax}):Play()task.wait(1.2)p:Create(aB,TweenInfo.new(1.2,Enum.EasingStyle.Sine,Enum.EasingDirection.In),{Scale=u.breathMin}):Play()task.wait(1.2)end end)task.spawn(function()task.wait(0.3)p:Create(a8,TweenInfo.new(0.8,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{TextTransparency=0}):Play()task.wait(0.25)p:Create(ad,TweenInfo.new(0.6,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{TextTransparency=0}):Play()p:Create(as,TweenInfo.new(0.6,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{TextTransparency=0.2}):Play()end)task.spawn(function()while Q do 
+local aY=p:Create(al,TweenInfo.new(1.5,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{BackgroundTransparency=0.8,Size=UDim2.fromOffset(140,140)})
+local aZ=p:Create(al,TweenInfo.new(1.5,Enum.EasingStyle.Sine,Enum.EasingDirection.In),{BackgroundTransparency=0.9,Size=UDim2.fromOffset(120,120)})aY:Play()aY.Completed:Wait()aZ:Play()aZ.Completed:Wait()end end)
+local function a_()
+local b0=T.BackgroundTransparency;
+local b1=p:Create(T,TweenInfo.new(0.08,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{BackgroundTransparency=math.max(0,b0-0.12)})
+local b2=p:Create(T,TweenInfo.new(0.18,Enum.EasingStyle.Sine,Enum.EasingDirection.In),{BackgroundTransparency=b0})b1:Play()b1.Completed:Wait()b2:Play()
+local b3=a3.Thickness;
+local b4=a3.Color;
+local b5=p:Create(a3,TweenInfo.new(0.08,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Thickness=b3*1.35,Color=y})
+local b6=p:Create(a3,TweenInfo.new(0.22,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Thickness=b3,Color=b4})b5:Play()b5.Completed:Wait()b6:Play()
+local b7=p:Create(aC,TweenInfo.new(0.08,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1.03})
+local b8=p:Create(aC,TweenInfo.new(0.20,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Scale=1})b7:Play()b7.Completed:Wait()b8:Play()for n=1,u.bubbleCount do task.spawn(function()
+local m,D=az()
+local b9=p:Create(m,TweenInfo.new(0.6,Enum.EasingStyle.Cubic,Enum.EasingDirection.Out),{Size=UDim2.fromOffset(u.size*u.bubbleScale,u.size*u.bubbleScale)})
+local ba=p:Create(D,TweenInfo.new(0.6,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Transparency=1})b9:Play()ba:Play()b9.Completed:Wait()m:Destroy()end)task.wait(u.bubbleGap)end end;task.spawn(a_)task.spawn(function()task.wait(0.25)
+local aT=Instance.new("Frame")aT.Size=UDim2.fromScale(1,1)aT.BackgroundColor3=Color3.fromRGB(255,255,255)aT.BackgroundTransparency=1;aT.ZIndex=-5;aT.Parent=S;
+local aU=p:Create(aT,TweenInfo.new(0.08,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{BackgroundTransparency=0.6})
+local aV=p:Create(aT,TweenInfo.new(0.20,Enum.EasingStyle.Sine,Enum.EasingDirection.In),{BackgroundTransparency=1})aU:Play()aU.Completed:Wait()aV:Play()aV.Completed:Wait()aT:Destroy()end)task.spawn(function()task.wait(0.55)p:Create(aw,TweenInfo.new(1.1,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Position=UDim2.fromScale(1.2,0.5)}):Play()end)
+local function bb()
+local a1=a0:Clone()a1.Size=UDim2.fromOffset(0,0)a1.BackgroundTransparency=0.5;a1.Parent=a7;p:Create(a1,TweenInfo.new(0.6,Enum.EasingStyle.Quart),{Size=UDim2.fromOffset(300,300),BackgroundTransparency=1}):Play()s:AddItem(a1,0.6)end;
+local bc=nil;
+local bd=nil;if bc then bc.Completed:Connect(bb)end;if bd then bd.Ended:Connect(bb)end;A.Event:Wait()end;
+local be=game.Players.LocalPlayer;
+local bf=be:WaitForChild("PlayerGui")
+local bg=bf:FindFirstChild("\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79")
+local bh=_G.XGO_GradientConn;
+local bi=_G.XGO_PositionConn;
+local bj=_G.XGO_FpsConn;
+local bk=_G.XGO_TextConn;if bh then bh:Disconnect()end;if bi then bi:Disconnect()end;if bj then task.cancel(bj)end;if bk then task.cancel(bk)end;if bg then bg:Destroy()end;
+local l=Instance.new("ScreenGui")l.Name="\120\103\111\32\72\117\98\32\228\189\156\232\128\133\88\71\79"l.Parent=bf;l.ZIndexBehavior=Enum.ZIndexBehavior.Sibling;l.ResetOnSpawn=false;
+local m=Instance.new("TextLabel")m.Parent=l;m.BackgroundColor3=Color3.fromRGB(0,0,0)m.BackgroundTransparency=1;m.BorderSizePixel=0;m.Size=UDim2.new(0,1100,0,40)m.Font=Enum.Font.GothamBlack;m.TextColor3=Color3.fromRGB(255,255,255)m.TextSize=11.5;m.TextStrokeTransparency=0.8;m.TextStrokeColor3=Color3.fromRGB(0,0,0)m.TextWrapped=true;m.TextXAlignment=Enum.TextXAlignment.Center;m.Text="\120\103\111\32\72\117\98\32\84\73\77\69\n\229\166\130\230\158\156\229\141\161\229\156\168\232\191\153\228\184\170\233\161\181\233\157\162\44\232\175\183\233\135\141\230\150\176\229\144\175\229\138\168\46"
+local q=game:GetService("RunService")
+local aA=Instance.new("UIGradient")aA.Parent=m;
+local bl=Instance.new("UIGradient")bl.Parent=m;
+local bm=Instance.new("UICorner")bm.Parent=m;bm.CornerRadius=UDim.new(0,8)
+local bn=14;
+local bo=1.0;
+local bp=1.0;
+local bq={}for n=0,bn-1 do 
+local C=n/bn;table.insert(bq,Color3.fromHSV(C,bo,bp))end;
+local br=9;
+local bs=1;
+local function bt(bu)
+local bv={}
+local bw=#bq;for n=1,bw do 
+local K=((n-1)/(bw-1)+bu)%1;table.insert(bv,ColorSequenceKeypoint.new(K,bq[n]))end;table.sort(bv,function(l,m)return l.Time<m.Time end)bv[1]=ColorSequenceKeypoint.new(0,bv[1].Value)bv[#bv]=ColorSequenceKeypoint.new(1,bv[#bv].Value)return ColorSequence.new(bv)end;task.spawn(function()
+local aR=tick()while true do 
+local bx=(tick()-aR)%br;
+local by=bx/(br/2)%1;if bx>=br/2 then by=1-by end;
+local bz=1-by;aA.Color=bt(by)bl.Color=bt(bz)q.Heartbeat:Wait()end end)bh=game:GetService("RunService").RenderStepped:Connect(updateRainbowGradient)_G.XGO_GradientConn=bh;
+local bm=Instance.new("UICorner")bm.Parent=m;bm.CornerRadius=UDim.new(0,8)
+local bA=game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name;
+local function bB()
+local W=game:GetService("GuiService"):GetScreenResolution().X;
+local bC=-60;
+local bD=W/2-m.AbsoluteSize.X/2;m.Position=UDim2.new(0,bD,0,bC)end;bB()bi=game:GetService("RunService").Heartbeat:Connect(bB)_G.XGO_PositionConn=bi;
+local function bE()
+local bF=game:GetService("UserInputService")if bF.TouchEnabled and not bF.KeyboardEnabled then return"移动"else return"PC端"end end;
+local bG=0;if bj then task.cancel(bj)end;bj=spawn(function()
+local bH=game:GetService("RunService")
+local bI=60;if bH:IsRunning()then 
+local bJ=tick()
+local bK=10;for aJ=1,bK do bH.RenderStepped:Wait()end;
+local bL=(tick()-bJ)/bK;
+local bM=math.floor(1/bL)bI=math.min(bM,240)end;while task.wait(1)do 
+local bN=0;
+local bO=tick()while tick()-bO<1 do bH.RenderStepped:Wait()bN=bN+1 end;bG=math.min(bN,bI)end end)_G.XGO_FpsConn=bj;
+local function bP(bQ,bR)if bQ==3 and bR>=21 or bQ==4 or bQ==5 or bQ==6 and bR<22 then return"\227\128\144\230\152\165\229\173\163\227\128\145"elseif bQ==6 and bR>=22 or bQ==7 or bQ==8 or bQ==9 and bR<23 then return"\227\128\144\229\164\143\229\173\163\227\128\145"elseif bQ==9 and bR>=23 or bQ==10 or bQ==11 or bQ==12 and bR<22 then return"\227\128\144\231\167\139\229\173\163\227\128\145"else return"\227\128\144\229\134\172\229\173\163\227\128\145"end end;
+local function bS(bQ,bR)
+local bT={{1,1,"\229\133\131\230\151\166"},{1,22,"\230\152\165\232\138\130"},{2,2,"\233\190\153\230\138\172\229\164\180"},{2,14,"\230\131\133\228\186\186\232\138\130"},{3,8,"\229\166\135\229\165\179\232\138\130"},{3,12,"\230\164\141\230\160\145\232\138\130"},{4,5,"\230\184\133\230\152\142\232\138\130"},{4,1,"\230\132\154\228\186\186\232\138\130"},{5,1,"\229\138\179\229\138\168\232\138\130"},{5,4,"\233\157\146\229\185\180\232\138\130"},{5,20,"\231\171\175\229\141\136\232\138\130"},{6,1,"\229\132\191\231\171\165\232\138\130"},{7,1,"\229\187\186\229\133\154\232\138\130"},{7,7,"\228\184\131\229\164\149\232\138\130"},{8,1,"\229\187\186\229\134\155\232\138\130"},{8,15,"\228\184\173\231\167\139\232\138\130"},{9,10,"\230\149\153\229\184\136\232\138\130"},{9,9,"\233\135\141\233\152\179\232\138\130"},{10,1,"\229\155\189\229\186\134\232\138\130"},{11,21,"\228\189\156\232\128\133\231\148\159\230\151\165"},{12,8,"\232\133\138\229\133\171\232\138\130"},{12,23,"\229\176\143\229\185\180"},{12,24,"\229\176\143\229\185\180"},{12,22,"\229\134\172\232\135\179"},{12,25,"\229\156\163\232\175\158\232\138\130"}}for aJ,bU in ipairs(bT)do if bU[1]==bQ and bU[2]==bR then return"\227\128\144\232\138\130\227\128\145\58"..bU[3].."\229\191\171\228\185\144 "end end;return"\232\132\154\230\156\172\232\174\164\229\135\134\88\71\79\72\85\66\32\124\32"end;
+local bV=game.ReplicatedStorage:FindFirstChild("XGO_GlobalData")if not bV then bV=Instance.new("NumberValue")bV.Name="XGO_GlobalData"bV.Value=tick()bV.Parent=game.ReplicatedStorage end;
+local bW=bV.Value;if bk then task.cancel(bk)end;bk=spawn(function()while task.wait(0.5)do pcall(function()
+local bX=tick()-bW;
+local bY=math.floor(bX/3600)
+local bZ=math.floor(bX%3600/60)
+local b_=math.floor(bX%60)
+local c0=string.format("%02d:%02d:%02d",bY,bZ,b_)
+local c1=os.date("%Y")
+local bQ=os.date("%m")
+local bR=os.date("%d")
+local c2=os.date("%w")
+local c3;if c2=="\48"then c3="\230\151\165\227\128\145"elseif c2=="\49"then c3="\228\184\128\227\128\145"elseif c2=="\50"then c3="\228\186\140\227\128\145"elseif c2=="\51"then c3="\228\184\137\227\128\145"elseif c2=="\52"then c3="\229\155\155\227\128\145"elseif c2=="\53"then c3="\228\186\148\227\128\145"else c3="\229\133\173"end;
+local c4=c1 .."\229\185\180"..bQ.."\230\156\136"..bR.."\230\151\165\32\227\128\144\229\145\168"..c3;
+local c5=os.date("%H:%M:%S")
+local c6=bP(tonumber(bQ),tonumber(bR))
+local c7=bS(tonumber(bQ),tonumber(bR))
+local c8=tonumber(os.date("%H"))
+local c9;if c8>=0 and c8<5 then c9="\229\183\178\231\187\143\60\229\135\140\230\153\168\62\228\186\134\44\232\191\152\228\184\141\231\157\161"elseif c8>=5 and c8<12 then c9="\229\147\142\229\145\128\229\183\178\231\187\143\60\230\151\169\228\184\138\62\228\186\134"elseif c8==12 then c9="\60\228\184\173\229\141\136\62\229\144\131\233\165\173\231\154\132\230\151\182\233\151\180\229\136\176\229\150\189"elseif c8>12 and c8<18 then c9="\60\228\184\139\229\141\136\62\230\151\182\233\151\180\230\178\161\228\186\139\229\129\154\203\130\226\129\189\203\136\226\130\141\32\226\129\190\203\178\226\130\142\226\130\140"else c9="\229\183\178\231\187\143\60\230\153\154\228\184\138\62\228\186\134\229\145\128\44\230\151\169\231\130\185\231\157\161"end;
+local ca="未知"
+local cb=game:GetService("Stats")if cb and cb.Network and cb.Network.ServerStatsItem["Data Ping"]then ca=cb.Network.ServerStatsItem["Data Ping"]:GetValueString()end;m.Text="\232\132\154\230\156\172\230\151\182\233\149\191\58\32"..c0 .."\32\124\32\232\174\190\229\164\135\58\32"..bE().."\32\124\32\229\184\167\231\142\135\58\32"..bG.."\32\32\124\32\80\73\78\71\58\32"..ca.."\n"..c4 .." "..c5 .." "..c6 .." "..c7 .."\230\173\163\229\156\168\231\142\169\58\32"..bA.." | "..c9 end)end end)_G.XGO_RAW_UI=l;_G.XGO_RAW_UI.Enabled=true;_G.XGO_TextConn=bk;_G.XGO_SET_VISIBLE=function(cc)if _G.XGO_RAW_UI then _G.XGO_RAW_UI.Enabled=cc end end
 local Library = {
 	Version = '\88\71\79\72\85\66\32\45\32\98\121\46\120\103\111',
 	Loaded = true,
@@ -983,7 +217,6 @@ local Library = {
 	info = debug.info,
 	xpcall = xpcall,
 };
-
 local function playSound(audioId)
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://" .. audioId
@@ -992,7 +225,6 @@ local function playSound(audioId)
     sound.Parent = game.Workspace
     sound:Play()
 end
-
 Library.Icons = {
     ["手"] = "rbxassetid://7733955740",     ["家"] = "rbxassetid://7733960981",
     ["锚"] = "rbxassetid://7733911490",      ["票"] = "rbxassetid://7734086558",
@@ -3514,6 +2746,26 @@ function Library:Windowxgo(setup)
         "rbxassetid://82946948263565",
         "rbxassetid://103978538129672",
         "rbxassetid://109910690533379",
+        "rbxassetid://102758966602051",
+        "rbxassetid://89176731754122",
+        "rbxassetid://91724363419315",
+        "rbxassetid://83870387504302",
+        "rbxassetid://111060921599915",
+        "rbxassetid://116604936921153",
+        "rbxassetid://110961266532965",
+        "rbxassetid://121651155995404",
+        "rbxassetid://71410956953263",
+        "rbxassetid://86755296299095",
+        "rbxassetid://138552271140582",
+        "rbxassetid://91156132315804",
+        "rbxassetid://110272249057084",
+        "rbxassetid://73800705556056",
+        "rbxassetid://126963092855966",
+        "rbxassetid://130633445624203",
+        "rbxassetid://132720010498486",
+        "rbxassetid://130431838452868",
+        "rbxassetid://122661063909203",
+        "rbxassetid://92512949372789",
         "rbxassetid://110959984143843"
     }
 
