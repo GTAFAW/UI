@@ -2917,26 +2917,26 @@ function Library:Windowxgo(setup)
 
         task.wait(1);
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
-local Players = game:GetService('Players')
+repeat task.wait() until game:IsLoaded()
 local HttpService = game:GetService('HttpService')
 local Workspace = game:GetService('Workspace')
 
-local function MakeFolder(path)   pcall(makefolder, path) end
+local function MakeFolder(path) pcall(makefolder, path) end
 local function IsFileExist(path)
     local ok = pcall(function() return readfile(path) end)
     return ok
 end
 local function ReadFile(path)
-    local ok,txt = pcall(readfile,path)
+    local ok, txt = pcall(readfile, path)
     return ok and txt or ''
 end
-local function WriteFile(path,txt)
-    pcall(function() writefile(path,tostring(txt)) end)
+local function WriteFile(path, txt)
+    pcall(function() writefile(path, tostring(txt)) end)
 end
-local function DelFile(path) pcall(delfile,path) end
+local function DelFile(path) pcall(delfile, path) end
 
-local CACHE_DIR  = 'XGOHUB'
-local CACHE_FILE = CACHE_DIR..'/key.txt'
+local CACHE_DIR = 'XGOHUB'
+local CACHE_FILE = CACHE_DIR .. '/key.txt'
 MakeFolder(CACHE_DIR)
 
 repeat task.wait() until setup and setup.KeySystemInfo
@@ -2983,7 +2983,7 @@ AuthFunction.BorderColor3 = Color3.fromRGB(0, 0, 0)
 AuthFunction.BorderSizePixel = 0
 AuthFunction.Position = UDim2.new(0.5, 0, -1.5, 0)
 AuthFunction.Size = UDim2.new(1, 0, 1, 0)
-Library:Tween(AuthFunction , Library.TweenLibrary.SmallEffect,{Position = UDim2.new(0.5, 0, 0.5, 0)})
+Library:Tween(AuthFunction, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(0.5, 0, 0.5, 0)})
 
 Title.Name = "Title"
 Title.Parent = AuthFunction
@@ -3191,7 +3191,7 @@ CloseButton.Text = "X"
 CloseButton.TextSize = 14
 CloseButton.MouseButton1Click:Connect(function()
     CloseSound:Play()
-    Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
+    Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0, 0)})
     task.wait(0.5)
     ScreenGui:Destroy()
     task.spawn(function()
@@ -3200,16 +3200,15 @@ CloseButton.MouseButton1Click:Connect(function()
     end)
 end)
 
-Library:MakeDrop(GetButton , UIStroke_3 , Library.Colors.Hightlight)
-Library:MakeDrop(LoginButton , UIStroke_4 , Library.Colors.Hightlight)
-Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
+Library:MakeDrop(GetButton, UIStroke_3, Library.Colors.Hightlight)
+Library:MakeDrop(LoginButton, UIStroke_4, Library.Colors.Hightlight)
+Library:MakeDrop(TextBox, UIStroke, Library.Colors.Hightlight)
 setup.KeySystemInfo.CodeId = HttpService:GenerateGUID(false)
 setup.KeySystemInfo.AntiSpam = false
 
 LButton.MouseButton1Click:Connect(function()
     if setup.KeySystemInfo.AntiSpam then return end
     setup.KeySystemInfo.AntiSpam = true
-
     if TextBox.Text == "" then
         TextBox.PlaceholderText = "你没有填入卡密"
         task.wait(1.5)
@@ -3244,11 +3243,10 @@ while true do
 end
 
 TextBox.TextEditable = false
-Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)})
+Library:Tween(AuthFunction, Library.TweenLibrary.Normal, {Position = UDim2.new(0.5, 0, 1.5, 0)})
 task.wait(0.5)
-Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
-Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
-
+Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged, {Size = setup.Size})
+Library:Tween(Ico, Library.TweenLibrary.SmallEffect, {ImageTransparency = 1})
 ------ // 最小化设置    ----------------------------------------------------------------------------------------
 local WindowLibrary = {};
 local OpenDelay = tick();
