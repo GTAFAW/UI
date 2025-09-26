@@ -2777,6 +2777,19 @@ function Library:Windowxgo(setup)
         "rbxassetid://116871060567717",
         "rbxassetid://103367830571291",
         "rbxassetid://96998968464408",
+        "rbxassetid://132579467991249",
+        "rbxassetid://104888945315767",
+        "rbxassetid://100633960898554",
+        "rbxassetid://131269679070989",
+        "rbxassetid://119328213269048",
+        "rbxassetid://72633967224235",
+        "rbxassetid://133389176535241",
+        "rbxassetid://140492333414033",
+        "rbxassetid://128721442456386",
+        "rbxassetid://138178487928940",
+        "rbxassetid://129455019299572",
+        "rbxassetid://105908188662165",
+        "rbxassetid://93578989735225",
         "rbxassetid://110959984143843"
     }
 
@@ -2919,102 +2932,69 @@ function Library:Windowxgo(setup)
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-local function getKeySavePath()
-    return "XGOHUB/卡密配置.json"
-end
 
 local function ensureXGOFolder()
     local folderPath = "XGOHUB"
-    local keyPath = getKeySavePath()
-    
+    local configPath = folderPath .. "/SavedKey.json"
     if isfolder and not isfolder(folderPath) then
         makefolder(folderPath)
-    elseif writefile and not pcall(function() readfile(keyPath) end) then
-        pcall(function() writefile(keyPath, HttpService:JSONEncode({})) end)
+    elseif writefile and not pcall(function() readfile(configPath) end) then
+        local success = pcall(function()
+            writefile(configPath, "{}")
+        end)
+        if not success then
+            warn("XGOHUB：无法创建卡密保存文件夹，可能无文件写入权限")
+        end
     end
-    return keyPath
+    return configPath
 end
+
+local savedKeyPath = ensureXGOFolder()
 
 local function loadSavedKey()
-    local keyPath = ensureXGOFolder()
-    local savedData = {Key = "", IsValid = false, SavedTime = ""}
-    
+    local savedKey = ""
     if readfile then
-        local success, rawData = pcall(function()
-            local jsonData = readfile(keyPath)
+        local success, data = pcall(function()
+            local jsonData = readfile(savedKeyPath)
             return HttpService:JSONDecode(jsonData)
         end)
-        if success and type(rawData) == "table" and rawData.Key then
-            savedData.Key = rawData.Key
-            savedData.IsValid = rawData.IsValid ~= nil and rawData.IsValid or false
-            savedData.SavedTime = rawData.SavedTime or os.date("%Y-%m-%d %H:%M:%S")
+        if success and data and data.Key then
+            savedKey = data.Key
         end
     end
-    return savedData
+    return savedKey
 end
 
-local function saveKeyToFile(key, isValid)
-    local keyPath = ensureXGOFolder()
-    if not writefile then return false end
-    
-    local success = pcall(function()
-        local saveData = {
-            Key = key,
-            IsValid = isValid,
-            SavedTime = os.date("%Y-%m-%d %H:%M:%S"),
-            PlayerName = LocalPlayer.Name
-        }
-        writefile(keyPath, HttpService:JSONEncode(saveData))
-    end)
-    
-    if success then
-        print(string.format("XGOHUB：卡密已保存（%s）", isValid and "有效" or "待验证"))
-    else
-        warn("XGOHUB：卡密保存失败，可能无文件写入权限")
-    end
-    return success
-end
-
-local function clearOldKey()
-    local keyPath = getKeySavePath()
-    if not writefile then return false end
-    
-    local success = pcall(function()
-        writefile(keyPath, HttpService:JSONEncode({Key = "", IsValid = false}))
-    end)
-    if success then
-        print("XGOHUB：旧卡密已清除")
-    end
-    return success
-end
-
-local autoLoginInProgress = false
-local function autoLogin(loginCallback)
-    if autoLoginInProgress then return false, "" end
-    autoLoginInProgress = true
-    
-    local savedData = loadSavedKey()
-    local result = false
-    local key = ""
-    
-    if savedData.Key ~= "" and savedData.IsValid then
-        print("XGOHUB：尝试自动登录...")
-        local verifySuccess = loginCallback(savedData.Key)
-        if verifySuccess then
-            print("XGOHUB：自动登录成功！")
-            result = true
-            key = savedData.Key
+local function saveKeyToFile(key)
+    if writefile then
+        local success = pcall(function()
+            local jsonData = HttpService:JSONEncode({
+                Key = key,
+                SavedTime = os.date("%Y-%m-%d %H:%M:%S")
+            })
+            writefile(savedKeyPath, jsonData)
+        end)
+        if not success then
+            warn("XGOHUB：卡密保存失败，可能无文件写入权限")
         else
-            print("XGOHUB：旧卡密失效，清除旧数据")
-            clearOldKey()
+            print("XGOHUB：卡密已保存至 " .. savedKeyPath)
         end
     end
-    
-    autoLoginInProgress = false
-    return result, key
+end
+
+local savedKey = loadSavedKey()
+
+local function trySilentLogin(key)
+    if not key or key == "" then return false end
+    local ok = setup.KeySystemInfo.OnLogin(key)
+    return ok
+end
+
+if trySilentLogin(savedKey) then
+    setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
+    Library:Tween(MainFrame, Library.TweenLibrary.WindowChanged,{Size = setup.Size})
+    Library:Tween(Ico, Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
+    return
 end
 
 local AuthFunction = Instance.new("Frame")
@@ -3067,9 +3047,8 @@ Title.TextSize = 14.000
 Title.TextStrokeColor3 = Library.Colors.TextColor
 Title.TextStrokeTransparency = 0.950
 Title.TextWrapped = true
-Title.RichText = true;
+Title.RichText = true
 
-local savedData = loadSavedKey()
 TextBox.Parent = AuthFunction
 TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
 TextBox.BackgroundColor3 = Library.Colors.Default
@@ -3081,8 +3060,8 @@ TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
 TextBox.ZIndex = 5
 TextBox.ClearTextOnFocus = false
 TextBox.Font = Enum.Font.SourceSans
-TextBox.PlaceholderText = savedData.Key ~= "" and "已检测到旧卡密，可直接验证或修改" or "请输入卡密"
-TextBox.Text = savedData.Key
+TextBox.PlaceholderText = "请输入卡密"
+TextBox.Text = savedKey
 TextBox.TextColor3 = Library.Colors.TextColor
 TextBox.TextSize = 13.000
 TextBox.TextStrokeColor3 = Library.Colors.TextColor
@@ -3155,7 +3134,7 @@ GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
 GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
 GTitle.ZIndex = 6
 GTitle.Font = Enum.Font.Gotham
-GTitle.Text = "获取卡密"
+GTitle.Text = "链接"
 GTitle.TextColor3 = Library.Colors.TextColor
 GTitle.TextScaled = true
 GTitle.TextSize = 14.000
@@ -3217,7 +3196,7 @@ LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
 LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
 LTitle.ZIndex = 6
 LTitle.Font = Enum.Font.Gotham
-LTitle.Text = "验证登录"
+LTitle.Text = "确认"
 LTitle.TextColor3 = Library.Colors.TextColor
 LTitle.TextScaled = true
 LTitle.TextSize = 14.000
@@ -3234,7 +3213,7 @@ LButton.BorderSizePixel = 0
 LButton.Size = UDim2.new(1, 0, 1, 0)
 LButton.ZIndex = 15
 LButton.Font = Enum.Font.SourceSans
-LButton.Text = "验证登录"
+LButton.Text = "确认"
 LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 LButton.TextSize = 14.000
 LButton.TextTransparency = 1.000
@@ -3256,7 +3235,7 @@ CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.Text = "X"
 CloseButton.TextSize = 14
 CloseButton.MouseButton1Click:Connect(function()
-    CloseSound:Play()  
+    CloseSound:Play()
     Library:Tween(MainFrame, Library.TweenLibrary.Normal, {Size = UDim2.fromScale(0,0)})
     task.wait(0.5)
     ScreenGui:Destroy()
@@ -3272,75 +3251,53 @@ Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
 setup.KeySystemInfo.CodeId = game:GetService('HttpService'):GenerateGUID(false);
 setup.KeySystemInfo.AntiSpam = false;
 
-local originalLoginCallback = setup.KeySystemInfo.OnLogin
-
 LButton.MouseButton1Click:Connect(function()
-    if setup.KeySystemInfo.AntiSpam or autoLoginInProgress then return end;
-    setup.KeySystemInfo.AntiSpam = true;
-    
-    local inputKey = TextBox.Text:trim()
-    if inputKey == "" then
-        TextBox.PlaceholderText = "请输入有效的卡密"
+    if setup.KeySystemInfo.AntiSpam then return end
+    setup.KeySystemInfo.AntiSpam = true
+
+    if TextBox.Text == "" then
+        TextBox.PlaceholderText = "你没有填入卡密"
         task.wait(1.5)
-        TextBox.PlaceholderText = savedData.Key ~= "" and "已检测到旧卡密，可直接验证或修改" or "请输入卡密"
+        TextBox.PlaceholderText = "请输入卡密"
     else
-        savedData.Key = inputKey
-        local verifySuccess = originalLoginCallback(inputKey)
-        if verifySuccess then
-            saveKeyToFile(inputKey, true)
+        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
+        if verify then
             setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-            CloseButton.Visible = false;
-            print("XGOHUB：卡密验证成功，下次登录将自动验证")
+            saveKeyToFile(TextBox.Text)
+            CloseButton.Visible = false
+            return
         else
-            if inputKey == savedData.Key then
-                clearOldKey()
-                TextBox.Text = ""
-                TextBox.PlaceholderText = "旧卡密已失效，请输入新卡密"
-            else
-                TextBox.PlaceholderText = "卡密错误，请重新输入"
+            if writefile then
+                pcall(function()
+                    writefile(savedKeyPath, "{}")
+                end)
             end
+            task.wait(0.1)
+            TextBox.Text = ""
+            TextBox.PlaceholderText = "你输入的卡密错误"
             task.wait(1.5)
-            TextBox.PlaceholderText = "请输入新卡密"
+            TextBox.PlaceholderText = "请重新输入卡密"
         end
     end
-    setup.KeySystemInfo.AntiSpam = false;
+    setup.KeySystemInfo.AntiSpam = false
 end)
 
 GButton.MouseButton1Click:Connect(setup.KeySystemInfo.OnGetKey)
 
 function setup:CancelLogin()
     setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-end;
+end
 
-task.spawn(function()
-    task.wait(0.5)
-    local autoLoginTimeout = task.delay(3, function()
-        autoLoginInProgress = false
-        print("XGOHUB：自动登录超时，切换为手动登录模式")
-    end)
-    
-    local autoLoginSuccess, validKey = autoLogin(originalLoginCallback)
-    if autoLoginSuccess then
-        task.cancel(autoLoginTimeout)
-        setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-        CloseButton.Visible = false;
-    end
-end)
-
-while true do 
-    local this = setup.KeySystemInfo.Finished.Event:Wait();
+while true do
+    local this = setup.KeySystemInfo.Finished.Event:Wait()
     if this == setup.KeySystemInfo.CodeId then
-        break;
-    end;
-end;
+        break
+    end
+end
 
-TextBox.TextEditable = false;
-Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)});
+TextBox.TextEditable = false
+Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)})
 task.wait(0.5)
-else
-    repeat task.wait(1.5) until game:IsLoaded();		
-end;
-
 Library:Tween(MainFrame , Library.TweenLibrary.WindowChanged,{Size = setup.Size})
 Library:Tween(Ico , Library.TweenLibrary.SmallEffect,{ImageTransparency = 1})
 
