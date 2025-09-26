@@ -2991,28 +2991,37 @@ local function clearOldKey()
     return success
 end
 
+local autoLoginInProgress = false
 local function autoLogin(loginCallback)
+    if autoLoginInProgress then return false, "" end
+    autoLoginInProgress = true
+    
     local savedData = loadSavedKey()
+    local result = false
+    local key = ""
+    
     if savedData.Key ~= "" and savedData.IsValid then
-        print("XGOHUB：检测到已保存的有效卡密，尝试自动登录...")
+        print("XGOHUB：尝试自动登录...")
         local verifySuccess = loginCallback(savedData.Key)
         if verifySuccess then
             print("XGOHUB：自动登录成功！")
-            return true, savedData.Key
+            result = true
+            key = savedData.Key
         else
-            print("XGOHUB：已保存的卡密失效，需重新输入")
+            print("XGOHUB：旧卡密失效，清除旧数据")
             clearOldKey()
-            return false, ""
         end
     end
-    return false, ""
+    
+    autoLoginInProgress = false
+    return result, key
 end
 
 local AuthFunction = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local TextBox = Instance.new("TextBox")
 local DropShadow = Instance.new("ImageLabel")
-local UIStroke = Instance.new("UIStroke") -- 边框
+local UIStroke = Instance.new("UIStroke")
 local UIStroke_2 = Instance.new("UIStroke")
 local GetButton = Instance.new("Frame")
 local DropShadow_2 = Instance.new("ImageLabel")
@@ -3089,7 +3098,7 @@ DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
 DropShadow.Position = UDim2.new(0, -5, 0, -5)
 DropShadow.Size = UDim2.new(1, 10, 1, 10)
 DropShadow.ZIndex = 4
-DropShadow.Image = "rbxassetid://297694300"  --2
+DropShadow.Image = "rbxassetid://297694300"
 DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
 DropShadow.ImageTransparency = 0.500
 DropShadow.ScaleType = Enum.ScaleType.Slice
@@ -3124,7 +3133,7 @@ DropShadow_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
 DropShadow_2.Position = UDim2.new(0, -5, 0, -5)
 DropShadow_2.Size = UDim2.new(1, 10, 1, 10)
 DropShadow_2.ZIndex = 4
-DropShadow_2.Image = "rbxassetid://297694300"  --3
+DropShadow_2.Image = "rbxassetid://297694300"
 DropShadow_2.ImageColor3 = Color3.fromRGB(0, 0, 0)
 DropShadow_2.ImageTransparency = 0.500
 DropShadow_2.ScaleType = Enum.ScaleType.Slice
@@ -3186,7 +3195,7 @@ DropShadow_3.BorderColor3 = Color3.fromRGB(27, 42, 53)
 DropShadow_3.Position = UDim2.new(0, -5, 0, -5)
 DropShadow_3.Size = UDim2.new(1, 10, 1, 10)
 DropShadow_3.ZIndex = 4
-DropShadow_3.Image = "rbxassetid://297694300"  --4
+DropShadow_3.Image = "rbxassetid://297694300"
 DropShadow_3.ImageColor3 = Color3.fromRGB(0, 0, 0)
 DropShadow_3.ImageTransparency = 0.500
 DropShadow_3.ScaleType = Enum.ScaleType.Slice
@@ -3231,15 +3240,15 @@ LButton.TextSize = 14.000
 LButton.TextTransparency = 1.000
 
 CloseSound.Name = "CloseSound"
-CloseSound.SoundId = "rbxassetid://104269922408932" -- 音频ID
+CloseSound.SoundId = "rbxassetid://104269922408932"
 CloseSound.Volume = 1.0
 CloseSound.PlayOnRemove = false
 CloseSound.Parent = Workspace
 
 CloseButton.Name = "CloseButton"
 CloseButton.Parent = AuthFunction
-CloseButton.BackgroundColor3 = Color3.new(0, 0, 0) 
-CloseButton.BackgroundTransparency = 1 
+CloseButton.BackgroundColor3 = Color3.new(0, 0, 0)
+CloseButton.BackgroundTransparency = 1
 CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
 CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
 CloseButton.Font = Enum.Font.GothamSemibold
@@ -3266,7 +3275,7 @@ setup.KeySystemInfo.AntiSpam = false;
 local originalLoginCallback = setup.KeySystemInfo.OnLogin
 
 LButton.MouseButton1Click:Connect(function()
-    if setup.KeySystemInfo.AntiSpam then return end;
+    if setup.KeySystemInfo.AntiSpam or autoLoginInProgress then return end;
     setup.KeySystemInfo.AntiSpam = true;
     
     local inputKey = TextBox.Text:trim()
@@ -3275,6 +3284,7 @@ LButton.MouseButton1Click:Connect(function()
         task.wait(1.5)
         TextBox.PlaceholderText = savedData.Key ~= "" and "已检测到旧卡密，可直接验证或修改" or "请输入卡密"
     else
+        savedData.Key = inputKey
         local verifySuccess = originalLoginCallback(inputKey)
         if verifySuccess then
             saveKeyToFile(inputKey, true)
@@ -3304,8 +3314,14 @@ end;
 
 task.spawn(function()
     task.wait(0.5)
+    local autoLoginTimeout = task.delay(3, function()
+        autoLoginInProgress = false
+        print("XGOHUB：自动登录超时，切换为手动登录模式")
+    end)
+    
     local autoLoginSuccess, validKey = autoLogin(originalLoginCallback)
     if autoLoginSuccess then
+        task.cancel(autoLoginTimeout)
         setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
         CloseButton.Visible = false;
     end
