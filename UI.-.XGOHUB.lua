@@ -2919,58 +2919,95 @@ function Library:Windowxgo(setup)
 ------ // 卡密系统设置    ----------------------------------------------------------------------------------------
 
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function getKeySavePath()
+    return "XGOHUB/卡密配置.json"
+end
 
 local function ensureXGOFolder()
     local folderPath = "XGOHUB"
-    local configPath = folderPath .. "/SavedKey.json"
+    local keyPath = getKeySavePath()
     
     if isfolder and not isfolder(folderPath) then
         makefolder(folderPath)
-    elseif writefile and not pcall(function() readfile(configPath) end) then
-        local success = pcall(function()
-            writefile(configPath, "{}")
-        end)
-        if not success then
-            warn("XGOHUB：无法创建卡密保存文件夹，可能无文件写入权限")
-        end
+    elseif writefile and not pcall(function() readfile(keyPath) end) then
+        pcall(function() writefile(keyPath, HttpService:JSONEncode({})) end)
     end
-    
-    return configPath
+    return keyPath
 end
 
-local savedKeyPath = ensureXGOFolder()
 local function loadSavedKey()
-    local savedKey = ""
+    local keyPath = ensureXGOFolder()
+    local savedData = {Key = "", IsValid = false, SavedTime = ""}
+    
     if readfile then
-        local success, data = pcall(function()
-            local jsonData = readfile(savedKeyPath)
+        local success, rawData = pcall(function()
+            local jsonData = readfile(keyPath)
             return HttpService:JSONDecode(jsonData)
         end)
-        if success and data and data.Key then
-            savedKey = data.Key
+        if success and type(rawData) == "table" and rawData.Key then
+            savedData.Key = rawData.Key
+            savedData.IsValid = rawData.IsValid ~= nil and rawData.IsValid or false
+            savedData.SavedTime = rawData.SavedTime or os.date("%Y-%m-%d %H:%M:%S")
         end
     end
-    return savedKey
+    return savedData
 end
 
-local function saveKeyToFile(key)
-    if writefile then
-        local success = pcall(function()
-            local jsonData = HttpService:JSONEncode({
-                Key = key,
-                SavedTime = os.date("%Y-%m-%d %H:%M:%S")
-            })
-            writefile(savedKeyPath, jsonData)
-        end)
-        if not success then
-            warn("XGOHUB：卡密保存失败，可能无文件写入权限")
+local function saveKeyToFile(key, isValid)
+    local keyPath = ensureXGOFolder()
+    if not writefile then return false end
+    
+    local success = pcall(function()
+        local saveData = {
+            Key = key,
+            IsValid = isValid,
+            SavedTime = os.date("%Y-%m-%d %H:%M:%S"),
+            PlayerName = LocalPlayer.Name
+        }
+        writefile(keyPath, HttpService:JSONEncode(saveData))
+    end)
+    
+    if success then
+        print(string.format("XGOHUB：卡密已保存（%s）", isValid and "有效" or "待验证"))
+    else
+        warn("XGOHUB：卡密保存失败，可能无文件写入权限")
+    end
+    return success
+end
+
+local function clearOldKey()
+    local keyPath = getKeySavePath()
+    if not writefile then return false end
+    
+    local success = pcall(function()
+        writefile(keyPath, HttpService:JSONEncode({Key = "", IsValid = false}))
+    end)
+    if success then
+        print("XGOHUB：旧卡密已清除")
+    end
+    return success
+end
+
+local function autoLogin(loginCallback)
+    local savedData = loadSavedKey()
+    if savedData.Key ~= "" and savedData.IsValid then
+        print("XGOHUB：检测到已保存的有效卡密，尝试自动登录...")
+        local verifySuccess = loginCallback(savedData.Key)
+        if verifySuccess then
+            print("XGOHUB：自动登录成功！")
+            return true, savedData.Key
         else
-            print("XGOHUB：卡密已保存至 " .. savedKeyPath)
+            print("XGOHUB：已保存的卡密失效，需重新输入")
+            clearOldKey()
+            return false, ""
         end
     end
+    return false, ""
 end
 
--- 【原有代码开始】
 local AuthFunction = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local TextBox = Instance.new("TextBox")
@@ -3023,6 +3060,7 @@ Title.TextStrokeTransparency = 0.950
 Title.TextWrapped = true
 Title.RichText = true;
 
+local savedData = loadSavedKey()
 TextBox.Parent = AuthFunction
 TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
 TextBox.BackgroundColor3 = Library.Colors.Default
@@ -3034,9 +3072,8 @@ TextBox.Size = UDim2.new(0.699999988, 0, 0.125, 0)
 TextBox.ZIndex = 5
 TextBox.ClearTextOnFocus = false
 TextBox.Font = Enum.Font.SourceSans
-TextBox.PlaceholderText = "请输入卡密"
-
-TextBox.Text = loadSavedKey()
+TextBox.PlaceholderText = savedData.Key ~= "" and "已检测到旧卡密，可直接验证或修改" or "请输入卡密"
+TextBox.Text = savedData.Key
 TextBox.TextColor3 = Library.Colors.TextColor
 TextBox.TextSize = 13.000
 TextBox.TextStrokeColor3 = Library.Colors.TextColor
@@ -3109,7 +3146,7 @@ GTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
 GTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
 GTitle.ZIndex = 6
 GTitle.Font = Enum.Font.Gotham
-GTitle.Text = "链接"
+GTitle.Text = "获取卡密"
 GTitle.TextColor3 = Library.Colors.TextColor
 GTitle.TextScaled = true
 GTitle.TextSize = 14.000
@@ -3171,7 +3208,7 @@ LTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
 LTitle.Size = UDim2.new(0.899999976, 0, 0.449999988, 0)
 LTitle.ZIndex = 6
 LTitle.Font = Enum.Font.Gotham
-LTitle.Text = "确认"
+LTitle.Text = "验证登录"
 LTitle.TextColor3 = Library.Colors.TextColor
 LTitle.TextScaled = true
 LTitle.TextSize = 14.000
@@ -3188,7 +3225,7 @@ LButton.BorderSizePixel = 0
 LButton.Size = UDim2.new(1, 0, 1, 0)
 LButton.ZIndex = 15
 LButton.Font = Enum.Font.SourceSans
-LButton.Text = "确认"
+LButton.Text = "验证登录"
 LButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 LButton.TextSize = 14.000
 LButton.TextTransparency = 1.000
@@ -3226,29 +3263,36 @@ Library:MakeDrop(TextBox , UIStroke , Library.Colors.Hightlight)
 setup.KeySystemInfo.CodeId = game:GetService('HttpService'):GenerateGUID(false);
 setup.KeySystemInfo.AntiSpam = false;
 
+local originalLoginCallback = setup.KeySystemInfo.OnLogin
+
 LButton.MouseButton1Click:Connect(function()
     if setup.KeySystemInfo.AntiSpam then return end;
     setup.KeySystemInfo.AntiSpam = true;
     
-    if TextBox.Text == "" then
-        TextBox.PlaceholderText = "你没有填入卡密"
+    local inputKey = TextBox.Text:trim()
+    if inputKey == "" then
+        TextBox.PlaceholderText = "请输入有效的卡密"
         task.wait(1.5)
-        TextBox.PlaceholderText = "请输入卡密"
+        TextBox.PlaceholderText = savedData.Key ~= "" and "已检测到旧卡密，可直接验证或修改" or "请输入卡密"
     else
-        local verify = setup.KeySystemInfo.OnLogin(TextBox.Text);
-        if verify then
+        local verifySuccess = originalLoginCallback(inputKey)
+        if verifySuccess then
+            saveKeyToFile(inputKey, true)
             setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
-            saveKeyToFile(TextBox.Text)
             CloseButton.Visible = false;
-            return TextBox.Text;
+            print("XGOHUB：卡密验证成功，下次登录将自动验证")
         else
-            task.wait(0.1)
-            TextBox.Text = ""
-            TextBox.PlaceholderText = "你输入的卡密错误"
+            if inputKey == savedData.Key then
+                clearOldKey()
+                TextBox.Text = ""
+                TextBox.PlaceholderText = "旧卡密已失效，请输入新卡密"
+            else
+                TextBox.PlaceholderText = "卡密错误，请重新输入"
+            end
             task.wait(1.5)
-            TextBox.PlaceholderText = "请重新输入卡密"
-        end;
-    end;
+            TextBox.PlaceholderText = "请输入新卡密"
+        end
+    end
     setup.KeySystemInfo.AntiSpam = false;
 end)
 
@@ -3258,18 +3302,24 @@ function setup:CancelLogin()
     setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
 end;
 
+task.spawn(function()
+    task.wait(0.5)
+    local autoLoginSuccess, validKey = autoLogin(originalLoginCallback)
+    if autoLoginSuccess then
+        setup.KeySystemInfo.Finished:Fire(setup.KeySystemInfo.CodeId)
+        CloseButton.Visible = false;
+    end
+end)
+
 while true do 
     local this = setup.KeySystemInfo.Finished.Event:Wait();
-
     if this == setup.KeySystemInfo.CodeId then
         break;
     end;
 end;
 
 TextBox.TextEditable = false;
-
 Library:Tween(AuthFunction , Library.TweenLibrary.Normal,{Position = UDim2.new(0.5, 0, 1.5, 0)});
-
 task.wait(0.5)
 else
     repeat task.wait(1.5) until game:IsLoaded();		
