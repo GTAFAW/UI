@@ -1,7 +1,7 @@
 -- 此源码不加密 | 也尽量保持更新 | UI.XGO修改更新 | 以内置独家水印 --
 -- UI版本: v2
 
---  修复针对F9无限报错问题
+--  修复针对F9无限报错问题 // 增加粒子动态特效
 --  懒得更
 
 local a = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
@@ -11,15 +11,12 @@ local b = a.Value or 0
 b = b + 1
 a.Value = b
 local function c(d)
-	game.StarterGui:SetCore(
-		"SendNotification",
-		{
-			Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
-			Text = d,
-			Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
-			Duration = 1.5,
-		}
-	)
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
+		Text = d,
+		Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
+		Duration = 1.5,
+	})
 end
 local function e(f)
 	local g = Instance.new("Sound")
@@ -595,8 +592,13 @@ if b == 1 then
 		end)
 	end
 	_G.ThunderIntro_Stop = aD
-	local aL =
-		{ rStroke = a3.Color, gStroke = a6.Color, titleGradient = a9.Color, sub = ad.TextColor3, orb = al.BackgroundColor3 }
+	local aL = {
+		rStroke = a3.Color,
+		gStroke = a6.Color,
+		titleGradient = a9.Color,
+		sub = ad.TextColor3,
+		orb = al.BackgroundColor3,
+	}
 	local function aM(C, D, E)
 		return Color3.fromHSV(C % 1, D, E)
 	end
@@ -3931,6 +3933,38 @@ function Library:Windowxgo(setup)
 		"rbxassetid://83223182022536",
 		"rbxassetid://74814776493127",
 		"rbxassetid://127389762731275",
+		"rbxassetid://136324927689308",
+		"rbxassetid://87188939840044",
+		"rbxassetid://83654855239725",
+		"rbxassetid://85955548830949",
+		"rbxassetid://109846950915315",
+		"rbxassetid://135928131229333",
+		"rbxassetid://139493973213962",
+		"rbxassetid://114209014671861",
+		"rbxassetid://132293651901159",
+		"rbxassetid://80827064765533",
+		"rbxassetid://99752135015489",
+		"rbxassetid://114728977368231",
+		"rbxassetid://139266256221471",
+		"rbxassetid://86979838000819",
+		"rbxassetid://93092463392537",
+		"rbxassetid://102268735725390",
+		"rbxassetid://83494304109970",
+		"rbxassetid://90201324587145",
+		"rbxassetid://80470711190039",
+		"rbxassetid://112685547627009",
+		"rbxassetid://88099959129530",
+		"rbxassetid://123572015723172",
+		"rbxassetid://77344234610326",
+		"rbxassetid://76891078817472",
+		"rbxassetid://91657099430282",
+		"rbxassetid://77110848199767",
+		"rbxassetid://133288552537181",
+		"rbxassetid://138495701339383",
+		"rbxassetid://100000222799561",
+		"rbxassetid://78603341208578",
+		"rbxassetid://134718107963116",
+		"rbxassetid://73582596868447",
 		"rbxassetid://110959984143843",
 	}
 
@@ -4025,6 +4059,457 @@ function Library:Windowxgo(setup)
 	MainFrame.ClipsDescendants = true
 	MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 	MainFrame.Size = UDim2.fromScale(0, 0)
+
+	do
+		----------------------------------------------------------------
+		local particleFolder = Instance.new("Frame")
+		particleFolder.Name = "PlayableStars"
+		particleFolder.Parent = MainFrame
+		particleFolder.AnchorPoint = Vector2.new(0.5, 0.5)
+		particleFolder.Position = UDim2.fromScale(0.5, 0.5)
+		particleFolder.Size = UDim2.fromScale(1, 1)
+		particleFolder.BackgroundTransparency = 1
+		particleFolder.ZIndex = 5
+		particleFolder.ClipsDescendants = true
+
+		local isParticleActive = true
+		local heartbeatConnection = nil
+		local rng = Random.new()
+		local run = game:GetService("RunService")
+		local uis = game:GetService("UserInputService")
+		local guiServ = game:GetService("GuiService")
+
+		---------------- 参数 ----------------
+		local TOTAL_COUNT = 40
+		local FIRST_BATCH = 20
+		local FADE_DELAY = 16
+		local SPAWN_GAP = 3
+		local FALL_SPEED = 0.2
+		local HORIZONTAL_RANGE = 0.6
+		local MIN_SIZE, MAX_SIZE = 8, 14
+		local MIN_ROT_SPEED, MAX_ROT_SPEED = -0.5, 0.5
+		local STAR_ELASTICITY = 0.75
+		local COLLAPSED_THRESHOLD = 50
+
+		-- 波纹
+		local WAVE_MAX_RADIUS = 200
+		local WAVE_DURATION = 0.4
+		local WAVE_PUSH_SPEED = 0.6
+		local WAVE_DECAY = 0.88
+
+		-- 公转
+		local ORBIT_SPEED = 1.2 -- 弧度/秒
+		local ORBIT_RADIUS = 0.25 -- 比例半径
+		local LONG_PRESS_TIME = 0.35 -- 长按判定时间
+		------------------------------------------
+
+		local particles = {}
+		local dragging = nil
+		local secondSpawned = false
+		local starImageIds = {
+			"rbxassetid://112950808406477",
+			"rbxassetid://126585145865309",
+			"rbxassetid://140049610411995",
+			"rbxassetid://127810956322486",
+		}
+
+		-- 冲击波
+		local waveActive = false
+		local waveCenter = Vector2.zero
+		local waveRadius = 0
+		local waveSpeed = WAVE_MAX_RADIUS / WAVE_DURATION
+
+		-- 长按状态
+		local pressStart = 0
+		local longPressing = false
+		local pressConn = nil
+		local releaseConn = nil
+
+		----------------------------------------------------------------函数
+		local function getFallInitParams()
+			local initX = rng:NextNumber(0, 1)
+			local initY = rng:NextNumber(-0.1, 0)
+			local horizontalOffset = rng:NextNumber(-HORIZONTAL_RANGE, HORIZONTAL_RANGE) * FALL_SPEED
+			local verticalSpeed = FALL_SPEED
+			return initX, initY, horizontalOffset, verticalSpeed
+		end
+
+		local function spawnStar()
+			if not isParticleActive then
+				return
+			end
+			local star = Instance.new("ImageLabel")
+			star.Name = "Star"
+			star.Parent = particleFolder
+			star.AnchorPoint = Vector2.new(0.5, 0.5)
+			star.BackgroundTransparency = 1
+			star.Image = starImageIds[rng:NextInteger(1, #starImageIds)]
+			star.ScaleType = Enum.ScaleType.Fit
+			star.ZIndex = 5
+
+			local s = rng:NextInteger(MIN_SIZE, MAX_SIZE)
+			star.Size = UDim2.fromOffset(s, s)
+			local r = s * 0.5
+			local initRot = rng:NextNumber(0, 360)
+			star.Rotation = initRot
+			local rotSpeed = rng:NextNumber(MIN_ROT_SPEED, MAX_ROT_SPEED)
+
+			local initX, initY, vx, vy = getFallInitParams()
+			star.Position = UDim2.new(initX, 0, initY, 0)
+			star.ImageTransparency = rng:NextNumber(0.2, 0.5)
+			star.ImageColor3 = Color3.fromHSV(rng:NextNumber(), 1, 1)
+
+			local data = {
+				obj = star,
+				vx = vx,
+				vy = vy,
+				life = 0,
+				rot = initRot,
+				rotSpeed = rotSpeed,
+				r = r,
+				waveVx = 0,
+				waveVy = 0,
+				-- 公转
+				orbitAngle = rng:NextNumber(0, 2 * math.pi),
+				orbitRadius = rng:NextNumber(ORBIT_RADIUS * 0.7, ORBIT_RADIUS),
+				orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1),
+			}
+
+			-- 拖拽
+			local function onPress(input)
+				if not isParticleActive then
+					return
+				end
+				if
+					input.UserInputType == Enum.UserInputType.Touch
+					or input.UserInputType == Enum.UserInputType.MouseButton1
+				then
+					dragging = data
+					data.vx, data.vy = 0, 0
+				end
+			end
+			local function onMove(input)
+				if not isParticleActive then
+					return
+				end
+				if dragging == data then
+					local pos = uis:GetMouseLocation()
+					local rel = MainFrame.AbsoluteSize
+					local x = math.clamp(pos.X - MainFrame.AbsolutePosition.X, 0, rel.X) / rel.X
+					local y = math.clamp(pos.Y - MainFrame.AbsolutePosition.Y, 0, rel.Y) / rel.Y
+					data.obj.Position = UDim2.new(x, 0, y, 0)
+				end
+			end
+			local function onRelease()
+				if not isParticleActive then
+					return
+				end
+				if dragging == data then
+					dragging = nil
+					local _, _, newVx, newVy = getFallInitParams()
+					data.vx = newVx
+					data.vy = newVy
+				end
+			end
+			star.InputBegan:Connect(onPress)
+			uis.InputChanged:Connect(onMove)
+			uis.InputEnded:Connect(function(input)
+				if not isParticleActive then
+					return
+				end
+				if
+					input.UserInputType == Enum.UserInputType.Touch
+					or input.UserInputType == Enum.UserInputType.MouseButton1
+				then
+					onRelease()
+				end
+			end)
+
+			table.insert(particles, data)
+			return data
+		end
+
+		for _ = 1, FIRST_BATCH do
+			spawnStar()
+		end
+
+		----------------------------------------------------------------
+		local function startWave(screenPos)
+			local mainPos = MainFrame.AbsolutePosition
+			local mainSize = MainFrame.AbsoluteSize
+			local x = math.clamp((screenPos.X - mainPos.X) / mainSize.X, 0, 1)
+			local y = math.clamp((screenPos.Y - mainPos.Y) / mainSize.Y, 0, 1)
+			waveCenter = Vector2.new(x, y)
+			waveRadius = 0
+			waveActive = true
+		end
+
+		local clickLayer = Instance.new("TextButton")
+		clickLayer.Name = "WaveClickLayer"
+		clickLayer.Parent = MainFrame
+		clickLayer.Size = UDim2.fromScale(1, 1)
+		clickLayer.BackgroundTransparency = 1
+		clickLayer.Text = ""
+		clickLayer.ZIndex = 1
+		clickLayer.Active = true
+
+		clickLayer.InputBegan:Connect(function(input, gpe)
+			if gpe then
+				return
+			end
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+			then
+				local objs = game:GetService("GuiService"):GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)
+				for _, obj in ipairs(objs) do
+					if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Active and obj ~= clickLayer then
+						return
+					end
+				end
+				startWave(input.Position)
+			end
+		end)
+		uis.InputBegan:Connect(function(input, gpe)
+			if gpe then
+				return
+			end
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+			then
+				local mainPos = MainFrame.AbsolutePosition
+				local mainSize = MainFrame.AbsoluteSize
+				local x = input.Position.X - mainPos.X
+				local y = input.Position.Y - mainPos.Y
+				if x < 0 or x > mainSize.X or y < 0 or y > mainSize.Y then
+					startWave(input.Position)
+				end
+			end
+		end)
+
+		----------------------------------------------------------------
+		local function tryLongPress(input)
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+			then
+				pressStart = tick()
+				longPressing = false
+				if pressConn then
+					pressConn:Disconnect()
+				end
+				if releaseConn then
+					releaseConn:Disconnect()
+				end
+				pressConn = run.Heartbeat:Connect(function()
+					if tick() - pressStart >= LONG_PRESS_TIME and not longPressing then
+						longPressing = true
+					end
+				end)
+				releaseConn = uis.InputEnded:Connect(function(endInput)
+					if endInput == input then
+						longPressing = false
+						if pressConn then
+							pressConn:Disconnect()
+							pressConn = nil
+						end
+						if releaseConn then
+							releaseConn:Disconnect()
+							releaseConn = nil
+						end
+					end
+				end)
+			end
+		end
+		uis.InputBegan:Connect(tryLongPress)
+
+		----------------------------------------------------------------
+		local function particleMainLoop(dt)
+			isParticleActive = MainFrame.AbsoluteSize.Y > COLLAPSED_THRESHOLD
+			particleFolder.Visible = isParticleActive
+			if not isParticleActive then
+				return
+			end
+
+			-- 冲击波
+			if waveActive then
+				waveRadius = waveRadius + waveSpeed * dt
+				if waveRadius >= WAVE_MAX_RADIUS then
+					waveActive = false
+				end
+			end
+
+			local cx, cy = 0.5, 0.5
+
+			for _, p in ipairs(particles) do
+				if waveActive then
+					local px = p.obj.Position.X.Scale
+					local py = p.obj.Position.Y.Scale
+					local dx = px - waveCenter.X
+					local dy = py - waveCenter.Y
+					local dist = math.sqrt(dx * dx + dy * dy) * MainFrame.AbsoluteSize.X
+					if dist < waveRadius and dist > 0 then
+						local nx, ny = dx / (dist / MainFrame.AbsoluteSize.X), dy / (dist / MainFrame.AbsoluteSize.X)
+						local push = (1 - dist / waveRadius) * WAVE_PUSH_SPEED
+						p.waveVx = p.waveVx + nx * push
+						p.waveVy = p.waveVy + ny * push
+					end
+				end
+				p.waveVx = p.waveVx * WAVE_DECAY
+				p.waveVy = p.waveVy * WAVE_DECAY
+
+				-- 长按公转模式
+				if longPressing then
+					p.orbitAngle = p.orbitAngle + p.orbitSpeed * dt
+					local ox = cx + math.cos(p.orbitAngle) * p.orbitRadius
+					local oy = cy + math.sin(p.orbitAngle) * p.orbitRadius
+					p.obj.Position = UDim2.new(ox, 0, oy, 0)
+					p.vx, p.vy = 0, 0
+					p.waveVx, p.waveVy = 0, 0
+				else
+					-- 正常运动
+					local totalVx = p.vx + p.waveVx
+					local totalVy = p.vy + p.waveVy
+					if dragging ~= p then
+						local x = p.obj.Position.X.Scale + totalVx * dt
+						local y = p.obj.Position.Y.Scale + totalVy * dt
+						-- 边缘反弹
+						if x < 0 then
+							x = 0
+							totalVx = -totalVx * STAR_ELASTICITY
+							p.waveVx = -p.waveVx * STAR_ELASTICITY
+						end
+						if x > 1 then
+							x = 1
+							totalVx = -totalVx * STAR_ELASTICITY
+							p.waveVx = -p.waveVx * STAR_ELASTICITY
+						end
+						if y < 0 then
+							y = 0
+							totalVy = -totalVy * STAR_ELASTICITY
+							p.waveVy = -p.waveVy * STAR_ELASTICITY
+						end
+						if y > 1 then
+							y = 1
+							totalVy = -totalVy * STAR_ELASTICITY
+							p.waveVy = -p.waveVy * STAR_ELASTICITY
+						end
+						p.obj.Position = UDim2.new(x, 0, y, 0)
+					end
+					p.vx = totalVx - p.waveVx
+					p.vy = totalVy - p.waveVy
+				end
+
+				p.rot = p.rot + p.rotSpeed * dt
+				p.obj.Rotation = p.rot
+
+				p.life = p.life + dt
+				if p.life > FADE_DELAY then
+					local t = p.obj.ImageTransparency + dt * 0.8
+					p.obj.ImageTransparency = math.min(1, t)
+					if t >= 1 then
+						local initX, initY, newVx, newVy = getFallInitParams()
+						p.obj.Position = UDim2.new(initX, 0, initY, 0)
+						p.obj.ImageTransparency = rng:NextNumber(0.2, 0.5)
+						p.life = 0
+						p.rot = rng:NextNumber(0, 360)
+						p.obj.Rotation = p.rot
+						p.vx = newVx
+						p.vy = newVy
+						p.waveVx, p.waveVy = 0, 0
+						-- 公转参数重新随机
+						p.orbitAngle = rng:NextNumber(0, 2 * math.pi)
+						p.orbitRadius = rng:NextNumber(ORBIT_RADIUS * 0.7, ORBIT_RADIUS)
+						p.orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
+					end
+				end
+			end
+
+			-- 第二段生成
+			if not secondSpawned then
+				local oldest = 0
+				for i = 1, FIRST_BATCH do
+					oldest = math.max(oldest, particles[i] and particles[i].life or 0)
+				end
+				if oldest >= FADE_DELAY - SPAWN_GAP then
+					secondSpawned = true
+					for i = 1, TOTAL_COUNT - FIRST_BATCH do
+						task.wait(0.15)
+						spawnStar()
+					end
+				end
+			end
+
+			-- 碰撞
+			for i = 1, #particles do
+				local a = particles[i]
+				if dragging == a or longPressing then
+					continue
+				end
+				local ax = a.obj.Position.X.Scale
+				local ay = a.obj.Position.Y.Scale
+				local ar = a.r / MainFrame.AbsoluteSize.X
+				for j = i + 1, #particles do
+					local b = particles[j]
+					if dragging == b or longPressing then
+						continue
+					end
+					local bx = b.obj.Position.X.Scale
+					local by = b.obj.Position.Y.Scale
+					local br = b.r / MainFrame.AbsoluteSize.X
+					local dx, dy = bx - ax, by - ay
+					local dist2 = dx * dx + dy * dy
+					local rad = ar + br
+					if dist2 < rad * rad and dist2 > 0 then
+						local dist = math.sqrt(dist2)
+						local nx, ny = dx / dist, dy / dist
+						local overlap = rad - dist
+						local ax_new = ax - nx * overlap * 0.5
+						local ay_new = ay - ny * overlap * 0.5
+						local bx_new = bx + nx * overlap * 0.5
+						local by_new = by + ny * overlap * 0.5
+						a.obj.Position = UDim2.new(ax_new, 0, ay_new, 0)
+						b.obj.Position = UDim2.new(bx_new, 0, by_new, 0)
+						local dvx = b.vx - a.vx
+						local dvy = b.vy - a.vy
+						local dvn = dvx * nx + dvy * ny
+						if dvn > 0 then
+							continue
+						end
+						local impulse = 2 * dvn / 2 * STAR_ELASTICITY
+						local ix, iy = impulse * nx, impulse * ny
+						a.vx = a.vx + ix
+						a.vy = a.vy + iy
+						b.vx = b.vx - ix
+						b.vy = b.vy - iy
+					end
+				end
+			end
+		end
+
+		----------------------------------------------------------------
+		local function onClose()
+			if heartbeatConnection then
+				heartbeatConnection:Disconnect()
+			end
+			particleFolder:Destroy()
+			if clickLayer then
+				clickLayer:Destroy()
+			end
+		end
+
+		local oldStop = _G.ThunderIntro_Stop or function() end
+		_G.ThunderIntro_Stop = function()
+			oldStop()
+			onClose()
+		end
+
+		----------------------------------------------------------------
+		task.defer(function()
+			heartbeatConnection = run.Heartbeat:Connect(particleMainLoop)
+		end)
+	end
 
 	initBackgrounds()
 
