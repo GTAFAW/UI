@@ -4080,9 +4080,9 @@ function Library:Windowxgo(setup)
 		local guiServ = game:GetService("GuiService")
 
 		---------------- 参数 ----------------
-		local TOTAL_COUNT = 40
-		local FIRST_BATCH = 20
-		local FADE_DELAY = 16
+		local TOTAL_COUNT = 30
+		local FIRST_BATCH = 15
+		local FADE_DELAY = 13
 		local SPAWN_GAP = 3
 		local FALL_SPEED = 0.2
 		local HORIZONTAL_RANGE = 0.6
@@ -9763,6 +9763,179 @@ function Library:Windowxgo(setup)
 			end
 		end
 	end)
+
+	do
+		local infoIco = Instance.new("ImageButton")
+		local card = Instance.new("Frame")
+		local closeBtn = Instance.new("ImageButton")
+		local img = Instance.new("ImageLabel")
+		local scroll = Instance.new("ScrollingFrame")
+		local msgLb = Instance.new("TextLabel")
+
+		infoIco.Name = "InfoButton"
+		infoIco.Parent = Headers
+		infoIco.AnchorPoint = Vector2.new(1, 0.5)
+		infoIco.Position = UDim2.new(0.99, 0, 0.5, 0)
+		infoIco.Size = UDim2.new(0, 18, 0, 18)
+		infoIco.BackgroundTransparency = 1
+		infoIco.Image = "rbxassetid://7733964719"
+		infoIco.ImageColor3 = Library.Colors.TextColor
+		infoIco.ImageTransparency = 0.3
+		infoIco.ZIndex = 20
+		WindowLibrary:AddToolTip(infoIco, "查看作者留言 / 更新日志")
+
+		function WindowLibrary:SetInfoText(newText: string)
+			if rawget(self, "_infoMsgLb") then
+				self._infoMsgLb.Text = newText
+				task.wait()
+				local h = self._infoMsgLb.TextBounds.Y + 10
+				self._infoMsgLb.Size = UDim2.new(1, 0, 0, h)
+				self._infoScroll.CanvasSize = UDim2.new(0, 0, 0, h)
+			end
+		end
+
+		local blocker
+		local isOpen = false
+
+		local function buildDialog()
+			if blocker then
+				return
+			end
+
+			blocker = Instance.new("TextButton")
+			blocker.Name = "InfoBlocker"
+			blocker.Parent = ScreenGui
+			blocker.AnchorPoint = Vector2.new(0.5, 0.5)
+			blocker.Position = UDim2.new(0.5, 0, 0.5, 0)
+			blocker.Size = UDim2.new(0, 320, 0, 220)
+			blocker.BackgroundTransparency = 1
+			blocker.Text = ""
+			blocker.Visible = false
+			blocker.ZIndex = 499
+			blocker.Active = true
+
+			card.Name = "InfoCard"
+			card.Parent = blocker
+			card.Size = UDim2.new(1, 0, 1, 0)
+			card.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			card.BackgroundTransparency = 0.5
+			card.BorderSizePixel = 1
+			card.BorderColor3 = Color3.fromRGB(255, 0, 0)
+			card.ClipsDescendants = true
+			card.ZIndex = 500
+
+			closeBtn.Name = "CloseBtn"
+			closeBtn.Parent = card
+			closeBtn.AnchorPoint = Vector2.new(1, 0)
+			closeBtn.Position = UDim2.new(1, -8, 0, 8)
+			closeBtn.Size = UDim2.new(0, 18, 0, 18)
+			closeBtn.BackgroundTransparency = 1
+			closeBtn.Image = "rbxassetid://476964555"
+			closeBtn.ImageColor3 = Color3.fromRGB(255, 0, 0)
+			closeBtn.ImageTransparency = 1
+			closeBtn.ZIndex = 501
+			closeBtn.MouseButton1Click:Connect(function()
+				blocker.Visible = false
+				isOpen = false
+			end)
+			closeBtn.MouseEnter:Connect(function()
+				closeBtn.ImageTransparency = 0
+			end)
+			closeBtn.MouseLeave:Connect(function()
+				closeBtn.ImageTransparency = 0.3
+			end)
+
+			img.Name = "BgImage"
+			img.Parent = card
+			img.Size = UDim2.new(1, 0, 1, 0)
+			img.BackgroundTransparency = 0.3
+			img.Image = "rbxassetid://81428127111090"
+			img.ScaleType = Enum.ScaleType.Slice
+			img.SliceCenter = Rect.new(128, 128, 128, 128)
+			img.ZIndex = 499
+
+			scroll.Name = "Scroll"
+			scroll.Parent = card
+			scroll.AnchorPoint = Vector2.new(0.5, 0.5)
+			scroll.Position = UDim2.new(0.5, 0, 0.5, 0)
+			scroll.Size = UDim2.new(1, -30, 1, -50)
+			scroll.BackgroundTransparency = 1
+			scroll.BorderSizePixel = 0
+			scroll.ScrollBarThickness = 5
+			scroll.ScrollBarImageColor3 = Library.Colors.Hightlight
+			scroll.ScrollBarImageTransparency = 0.6
+			scroll.ZIndex = 501
+			scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+			msgLb.Name = "Message"
+			msgLb.Parent = scroll
+			msgLb.Size = UDim2.new(1, 0, 0, 0)
+			msgLb.BackgroundTransparency = 1
+			msgLb.Font = Enum.Font.Gotham
+			msgLb.TextColor3 = Library.Colors.TextColor
+			msgLb.TextSize = 14
+			msgLb.TextWrapped = true
+			msgLb.RichText = true
+			msgLb.ZIndex = 502
+			msgLb.TextXAlignment = Enum.TextXAlignment.Center
+			msgLb.TextYAlignment = Enum.TextYAlignment.Top
+			msgLb.Text = [[<b>v1.2.0 更新摘要</b>
+• 新增粒子星空背景
+• 新增 40+ 主题配色
+• 新增颜色选择器组件
+• 优化拖拽手感与内存占用
+
+<b>后续计划</b>
+- 多语言包
+- 自定义背景图
+- 云端脚本市场
+
+感谢各位使用，如有 BUG 请反馈至 QQ群：259461151
+
+ /$$   /$$        /$$$$$$         /$$$$$$        /$$   /$$       /$$   /$$       /$$$$$$$ 
+| $$  / $$       /$$__  $$       /$$__  $$      | $$  | $$      | $$  | $$      | $$__  $$
+|  $$/ $$/      | $$  \__/      | $$  \ $$      | $$  | $$      | $$  | $$      | $$  \ $$
+ \  $$$$/       | $$ /$$$$      | $$  | $$      | $$$$$$$$      | $$  | $$      | $$$$$$$ 
+  >$$  $$       | $$|_  $$      | $$  | $$      | $$__  $$      | $$  | $$      | $$__  $$
+ /$$/\  $$      | $$  \ $$      | $$  | $$      | $$  | $$      | $$  | $$      | $$  \ $$
+| $$  \ $$      |  $$$$$$/      |  $$$$$$/      | $$  | $$      |  $$$$$$/      | $$$$$$$/
+|__/  |__/       \______/        \______/       |__/  |__/       \______/       |_______/ 
+                                                                                          
+╔═╗╔═╦═══╦═══╦╗─╔╦╗─╔╦══╗
+╚╗╚╝╔╣╔═╗║╔═╗║║─║║║─║║╔╗║
+─╚╗╔╝║║─╚╣║─║║╚═╝║║─║║╚╝╚╗
+─╔╝╚╗║║╔═╣║─║║╔═╗║║─║║╔═╗║
+╔╝╔╗╚╣╚╩═║╚═╝║║─║║╚═╝║╚═╝║
+╚═╝╚═╩═══╩═══╩╝─╚╩═══╩═══╝   
+
+
+]]
+
+			local function updateCanvas()
+				local h = msgLb.TextBounds.Y + 10
+				msgLb.Size = UDim2.new(1, 0, 0, h)
+				scroll.CanvasSize = UDim2.new(0, 0, 0, h)
+			end
+			msgLb:GetPropertyChangedSignal("Text"):Connect(updateCanvas)
+			updateCanvas()
+
+			WindowLibrary._infoMsgLb = msgLb
+			WindowLibrary._infoScroll = scroll
+
+			Library.UserInputService.InputBegan:Connect(function(inp)
+				if inp.KeyCode == Enum.KeyCode.Escape and isOpen then
+					blocker.Visible = false
+					isOpen = false
+				end
+			end)
+		end
+
+		infoIco.MouseButton1Click:Connect(function()
+			buildDialog()
+			isOpen = not isOpen
+			blocker.Visible = isOpen
+		end)
+	end
 
 	return WindowLibrary
 end
