@@ -14,45 +14,99 @@
     Discord: https://discord.gg/ftgs-development-hub-1300692552005189632
     License: MIT
 ]] -- 星果 还原  进度10%
+--[[
+a  →  WindUI             -- 总入口，保持不变
+b  →  CreateLocalization -- 本地化
+c  →  CreateNotification -- 通知系统
+d  →  CreatePlatoboost   -- Platoboost 密钥验证
+e  →  CreatePandaDev     -- PandaDevelopment 密钥验证
+f  →  CreateLuarmor      -- Luarmor 密钥验证
+g  →  LoadKeyServices    -- 统一加载上面三种密钥服务
+h  →  LoadPackageJson    -- 读取 package.json 版本号
+i  →  CreateButton       -- 按钮控件
+j  →  CreateInput        -- 输入框控件
+k  →  CreateDialog       -- 通用弹窗容器
+l  →  CreateKeySystem    -- 整套密钥系统 UI
+m  →  UtilViewport       -- 视口/摄像机工具函数
+n  →  CreateAcrylicBlur  -- Acrylic 背景模糊
+o  →  CreateAcrylicPaint -- Acrylic 前景绘制
+p  →  AcrylicManager     -- 统一开关 Acrylic
+q  →  CreatePopup        -- 二次确认弹窗
+r  →  LoadAllThemes      -- 主题表
+s  →  CreateLabel        -- 单行文本/标签
+t  →  CreateScrollBar    -- 自定义滚动条
+u  →  CreateTag          -- 彩色标签
+v  →  ConfigManager      -- 配置读写
+w  →  CreateOpenButton   -- 屏幕边缘悬浮球
+x  →  CreateTooltip      -- 气泡提示
+y  →  CreateElementFrame -- 元素外壳（按钮/输入框等共用）
+z  →  CreateParagraph    -- 段落文本
+A  →  CreateButtonEx     -- 带图标按钮（继承 y）
+B  →  CreateToggle       -- 开关
+C  →  CreateCheckbox     -- 复选框
+D  →  CreateToggleEx     -- 开关+复选框组合
+E  →  CreateSlider       -- 滑块
+F  →  CreateKeybind      -- 热键绑定
+G  →  CreateInputEx      -- 输入框完整版
+H  →  CreateDropdownMenu -- 下拉菜单核心
+I  →  CreateDropdown     -- 下拉框完整版
+J  →  LuaHighlighter     -- Lua 代码高亮
+K  →  CreateCodeBlock    -- 代码块+复制按钮
+L  →  CreateCode         -- 代码块简化版
+M  →  CreateColorpicker  -- 颜色选择器
+N  →  CreateSection      -- 折叠分区
+O  →  CreateDivider      -- 分割线
+P  →  CreateSpace        -- 空白占位
+Q  →  CreateImage        -- 图片
+R  →  ElementLoader      -- 统一加载所有控件
+S  →  TabManager         -- 标签页管理
+T  →  SectionManager     -- 侧边栏分区管理
+U  →  IconAtlas          -- 图标表
+V  →  SearchModal        -- 全局搜索弹窗
+W  →  WindowBuilder      -- 主窗口建造器
+]]
 
-local a
-a = {
+
+
+
+local WindUI
+WindUI = {
 	cache = {},
-	load = function(b)
-		if not a.cache[b] then
-			a.cache[b] = { c = a[b]() }
+	load = function(CreateLocalization)
+		if not WindUI.cache[CreateLocalization] then
+			WindUI.cache[CreateLocalization] = { CreateNotification = WindUI[CreateLocalization]() }
 		end
-		return a.cache[b].c
+		return WindUI.cache[CreateLocalization].CreateNotification
 	end,
 }
 do
-	function a.a()
-		local b = game:GetService("RunService")
-		local d = b.Heartbeat
-		local e = game:GetService("UserInputService")
-		local f = game:GetService("TweenService")
-		local g = game:GetService("LocalizationService")
-		local h = game:GetService("HttpService")
+	function WindUI.WindUI()
+		local CreateLocalization = game:GetService("RunService")
+		local CreatePlatoboost = CreateLocalization.Heartbeat
+		local CreatePandaDev = game:GetService("UserInputService")
+		local CreateLuarmor = game:GetService("TweenService")
+		local LoadKeyServices = game:GetService("LocalizationService")
+		local LoadPackageJson = game:GetService("HttpService")
 
-		local i = "https://raw.githubusercontent.com/Footagesus/Icons/main/Main-v2.lua"
+		local CreateButton = "https://raw.githubusercontent.com/Footagesus/Icons/main/Main-v2.lua"
 
-		local j = loadstring(game.HttpGetAsync and game:HttpGetAsync(i) or h:GetAsync(i))()
-		j.SetIconsType("lucide")
+		local CreateInput = loadstring(game.HttpGetAsync and game:HttpGetAsync(CreateButton) or LoadPackageJson:GetAsync(CreateButton))()
+		CreateInput.SetIconsType("lucide")
 
-		local l
+		local CreateKeySystem
 
-		local m = {
+		local UtilViewport = {
 			Font = "rbxassetid://12187365364",
 			Localization = nil,
 			CanDraggable = true,
 			Theme = nil,
 			Themes = nil,
-			Icons = j,
+			Icons = CreateInput,
 			Signals = {},
 			Objects = {},
 			LocalizationObjects = {},
 			FontObjects = {},
-			Language = string.match(g.SystemLocaleId, "^[a-z]+"),
+			Language = string.match(LoadKeyServices.SystemLocaleId, "^[WindUI-CreateParagraph]+"),
 			Request = http_request or (syn and syn.request) or request,
 			DefaultProperties = {
 				ScreenGui = {
@@ -122,438 +176,438 @@ do
 			},
 		}
 
-		function m.Init(p)
-			l = p
+		function UtilViewport.Init(AcrylicManager)
+			CreateKeySystem = AcrylicManager
 		end
 
-		function m.AddSignal(p, r)
-			local u = p:Connect(r)
-			table.insert(m.Signals, u)
-			return u
+		function UtilViewport.AddSignal(AcrylicManager, LoadAllThemes)
+			local CreateTag = AcrylicManager:Connect(LoadAllThemes)
+			table.insert(UtilViewport.Signals, CreateTag)
+			return CreateTag
 		end
 
-		function m.DisconnectAll()
-			for p, r in next, m.Signals do
-				local u = table.remove(m.Signals, p)
-				u:Disconnect()
+		function UtilViewport.DisconnectAll()
+			for AcrylicManager, LoadAllThemes in next, UtilViewport.Signals do
+				local CreateTag = table.remove(UtilViewport.Signals, AcrylicManager)
+				CreateTag:Disconnect()
 			end
 		end
 
-		function m.SafeCallback(p, ...)
-			if not p then
+		function UtilViewport.SafeCallback(AcrylicManager, ...)
+			if not AcrylicManager then
 				return
 			end
 
-			local r, u = pcall(p, ...)
-			if not r then
-				if l and l.Window and l.Window.Debug then
-					local v, x = u:find(":%d+: ")
+			local LoadAllThemes, CreateTag = pcall(AcrylicManager, ...)
+			if not LoadAllThemes then
+				if CreateKeySystem and CreateKeySystem.Window and CreateKeySystem.Window.Debug then
+					local ConfigManager, CreateTooltip = CreateTag:find(":%CreatePlatoboost+: ")
 
-					warn("[ WindUI: DEBUG Mode ] " .. u)
+					warn("[ WindUI: DEBUG Mode ] " .. CreateTag)
 
-					return l:Notify({
+					return CreateKeySystem:Notify({
 						Title = "DEBUG Mode: Error",
-						Content = not x and u or u:sub(x + 1),
+						Content = not CreateTooltip and CreateTag or CreateTag:sub(CreateTooltip + 1),
 						Duration = 8,
 					})
 				end
 			end
 		end
 
-		function m.Gradient(p, r)
-			if l and l.Gradient then
-				return l:Gradient(p, r)
+		function UtilViewport.Gradient(AcrylicManager, LoadAllThemes)
+			if CreateKeySystem and CreateKeySystem.Gradient then
+				return CreateKeySystem:Gradient(AcrylicManager, LoadAllThemes)
 			end
 
-			local u = {}
-			local v = {}
+			local CreateTag = {}
+			local ConfigManager = {}
 
-			for x, z in next, p do
-				local A = tonumber(x)
-				if A then
-					A = math.clamp(A / 100, 0, 1)
-					table.insert(u, ColorSequenceKeypoint.new(A, z.Color))
-					table.insert(v, NumberSequenceKeypoint.new(A, z.Transparency or 0))
+			for CreateTooltip, CreateParagraph in next, AcrylicManager do
+				local CreateButtonEx = tonumber(CreateTooltip)
+				if CreateButtonEx then
+					CreateButtonEx = math.clamp(CreateButtonEx / 100, 0, 1)
+					table.insert(CreateTag, ColorSequenceKeypoint.new(CreateButtonEx, CreateParagraph.Color))
+					table.insert(ConfigManager, NumberSequenceKeypoint.new(CreateButtonEx, CreateParagraph.Transparency or 0))
 				end
 			end
 
-			table.sort(u, function(A, B)
-				return A.Time < B.Time
+			table.sort(CreateTag, function(CreateButtonEx, CreateToggle)
+				return CreateButtonEx.Time < CreateToggle.Time
 			end)
-			table.sort(v, function(A, B)
-				return A.Time < B.Time
+			table.sort(ConfigManager, function(CreateButtonEx, CreateToggle)
+				return CreateButtonEx.Time < CreateToggle.Time
 			end)
 
-			if #u < 2 then
+			if #CreateTag < 2 then
 				error("ColorSequence requires at least 2 keypoints")
 			end
 
-			local A = {
-				Color = ColorSequence.new(u),
-				Transparency = NumberSequence.new(v),
+			local CreateButtonEx = {
+				Color = ColorSequence.new(CreateTag),
+				Transparency = NumberSequence.new(ConfigManager),
 			}
 
-			if r then
-				for B, C in pairs(r) do
-					A[B] = C
+			if LoadAllThemes then
+				for CreateToggle, CreateCheckbox in pairs(LoadAllThemes) do
+					CreateButtonEx[CreateToggle] = CreateCheckbox
 				end
 			end
 
-			return A
+			return CreateButtonEx
 		end
 
-		function m.SetTheme(p)
-			m.Theme = p
-			m.UpdateTheme(nil, true)
+		function UtilViewport.SetTheme(AcrylicManager)
+			UtilViewport.Theme = AcrylicManager
+			UtilViewport.UpdateTheme(nil, true)
 		end
 
-		function m.AddFontObject(p)
-			table.insert(m.FontObjects, p)
-			m.UpdateFont(m.Font)
+		function UtilViewport.AddFontObject(AcrylicManager)
+			table.insert(UtilViewport.FontObjects, AcrylicManager)
+			UtilViewport.UpdateFont(UtilViewport.Font)
 		end
 
-		function m.UpdateFont(p)
-			m.Font = p
-			for r, u in next, m.FontObjects do
-				u.FontFace = Font.new(p, u.FontFace.Weight, u.FontFace.Style)
+		function UtilViewport.UpdateFont(AcrylicManager)
+			UtilViewport.Font = AcrylicManager
+			for LoadAllThemes, CreateTag in next, UtilViewport.FontObjects do
+				CreateTag.FontFace = Font.new(AcrylicManager, CreateTag.FontFace.Weight, CreateTag.FontFace.Style)
 			end
 		end
 
-		function m.GetThemeProperty(p, r)
-			local u = r[p] or m.Themes.Dark[p]
+		function UtilViewport.GetThemeProperty(AcrylicManager, LoadAllThemes)
+			local CreateTag = LoadAllThemes[AcrylicManager] or UtilViewport.Themes.Dark[AcrylicManager]
 
-			if not u then
+			if not CreateTag then
 				return nil
 			end
 
-			if type(u) == "string" and string.sub(u, 1, 1) == "#" then
-				return Color3.fromHex(u)
+			if type(CreateTag) == "string" and string.sub(CreateTag, 1, 1) == "#" then
+				return Color3.fromHex(CreateTag)
 			end
 
-			if typeof(u) == "Color3" then
-				return u
+			if typeof(CreateTag) == "Color3" then
+				return CreateTag
 			end
 
-			if type(u) == "table" and u.Color and u.Transparency then
-				return u
+			if type(CreateTag) == "table" and CreateTag.Color and CreateTag.Transparency then
+				return CreateTag
 			end
 
-			if type(u) == "function" then
-				return u()
+			if type(CreateTag) == "function" then
+				return CreateTag()
 			end
 
 			return nil
 		end
 
-		function m.AddThemeObject(p, r)
-			m.Objects[p] = { Object = p, Properties = r }
-			m.UpdateTheme(p, false)
-			return p
+		function UtilViewport.AddThemeObject(AcrylicManager, LoadAllThemes)
+			UtilViewport.Objects[AcrylicManager] = { Object = AcrylicManager, Properties = LoadAllThemes }
+			UtilViewport.UpdateTheme(AcrylicManager, false)
+			return AcrylicManager
 		end
 
-		function m.AddLangObject(p)
-			local r = m.LocalizationObjects[p]
-			local u = r.Object
-			local v = currentObjTranslationId
-			m.UpdateLang(u, v)
-			return u
+		function UtilViewport.AddLangObject(AcrylicManager)
+			local LoadAllThemes = UtilViewport.LocalizationObjects[AcrylicManager]
+			local CreateTag = LoadAllThemes.Object
+			local ConfigManager = currentObjTranslationId
+			UtilViewport.UpdateLang(CreateTag, ConfigManager)
+			return CreateTag
 		end
 
-		function m.UpdateTheme(p, r)
-			local function ApplyTheme(u)
-				for v, x in pairs(u.Properties or {}) do
-					local z = m.GetThemeProperty(x, m.Theme)
-					if z then
-						if typeof(z) == "Color3" then
-							local A = u.Object:FindFirstChild("WindUIGradient")
-							if A then
-								A:Destroy()
+		function UtilViewport.UpdateTheme(AcrylicManager, LoadAllThemes)
+			local function ApplyTheme(CreateTag)
+				for ConfigManager, CreateTooltip in pairs(CreateTag.Properties or {}) do
+					local CreateParagraph = UtilViewport.GetThemeProperty(CreateTooltip, UtilViewport.Theme)
+					if CreateParagraph then
+						if typeof(CreateParagraph) == "Color3" then
+							local CreateButtonEx = CreateTag.Object:FindFirstChild("WindUIGradient")
+							if CreateButtonEx then
+								CreateButtonEx:Destroy()
 							end
 
-							if not r then
-								u.Object[v] = z
+							if not LoadAllThemes then
+								CreateTag.Object[ConfigManager] = CreateParagraph
 							else
-								m.Tween(u.Object, 0.08, { [v] = z }):Play()
+								UtilViewport.Tween(CreateTag.Object, 0.08, { [ConfigManager] = CreateParagraph }):Play()
 							end
-						elseif type(z) == "table" and z.Color and z.Transparency then
-							u.Object[v] = Color3.new(1, 1, 1)
+						elseif type(CreateParagraph) == "table" and CreateParagraph.Color and CreateParagraph.Transparency then
+							CreateTag.Object[ConfigManager] = Color3.new(1, 1, 1)
 
-							local A = u.Object:FindFirstChild("WindUIGradient")
-							if not A then
-								A = Instance.new("UIGradient")
-								A.Name = "WindUIGradient"
-								A.Parent = u.Object
+							local CreateButtonEx = CreateTag.Object:FindFirstChild("WindUIGradient")
+							if not CreateButtonEx then
+								CreateButtonEx = Instance.new("UIGradient")
+								CreateButtonEx.Name = "WindUIGradient"
+								CreateButtonEx.Parent = CreateTag.Object
 							end
 
-							A.Color = z.Color
-							A.Transparency = z.Transparency
+							CreateButtonEx.Color = CreateParagraph.Color
+							CreateButtonEx.Transparency = CreateParagraph.Transparency
 
-							for B, C in pairs(z) do
-								if B ~= "Color" and B ~= "Transparency" and A[B] ~= nil then
-									A[B] = C
+							for CreateToggle, CreateCheckbox in pairs(CreateParagraph) do
+								if CreateToggle ~= "Color" and CreateToggle ~= "Transparency" and CreateButtonEx[CreateToggle] ~= nil then
+									CreateButtonEx[CreateToggle] = CreateCheckbox
 								end
 							end
 						end
 					else
-						local A = u.Object:FindFirstChild("WindUIGradient")
-						if A then
-							A:Destroy()
+						local CreateButtonEx = CreateTag.Object:FindFirstChild("WindUIGradient")
+						if CreateButtonEx then
+							CreateButtonEx:Destroy()
 						end
 					end
 				end
 			end
 
-			if p then
-				local u = m.Objects[p]
-				if u then
-					ApplyTheme(u)
+			if AcrylicManager then
+				local CreateTag = UtilViewport.Objects[AcrylicManager]
+				if CreateTag then
+					ApplyTheme(CreateTag)
 				end
 			else
-				for u, v in pairs(m.Objects) do
-					ApplyTheme(v)
+				for CreateTag, ConfigManager in pairs(UtilViewport.Objects) do
+					ApplyTheme(ConfigManager)
 				end
 			end
 		end
 
-		function m.SetLangForObject(p)
-			if m.Localization and m.Localization.Enabled then
-				local r = m.LocalizationObjects[p]
-				if not r then
+		function UtilViewport.SetLangForObject(AcrylicManager)
+			if UtilViewport.Localization and UtilViewport.Localization.Enabled then
+				local LoadAllThemes = UtilViewport.LocalizationObjects[AcrylicManager]
+				if not LoadAllThemes then
 					return
 				end
 
-				local u = r.Object
-				local v = r.TranslationId
+				local CreateTag = LoadAllThemes.Object
+				local ConfigManager = LoadAllThemes.TranslationId
 
-				local x = m.Localization.Translations[m.Language]
-				if x and x[v] then
-					u.Text = x[v]
+				local CreateTooltip = UtilViewport.Localization.Translations[UtilViewport.Language]
+				if CreateTooltip and CreateTooltip[ConfigManager] then
+					CreateTag.Text = CreateTooltip[ConfigManager]
 				else
-					local z = m.Localization and m.Localization.Translations and m.Localization.Translations.en or nil
-					if z and z[v] then
-						u.Text = z[v]
+					local CreateParagraph = UtilViewport.Localization and UtilViewport.Localization.Translations and UtilViewport.Localization.Translations.en or nil
+					if CreateParagraph and CreateParagraph[ConfigManager] then
+						CreateTag.Text = CreateParagraph[ConfigManager]
 					else
-						u.Text = "[" .. v .. "]"
+						CreateTag.Text = "[" .. ConfigManager .. "]"
 					end
 				end
 			end
 		end
 
-		function m.ChangeTranslationKey(p, r, u)
-			if m.Localization and m.Localization.Enabled then
-				local v = string.match(u, "^" .. m.Localization.Prefix .. "(.+)")
-				if v then
-					for x, z in ipairs(m.LocalizationObjects) do
-						if z.Object == r then
-							z.TranslationId = v
-							m.SetLangForObject(x)
+		function UtilViewport.ChangeTranslationKey(AcrylicManager, LoadAllThemes, CreateTag)
+			if UtilViewport.Localization and UtilViewport.Localization.Enabled then
+				local ConfigManager = string.match(CreateTag, "^" .. UtilViewport.Localization.Prefix .. "(.+)")
+				if ConfigManager then
+					for CreateTooltip, CreateParagraph in ipairs(UtilViewport.LocalizationObjects) do
+						if CreateParagraph.Object == LoadAllThemes then
+							CreateParagraph.TranslationId = ConfigManager
+							UtilViewport.SetLangForObject(CreateTooltip)
 							return
 						end
 					end
 
-					table.insert(m.LocalizationObjects, {
-						TranslationId = v,
-						Object = r,
+					table.insert(UtilViewport.LocalizationObjects, {
+						TranslationId = ConfigManager,
+						Object = LoadAllThemes,
 					})
-					m.SetLangForObject(#m.LocalizationObjects)
+					UtilViewport.SetLangForObject(#UtilViewport.LocalizationObjects)
 				end
 			end
 		end
 
-		function m.UpdateLang(p)
-			if p then
-				m.Language = p
+		function UtilViewport.UpdateLang(AcrylicManager)
+			if AcrylicManager then
+				UtilViewport.Language = AcrylicManager
 			end
 
-			for r = 1, #m.LocalizationObjects do
-				local u = m.LocalizationObjects[r]
-				if u.Object and u.Object.Parent ~= nil then
-					m.SetLangForObject(r)
+			for LoadAllThemes = 1, #UtilViewport.LocalizationObjects do
+				local CreateTag = UtilViewport.LocalizationObjects[LoadAllThemes]
+				if CreateTag.Object and CreateTag.Object.Parent ~= nil then
+					UtilViewport.SetLangForObject(LoadAllThemes)
 				else
-					m.LocalizationObjects[r] = nil
+					UtilViewport.LocalizationObjects[LoadAllThemes] = nil
 				end
 			end
 		end
 
-		function m.SetLanguage(p)
-			m.Language = p
-			m.UpdateLang()
+		function UtilViewport.SetLanguage(AcrylicManager)
+			UtilViewport.Language = AcrylicManager
+			UtilViewport.UpdateLang()
 		end
 
-		function m.Icon(p)
-			return j.Icon(p)
+		function UtilViewport.Icon(AcrylicManager)
+			return CreateInput.Icon(AcrylicManager)
 		end
 
-		function m.AddIcons(p, r)
-			return j.AddIcons(p, r)
+		function UtilViewport.AddIcons(AcrylicManager, LoadAllThemes)
+			return CreateInput.AddIcons(AcrylicManager, LoadAllThemes)
 		end
 
-		function m.New(p, r, u)
-			local v = Instance.new(p)
+		function UtilViewport.New(AcrylicManager, LoadAllThemes, CreateTag)
+			local ConfigManager = Instance.new(AcrylicManager)
 
-			for x, z in next, m.DefaultProperties[p] or {} do
-				v[x] = z
+			for CreateTooltip, CreateParagraph in next, UtilViewport.DefaultProperties[AcrylicManager] or {} do
+				ConfigManager[CreateTooltip] = CreateParagraph
 			end
 
-			for A, B in next, r or {} do
-				if A ~= "ThemeTag" then
-					v[A] = B
+			for CreateButtonEx, CreateToggle in next, LoadAllThemes or {} do
+				if CreateButtonEx ~= "ThemeTag" then
+					ConfigManager[CreateButtonEx] = CreateToggle
 				end
-				if m.Localization and m.Localization.Enabled and A == "Text" then
-					local C = string.match(B, "^" .. m.Localization.Prefix .. "(.+)")
-					if C then
-						local F = #m.LocalizationObjects + 1
-						m.LocalizationObjects[F] = { TranslationId = C, Object = v }
+				if UtilViewport.Localization and UtilViewport.Localization.Enabled and CreateButtonEx == "Text" then
+					local CreateCheckbox = string.match(CreateToggle, "^" .. UtilViewport.Localization.Prefix .. "(.+)")
+					if CreateCheckbox then
+						local CreateKeybind = #UtilViewport.LocalizationObjects + 1
+						UtilViewport.LocalizationObjects[CreateKeybind] = { TranslationId = CreateCheckbox, Object = ConfigManager }
 
-						m.SetLangForObject(F)
+						UtilViewport.SetLangForObject(CreateKeybind)
 					end
 				end
 			end
 
-			for C, F in next, u or {} do
-				F.Parent = v
+			for CreateCheckbox, CreateKeybind in next, CreateTag or {} do
+				CreateKeybind.Parent = ConfigManager
 			end
 
-			if r and r.ThemeTag then
-				m.AddThemeObject(v, r.ThemeTag)
+			if LoadAllThemes and LoadAllThemes.ThemeTag then
+				UtilViewport.AddThemeObject(ConfigManager, LoadAllThemes.ThemeTag)
 			end
-			if r and r.FontFace then
-				m.AddFontObject(v)
+			if LoadAllThemes and LoadAllThemes.FontFace then
+				UtilViewport.AddFontObject(ConfigManager)
 			end
-			return v
+			return ConfigManager
 		end
 
-		function m.Tween(p, r, u, ...)
-			return f:Create(p, TweenInfo.new(r, ...), u)
+		function UtilViewport.Tween(AcrylicManager, LoadAllThemes, CreateTag, ...)
+			return CreateLuarmor:Create(AcrylicManager, TweenInfo.new(LoadAllThemes, ...), CreateTag)
 		end
 
-		function m.NewRoundFrame(p, r, u, v, A, B)
-			local function getImageForType(C)
-				return C == "Squircle" and "rbxassetid://80999662900595"
-					or C == "SquircleOutline" and "rbxassetid://117788349049947"
-					or C == "SquircleOutline2" and "rbxassetid://117817408534198"
-					or C == "Squircle-Outline" and "rbxassetid://117817408534198"
-					or C == "Shadow-sm" and "rbxassetid://84825982946844"
-					or C == "Squircle-TL-TR" and "rbxassetid://73569156276236"
-					or C == "Squircle-BL-BR" and "rbxassetid://93853842912264"
-					or C == "Squircle-TL-TR-Outline" and "rbxassetid://136702870075563"
-					or C == "Squircle-BL-BR-Outline" and "rbxassetid://75035847706564"
-					or C == "Square" and "rbxassetid://82909646051652"
-					or C == "Square-Outline" and "rbxassetid://72946211851948"
+		function UtilViewport.NewRoundFrame(AcrylicManager, LoadAllThemes, CreateTag, ConfigManager, CreateButtonEx, CreateToggle)
+			local function getImageForType(CreateCheckbox)
+				return CreateCheckbox == "Squircle" and "rbxassetid://80999662900595"
+					or CreateCheckbox == "SquircleOutline" and "rbxassetid://117788349049947"
+					or CreateCheckbox == "SquircleOutline2" and "rbxassetid://117817408534198"
+					or CreateCheckbox == "Squircle-Outline" and "rbxassetid://117817408534198"
+					or CreateCheckbox == "Shadow-sm" and "rbxassetid://84825982946844"
+					or CreateCheckbox == "Squircle-TL-TR" and "rbxassetid://73569156276236"
+					or CreateCheckbox == "Squircle-BL-BR" and "rbxassetid://93853842912264"
+					or CreateCheckbox == "Squircle-TL-TR-Outline" and "rbxassetid://136702870075563"
+					or CreateCheckbox == "Squircle-BL-BR-Outline" and "rbxassetid://75035847706564"
+					or CreateCheckbox == "Square" and "rbxassetid://82909646051652"
+					or CreateCheckbox == "Square-Outline" and "rbxassetid://72946211851948"
 			end
 
-			local function getSliceCenterForType(C)
-				return C ~= "Shadow-sm" and Rect.new(256, 256, 256, 256
+			local function getSliceCenterForType(CreateCheckbox)
+				return CreateCheckbox ~= "Shadow-sm" and Rect.new(256, 256, 256, 256
 ) or Rect.new(512, 512, 512, 512)
 			end
 
-			local C = m.New(A and "ImageButton" or "ImageLabel", {
-				Image = getImageForType(r),
+			local CreateCheckbox = UtilViewport.New(CreateButtonEx and "ImageButton" or "ImageLabel", {
+				Image = getImageForType(LoadAllThemes),
 				ScaleType = "Slice",
-				SliceCenter = getSliceCenterForType(r),
+				SliceCenter = getSliceCenterForType(LoadAllThemes),
 				SliceScale = 1,
 				BackgroundTransparency = 1,
-				ThemeTag = u.ThemeTag and u.ThemeTag,
-			}, v)
+				ThemeTag = CreateTag.ThemeTag and CreateTag.ThemeTag,
+			}, ConfigManager)
 
-			for F, G in pairs(u or {}) do
-				if F ~= "ThemeTag" then
-					C[F] = G
+			for CreateKeybind, CreateInputEx in pairs(CreateTag or {}) do
+				if CreateKeybind ~= "ThemeTag" then
+					CreateCheckbox[CreateKeybind] = CreateInputEx
 				end
 			end
 
-			local function UpdateSliceScale(H)
-				local J = r ~= "Shadow-sm" and (H / 256) or (H / 512)
-				C.SliceScale = math.max(J, 0.0001)
+			local function UpdateSliceScale(CreateDropdownMenu)
+				local LuaHighlighter = LoadAllThemes ~= "Shadow-sm" and (CreateDropdownMenu / 256) or (CreateDropdownMenu / 512)
+				CreateCheckbox.SliceScale = math.max(LuaHighlighter, 0.0001)
 			end
 
-			local H = {}
+			local CreateDropdownMenu = {}
 
-			function H.SetRadius(J, L)
-				UpdateSliceScale(L)
+			function CreateDropdownMenu.SetRadius(LuaHighlighter, CreateCode)
+				UpdateSliceScale(CreateCode)
 			end
 
-			function H.SetType(J, L)
-				r = L
-				C.Image = getImageForType(L)
-				C.SliceCenter = getSliceCenterForType(L)
-				UpdateSliceScale(p)
+			function CreateDropdownMenu.SetType(LuaHighlighter, CreateCode)
+				LoadAllThemes = CreateCode
+				CreateCheckbox.Image = getImageForType(CreateCode)
+				CreateCheckbox.SliceCenter = getSliceCenterForType(CreateCode)
+				UpdateSliceScale(AcrylicManager)
 			end
 
-			function H.UpdateShape(J, L, M)
-				if M then
-					r = M
-					C.Image = getImageForType(M)
-					C.SliceCenter = getSliceCenterForType(M)
+			function CreateDropdownMenu.UpdateShape(LuaHighlighter, CreateCode, CreateColorpicker)
+				if CreateColorpicker then
+					LoadAllThemes = CreateColorpicker
+					CreateCheckbox.Image = getImageForType(CreateColorpicker)
+					CreateCheckbox.SliceCenter = getSliceCenterForType(CreateColorpicker)
 				end
-				if L then
-					p = L
+				if CreateCode then
+					AcrylicManager = CreateCode
 				end
-				UpdateSliceScale(p)
+				UpdateSliceScale(AcrylicManager)
 			end
 
-			function H.GetRadius(J)
-				return p
+			function CreateDropdownMenu.GetRadius(LuaHighlighter)
+				return AcrylicManager
 			end
 
-			function H.GetType(J)
-				return r
+			function CreateDropdownMenu.GetType(LuaHighlighter)
+				return LoadAllThemes
 			end
 
-			UpdateSliceScale(p)
+			UpdateSliceScale(AcrylicManager)
 
-			return C, B and H or nil
+			return CreateCheckbox, CreateToggle and CreateDropdownMenu or nil
 		end
 
-		local p = m.New
-		local r = m.Tween
+		local AcrylicManager = UtilViewport.New
+		local LoadAllThemes = UtilViewport.Tween
 
-		function m.SetDraggable(u)
-			m.CanDraggable = u
+		function UtilViewport.SetDraggable(CreateTag)
+			UtilViewport.CanDraggable = CreateTag
 		end
 
-		function m.Drag(u, v, A)
-			local B
-			local C, F, G, H
-			local J = {
+		function UtilViewport.Drag(CreateTag, ConfigManager, CreateButtonEx)
+			local CreateToggle
+			local CreateCheckbox, CreateKeybind, CreateInputEx, CreateDropdownMenu
+			local LuaHighlighter = {
 				CanDraggable = true,
 			}
 
-			if not v or type(v) ~= "table" then
-				v = { u }
+			if not ConfigManager or type(ConfigManager) ~= "table" then
+				ConfigManager = { CreateTag }
 			end
 
-			local function update(L)
-				local M = L.Position - G
-				m.Tween(u, 0.02, { Position = UDim2.new(H.X.Scale, H.X.Offset + M.X, H.Y.Scale, H.Y.Offset + M.Y) })
+			local function update(CreateCode)
+				local CreateColorpicker = CreateCode.Position - CreateInputEx
+				UtilViewport.Tween(CreateTag, 0.02, { Position = UDim2.new(CreateDropdownMenu.X.Scale, CreateDropdownMenu.X.Offset + CreateColorpicker.X, CreateDropdownMenu.Y.Scale, CreateDropdownMenu.Y.Offset + CreateColorpicker.Y) })
 					:Play()
 			end
 
-			for L, M in pairs(v) do
-				M.InputBegan:Connect(function(N)
+			for CreateCode, CreateColorpicker in pairs(ConfigManager) do
+				CreateColorpicker.InputBegan:Connect(function(CreateSection)
 					if
 						(
-							N.UserInputType == Enum.UserInputType.MouseButton1
-							or N.UserInputType == Enum.UserInputType.Touch
-						) and J.CanDraggable
+							CreateSection.UserInputType == Enum.UserInputType.MouseButton1
+							or CreateSection.UserInputType == Enum.UserInputType.Touch
+						) and LuaHighlighter.CanDraggable
 					then
-						if B == nil then
-							B = M
-							C = true
-							G = N.Position
-							H = u.Position
+						if CreateToggle == nil then
+							CreateToggle = CreateColorpicker
+							CreateCheckbox = true
+							CreateInputEx = CreateSection.Position
+							CreateDropdownMenu = CreateTag.Position
 
-							if A and type(A) == "function" then
-								A(true, B)
+							if CreateButtonEx and type(CreateButtonEx) == "function" then
+								CreateButtonEx(true, CreateToggle)
 							end
 
-							N.Changed:Connect(function()
-								if N.UserInputState == Enum.UserInputState.End then
-									C = false
-									B = nil
+							CreateSection.Changed:Connect(function()
+								if CreateSection.UserInputState == Enum.UserInputState.End then
+									CreateCheckbox = false
+									CreateToggle = nil
 
-									if A and type(A) == "function" then
-										A(false, B)
+									if CreateButtonEx and type(CreateButtonEx) == "function" then
+										CreateButtonEx(false, CreateToggle)
 									end
 								end
 							end)
@@ -561,131 +615,131 @@ do
 					end
 				end)
 
-				M.InputChanged:Connect(function(N)
-					if B == M and C then
+				CreateColorpicker.InputChanged:Connect(function(CreateSection)
+					if CreateToggle == CreateColorpicker and CreateCheckbox then
 						if
-							N.UserInputType == Enum.UserInputType.MouseMovement
-							or N.UserInputType == Enum.UserInputType.Touch
+							CreateSection.UserInputType == Enum.UserInputType.MouseMovement
+							or CreateSection.UserInputType == Enum.UserInputType.Touch
 						then
-							F = N
+							CreateKeybind = CreateSection
 						end
 					end
 				end)
 			end
 
-			e.InputChanged:Connect(function(N)
-				if N == F and C and B ~= nil then
-					if J.CanDraggable then
-						update(N)
+			CreatePandaDev.InputChanged:Connect(function(CreateSection)
+				if CreateSection == CreateKeybind and CreateCheckbox and CreateToggle ~= nil then
+					if LuaHighlighter.CanDraggable then
+						update(CreateSection)
 					end
 				end
 			end)
 
-			function J.Set(N, O)
-				J.CanDraggable = O
+			function LuaHighlighter.Set(CreateSection, CreateDivider)
+				LuaHighlighter.CanDraggable = CreateDivider
 			end
 
-			return J
+			return LuaHighlighter
 		end
 
-		j.Init(p, "Icon")
+		CreateInput.Init(AcrylicManager, "Icon")
 
-		function m.Image(u, v, A, B, C, F, G)
-			local function SanitizeFilename(H)
-				H = H:gsub('[%s/\\:*?"<>|]+', "-")
-				H = H:gsub("[^%w%-_%.]", "")
-				return H
+		function UtilViewport.Image(CreateTag, ConfigManager, CreateButtonEx, CreateToggle, CreateCheckbox, CreateKeybind, CreateInputEx)
+			local function SanitizeFilename(CreateDropdownMenu)
+				CreateDropdownMenu = CreateDropdownMenu:gsub('[%CreateLabel/\\:*?"<>|]+', "-")
+				CreateDropdownMenu = CreateDropdownMenu:gsub("[^%CreateOpenButton%-_%.]", "")
+				return CreateDropdownMenu
 			end
 
-			B = B or "Temp"
-			v = SanitizeFilename(v)
+			CreateToggle = CreateToggle or "Temp"
+			ConfigManager = SanitizeFilename(ConfigManager)
 
-			local H = p("Frame", {
+			local CreateDropdownMenu = AcrylicManager("Frame", {
 				Size = UDim2.new(0, 0, 0, 0),
 				BackgroundTransparency = 1,
 			}, {
-				p("ImageLabel", {
+				AcrylicManager("ImageLabel", {
 					Size = UDim2.new(1, 0, 1, 0),
 					BackgroundTransparency = 1,
 					ScaleType = "Crop",
-					ThemeTag = (m.Icon(u) or G) and {
-						ImageColor3 = F and "Icon" or nil,
+					ThemeTag = (UtilViewport.Icon(CreateTag) or CreateInputEx) and {
+						ImageColor3 = CreateKeybind and "Icon" or nil,
 					} or nil,
 				}, {
-					p("UICorner", {
-						CornerRadius = UDim.new(0, A),
+					AcrylicManager("UICorner", {
+						CornerRadius = UDim.new(0, CreateButtonEx),
 					}),
 				}),
 			})
-			if m.Icon(u) then
-				H.ImageLabel:Destroy()
+			if UtilViewport.Icon(CreateTag) then
+				CreateDropdownMenu.ImageLabel:Destroy()
 
-				local J = j.Image({
-					Icon = u,
+				local LuaHighlighter = CreateInput.Image({
+					Icon = CreateTag,
 					Size = UDim2.new(1, 0, 1, 0),
 					Colors = {
-						(F and "Icon" or false),
+						(CreateKeybind and "Icon" or false),
 						"Button",
 					},
 				}).IconFrame
-				J.Parent = H
-			elseif string.find(u, "http") then
-				local J = "WindUI/" .. B .. "/Assets/." .. C .. "-" .. v .. ".png"
-				local L, M = pcall(function()
+				LuaHighlighter.Parent = CreateDropdownMenu
+			elseif string.find(CreateTag, "http") then
+				local LuaHighlighter = "WindUI/" .. CreateToggle .. "/Assets/." .. CreateCheckbox .. "-" .. ConfigManager .. ".png"
+				local CreateCode, CreateColorpicker = pcall(function()
 					task.spawn(function()
-						if not isfile(J) then
-							local L = m.Request({
-								Url = u,
+						if not isfile(LuaHighlighter) then
+							local CreateCode = UtilViewport.Request({
+								Url = CreateTag,
 								Method = "GET",
 							}).Body
 
-							writefile(J, L)
+							writefile(LuaHighlighter, CreateCode)
 						end
-						H.ImageLabel.Image = getcustomasset(J)
+						CreateDropdownMenu.ImageLabel.Image = getcustomasset(LuaHighlighter)
 					end)
 				end)
-				if not L then
+				if not CreateCode then
 					warn(
-						"[ WindUI.Creator ]  '" .. identifyexecutor() .. "' doesnt support the URL Images. Error: " .. M
+						"[ WindUI.Creator ]  '" .. identifyexecutor() .. "' doesnt support the URL Images. Error: " .. CreateColorpicker
 					)
 
-					H:Destroy()
+					CreateDropdownMenu:Destroy()
 				end
-			elseif u == "" then
-				H.Visible = false
+			elseif CreateTag == "" then
+				CreateDropdownMenu.Visible = false
 			else
-				H.ImageLabel.Image = u
+				CreateDropdownMenu.ImageLabel.Image = CreateTag
 			end
 
-			return H
+			return CreateDropdownMenu
 		end
 
-		return m
+		return UtilViewport
 	end
-	function a.b()
-		local b = {}
+	function WindUI.CreateLocalization()
+		local CreateLocalization = {}
 
-		function b.New(e, f, g)
-			local h = {
-				Enabled = f.Enabled or false,
-				Translations = f.Translations or {},
-				Prefix = f.Prefix or "loc:",
-				DefaultLanguage = f.DefaultLanguage or "en",
+		function CreateLocalization.New(CreatePandaDev, CreateLuarmor, LoadKeyServices)
+			local LoadPackageJson = {
+				Enabled = CreateLuarmor.Enabled or false,
+				Translations = CreateLuarmor.Translations or {},
+				Prefix = CreateLuarmor.Prefix or "loc:",
+				DefaultLanguage = CreateLuarmor.DefaultLanguage or "en",
 			}
 
-			g.Localization = h
+			LoadKeyServices.Localization = LoadPackageJson
 
-			return h
+			return LoadPackageJson
 		end
 
-		return b
+		return CreateLocalization
 	end
-	function a.c()
-		local b = a.load("a")
-		local e = b.New
-		local f = b.Tween
+	function WindUI.CreateNotification()
+		local CreateLocalization = WindUI.load("WindUI")
+		local CreatePandaDev = CreateLocalization.New
+		local CreateLuarmor = CreateLocalization.Tween
 
-		local g = {
+		local LoadKeyServices = {
 			Size = UDim2.new(0, 300, 1, -156),
 			SizeLower = UDim2.new(0, 300, 1, -56),
 			UICorner = 13,
@@ -696,80 +750,80 @@ do
 			Notifications = {},
 		}
 
-		function g.Init(h)
-			local i = {
+		function LoadKeyServices.Init(LoadPackageJson)
+			local CreateButton = {
 				Lower = false,
 			}
 
-			function i.SetLower(j)
-				i.Lower = j
-				i.Frame.Size = j and g.SizeLower or g.Size
+			function CreateButton.SetLower(CreateInput)
+				CreateButton.Lower = CreateInput
+				CreateButton.Frame.Size = CreateInput and LoadKeyServices.SizeLower or LoadKeyServices.Size
 			end
 
-			i.Frame = e("Frame", {
+			CreateButton.Frame = CreatePandaDev("Frame", {
 				Position = UDim2.new(1, -29, 0, 56),
 				AnchorPoint = Vector2.new(1, 0),
-				Size = g.Size,
-				Parent = h,
+				Size = LoadKeyServices.Size,
+				Parent = LoadPackageJson,
 				BackgroundTransparency = 1,
 			}, {
-				e("UIListLayout", {
+				CreatePandaDev("UIListLayout", {
 					HorizontalAlignment = "Center",
 					SortOrder = "LayoutOrder",
 					VerticalAlignment = "Bottom",
 					Padding = UDim.new(0, 8),
 				}),
-				e("UIPadding", {
+				CreatePandaDev("UIPadding", {
 					PaddingBottom = UDim.new(0, 29),
 				}),
 			})
-			return i
+			return CreateButton
 		end
 
-		function g.New(h)
-			local i = {
-				Title = h.Title or "Notification",
-				Content = h.Content or nil,
-				Icon = h.Icon or nil,
-				IconThemed = h.IconThemed,
-				Background = h.Background,
-				BackgroundImageTransparency = h.BackgroundImageTransparency,
-				Duration = h.Duration or 5,
-				Buttons = h.Buttons or {},
+		function LoadKeyServices.New(LoadPackageJson)
+			local CreateButton = {
+				Title = LoadPackageJson.Title or "Notification",
+				Content = LoadPackageJson.Content or nil,
+				Icon = LoadPackageJson.Icon or nil,
+				IconThemed = LoadPackageJson.IconThemed,
+				Background = LoadPackageJson.Background,
+				BackgroundImageTransparency = LoadPackageJson.BackgroundImageTransparency,
+				Duration = LoadPackageJson.Duration or 5,
+				Buttons = LoadPackageJson.Buttons or {},
 				CanClose = true,
 				UIElements = {},
 				Closed = false,
 			}
-			if i.CanClose == nil then
-				i.CanClose = true
+			if CreateButton.CanClose == nil then
+				CreateButton.CanClose = true
 			end
-			g.NotificationIndex = g.NotificationIndex + 1
-			g.Notifications[g.NotificationIndex] = i
+			LoadKeyServices.NotificationIndex = LoadKeyServices.NotificationIndex + 1
+			LoadKeyServices.Notifications[LoadKeyServices.NotificationIndex] = CreateButton
 
-			local j
+			local CreateInput
 
-			if i.Icon then
-				j = b.Image(i.Icon, i.Title .. ":" .. i.Icon, 0, h.Window, "Notification", i.IconThemed)
-				j.Size = UDim2.new(0, 26, 0, 26)
-				j.Position = UDim2.new(0, g.UIPadding, 0, g.UIPadding)
+			if CreateButton.Icon then
+				CreateInput = CreateLocalization.Image(CreateButton.Icon, CreateButton.Title .. ":" .. CreateButton.Icon, 0, LoadPackageJson.Window, "Notification", CreateButton.IconThemed)
+				CreateInput.Size = UDim2.new(0, 26, 0, 26)
+				CreateInput.Position = UDim2.new(0, LoadKeyServices.UIPadding, 0, LoadKeyServices.UIPadding)
 			end
 
-			local l
-			if i.CanClose then
-				l = e("ImageButton", {
-					Image = b.Icon("x")[1],
-					ImageRectSize = b.Icon("x")[2].ImageRectSize,
-					ImageRectOffset = b.Icon("x")[2].ImageRectPosition,
+			local CreateKeySystem
+			if CreateButton.CanClose then
+				CreateKeySystem = CreatePandaDev("ImageButton", {
+					Image = CreateLocalization.Icon("CreateTooltip")[1],
+					ImageRectSize = CreateLocalization.Icon("CreateTooltip")[2].ImageRectSize,
+					ImageRectOffset = CreateLocalization.Icon("CreateTooltip")[2].ImageRectPosition,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(0, 16, 0, 16),
-					Position = UDim2.new(1, -g.UIPadding, 0, g.UIPadding),
+					Position = UDim2.new(1, -LoadKeyServices.UIPadding, 0, LoadKeyServices.UIPadding),
 					AnchorPoint = Vector2.new(1, 0),
 					ThemeTag = {
 						ImageColor3 = "Text",
 					},
 					ImageTransparency = 0.4,
 				}, {
-					e("TextButton", {
+					CreatePandaDev("TextButton", {
 						Size = UDim2.new(1, 8, 1, 8),
 						BackgroundTransparency = 1,
 						AnchorPoint = Vector2.new(0.5, 0.5),
@@ -779,7 +833,7 @@ do
 				})
 			end
 
-			local m = e("Frame", {
+			local UtilViewport = CreatePandaDev("Frame", {
 				Size = UDim2.new(0, 0, 1, 0),
 				BackgroundTransparency = 0.95,
 				ThemeTag = {
@@ -787,22 +841,22 @@ do
 				},
 			})
 
-			local p = e("Frame", {
-				Size = UDim2.new(1, i.Icon and -28 - g.UIPadding or 0, 1, 0),
+			local AcrylicManager = CreatePandaDev("Frame", {
+				Size = UDim2.new(1, CreateButton.Icon and -28 - LoadKeyServices.UIPadding or 0, 1, 0),
 				Position = UDim2.new(1, 0, 0, 0),
 				AnchorPoint = Vector2.new(1, 0),
 				BackgroundTransparency = 1,
 				AutomaticSize = "Y",
 			}, {
-				e("UIPadding", {
-					PaddingTop = UDim.new(0, g.UIPadding),
-					PaddingLeft = UDim.new(0, g.UIPadding),
-					PaddingRight = UDim.new(0, g.UIPadding),
-					PaddingBottom = UDim.new(0, g.UIPadding),
+				CreatePandaDev("UIPadding", {
+					PaddingTop = UDim.new(0, LoadKeyServices.UIPadding),
+					PaddingLeft = UDim.new(0, LoadKeyServices.UIPadding),
+					PaddingRight = UDim.new(0, LoadKeyServices.UIPadding),
+					PaddingBottom = UDim.new(0, LoadKeyServices.UIPadding),
 				}),
-				e("TextLabel", {
+				CreatePandaDev("TextLabel", {
 					AutomaticSize = "Y",
-					Size = UDim2.new(1, -30 - g.UIPadding, 0, 0),
+					Size = UDim2.new(1, -30 - LoadKeyServices.UIPadding, 0, 0),
 					TextWrapped = true,
 					TextXAlignment = "Left",
 					RichText = true,
@@ -811,16 +865,16 @@ do
 					ThemeTag = {
 						TextColor3 = "Text",
 					},
-					Text = i.Title,
-					FontFace = Font.new(b.Font, Enum.FontWeight.Medium),
+					Text = CreateButton.Title,
+					FontFace = Font.new(CreateLocalization.Font, Enum.FontWeight.Medium),
 				}),
-				e("UIListLayout", {
-					Padding = UDim.new(0, g.UIPadding / 3),
+				CreatePandaDev("UIListLayout", {
+					Padding = UDim.new(0, LoadKeyServices.UIPadding / 3),
 				}),
 			})
 
-			if i.Content then
-				e("TextLabel", {
+			if CreateButton.Content then
+				CreatePandaDev("TextLabel", {
 					AutomaticSize = "Y",
 					Size = UDim2.new(1, 0, 0, 0),
 					TextWrapped = true,
@@ -832,13 +886,13 @@ do
 					ThemeTag = {
 						TextColor3 = "Text",
 					},
-					Text = i.Content,
-					FontFace = Font.new(b.Font, Enum.FontWeight.Medium),
-					Parent = p,
+					Text = CreateButton.Content,
+					FontFace = Font.new(CreateLocalization.Font, Enum.FontWeight.Medium),
+					Parent = AcrylicManager,
 				})
 			end
 
-			local r = b.NewRoundFrame(g.UICorner, "Squircle", {
+			local LoadAllThemes = CreateLocalization.NewRoundFrame(LoadKeyServices.UICorner, "Squircle", {
 				Size = UDim2.new(1, 0, 0, 0),
 				Position = UDim2.new(2, 0, 1, 0),
 				AnchorPoint = Vector2.new(0, 1),
@@ -848,160 +902,160 @@ do
 					ImageColor3 = "Background",
 				},
 			}, {
-				e("CanvasGroup", {
+				CreatePandaDev("CanvasGroup", {
 					Size = UDim2.new(1, 0, 1, 0),
 					BackgroundTransparency = 1,
 				}, {
-					m,
-					e("UICorner", {
-						CornerRadius = UDim.new(0, g.UICorner),
+					UtilViewport,
+					CreatePandaDev("UICorner", {
+						CornerRadius = UDim.new(0, LoadKeyServices.UICorner),
 					}),
 				}),
-				e("ImageLabel", {
+				CreatePandaDev("ImageLabel", {
 					Name = "Background",
-					Image = i.Background,
+					Image = CreateButton.Background,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
 					ScaleType = "Crop",
-					ImageTransparency = i.BackgroundImageTransparency,
+					ImageTransparency = CreateButton.BackgroundImageTransparency,
 				}, {
-					e("UICorner", {
-						CornerRadius = UDim.new(0, g.UICorner),
+					CreatePandaDev("UICorner", {
+						CornerRadius = UDim.new(0, LoadKeyServices.UICorner),
 					}),
 				}),
 
-				p,
-				j,
-				l,
+				AcrylicManager,
+				CreateInput,
+				CreateKeySystem,
 			})
 
-			local u = e("Frame", {
+			local CreateTag = CreatePandaDev("Frame", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 0, 0),
-				Parent = h.Holder,
+				Parent = LoadPackageJson.Holder,
 			}, {
-				r,
+				LoadAllThemes,
 			})
 
-			function i.Close(v)
-				if not i.Closed then
-					i.Closed = true
-					f(u, 0.45, { Size = UDim2.new(1, 0, 0, -8) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-					f(r, 0.55, { Position = UDim2.new(2, 0, 1, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+			function CreateButton.Close(ConfigManager)
+				if not CreateButton.Closed then
+					CreateButton.Closed = true
+					CreateLuarmor(CreateTag, 0.45, { Size = UDim2.new(1, 0, 0, -8) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+					CreateLuarmor(LoadAllThemes, 0.55, { Position = UDim2.new(2, 0, 1, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 					task.wait(0.45)
-					u:Destroy()
+					CreateTag:Destroy()
 				end
 			end
 
 			task.spawn(function()
 				task.wait()
-				f(
-					u,
+				CreateLuarmor(
+					CreateTag,
 					0.45,
-					{ Size = UDim2.new(1, 0, 0, r.AbsoluteSize.Y) },
+					{ Size = UDim2.new(1, 0, 0, LoadAllThemes.AbsoluteSize.Y) },
 					Enum.EasingStyle.Quint,
 					Enum.EasingDirection.Out
 				):Play()
-				f(r, 0.45, { Position = UDim2.new(0, 0, 1, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-				if i.Duration then
-					f(
-						m,
-						i.Duration,
+				CreateLuarmor(LoadAllThemes, 0.45, { Position = UDim2.new(0, 0, 1, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+				if CreateButton.Duration then
+					CreateLuarmor(
+						UtilViewport,
+						CreateButton.Duration,
 						{ Size = UDim2.new(1, 0, 1, 0) },
 						Enum.EasingStyle.Linear,
 						Enum.EasingDirection.InOut
 					):Play()
-					task.wait(i.Duration)
-					i:Close()
+					task.wait(CreateButton.Duration)
+					CreateButton:Close()
 				end
 			end)
 
-			if l then
-				b.AddSignal(l.TextButton.MouseButton1Click, function()
-					i:Close()
+			if CreateKeySystem then
+				CreateLocalization.AddSignal(CreateKeySystem.TextButton.MouseButton1Click, function()
+					CreateButton:Close()
 				end)
 			end
 
-			return i
+			return CreateButton
 		end
 
-		return g
+		return LoadKeyServices
 	end
-	function a.d()
-		local b = 4294967296
-		local e = b - 1
-		local function c(f, g)
-			local h, i = 0, 1
-			while f ~= 0 or g ~= 0 do
-				local j, l = f % 2, g % 2
-				local m = (j + l) % 2
-				h = h + m * i
-				f = math.floor(f / 2)
-				g = math.floor(g / 2)
-				i = i * 2
+	function WindUI.CreatePlatoboost()
+		local CreateLocalization = 4294967296
+		local CreatePandaDev = CreateLocalization - 1
+		local function CreateNotification(CreateLuarmor, LoadKeyServices)
+			local LoadPackageJson, CreateButton = 0, 1
+			while CreateLuarmor ~= 0 or LoadKeyServices ~= 0 do
+				local CreateInput, CreateKeySystem = CreateLuarmor % 2, LoadKeyServices % 2
+				local UtilViewport = (CreateInput + CreateKeySystem) % 2
+				LoadPackageJson = LoadPackageJson + UtilViewport * CreateButton
+				CreateLuarmor = math.floor(CreateLuarmor / 2)
+				LoadKeyServices = math.floor(LoadKeyServices / 2)
+				CreateButton = CreateButton * 2
 			end
-			return h % b
+			return LoadPackageJson % CreateLocalization
 		end
-		local function k(f, g, h, ...)
-			local i
-			if g then
-				f = f % b
-				g = g % b
-				i = c(f, g)
-				if h then
-					i = k(i, h, ...)
+		local function CreateDialog(CreateLuarmor, LoadKeyServices, LoadPackageJson, ...)
+			local CreateButton
+			if LoadKeyServices then
+				CreateLuarmor = CreateLuarmor % CreateLocalization
+				LoadKeyServices = LoadKeyServices % CreateLocalization
+				CreateButton = CreateNotification(CreateLuarmor, LoadKeyServices)
+				if LoadPackageJson then
+					CreateButton = CreateDialog(CreateButton, LoadPackageJson, ...)
 				end
-				return i
-			elseif f then
-				return f % b
+				return CreateButton
+			elseif CreateLuarmor then
+				return CreateLuarmor % CreateLocalization
 			else
 				return 0
 			end
 		end
-		local function n(f, g, h, ...)
-			local i
-			if g then
-				f = f % b
-				g = g % b
-				i = (f + g - c(f, g)) / 2
-				if h then
-					i = n(i, h, ...)
+		local function CreateAcrylicBlur(CreateLuarmor, LoadKeyServices, LoadPackageJson, ...)
+			local CreateButton
+			if LoadKeyServices then
+				CreateLuarmor = CreateLuarmor % CreateLocalization
+				LoadKeyServices = LoadKeyServices % CreateLocalization
+				CreateButton = (CreateLuarmor + LoadKeyServices - CreateNotification(CreateLuarmor, LoadKeyServices)) / 2
+				if LoadPackageJson then
+					CreateButton = CreateAcrylicBlur(CreateButton, LoadPackageJson, ...)
 				end
-				return i
-			elseif f then
-				return f % b
+				return CreateButton
+			elseif CreateLuarmor then
+				return CreateLuarmor % CreateLocalization
 			else
-				return e
+				return CreatePandaDev
 			end
 		end
-		local function o(f)
-			return e - f
+		local function CreateAcrylicPaint(CreateLuarmor)
+			return CreatePandaDev - CreateLuarmor
 		end
-		local function q(f, g)
-			if g < 0 then
-				return lshift(f, -g)
+		local function CreatePopup(CreateLuarmor, LoadKeyServices)
+			if LoadKeyServices < 0 then
+				return lshift(CreateLuarmor, -LoadKeyServices)
 			end
-			return math.floor(f % 4294967296 / 2 ^ g)
+			return math.floor(CreateLuarmor % 4294967296 / 2 ^ LoadKeyServices)
 		end
-		local function s(f, g)
-			if g > 31 or g < -31 then
+		local function CreateLabel(CreateLuarmor, LoadKeyServices)
+			if LoadKeyServices > 31 or LoadKeyServices < -31 then
 				return 0
 			end
-			return q(f % b, g)
+			return CreatePopup(CreateLuarmor % CreateLocalization, LoadKeyServices)
 		end
-		local function lshift(f, g)
-			if g < 0 then
-				return s(f, -g)
+		local function lshift(CreateLuarmor, LoadKeyServices)
+			if LoadKeyServices < 0 then
+				return CreateLabel(CreateLuarmor, -LoadKeyServices)
 			end
-			return f * 2 ^ g % 4294967296
+			return CreateLuarmor * 2 ^ LoadKeyServices % 4294967296
 		end
-		local function t(f, g)
-			f = f % b
-			g = g % 32
-			local h = n(f, 2 ^ g - 1)
-			return s(f, g) + lshift(h, 32 - g)
+		local function CreateScrollBar(CreateLuarmor, LoadKeyServices)
+			CreateLuarmor = CreateLuarmor % CreateLocalization
+			LoadKeyServices = LoadKeyServices % 32
+			local LoadPackageJson = CreateAcrylicBlur(CreateLuarmor, 2 ^ LoadKeyServices - 1)
+			return CreateLabel(CreateLuarmor, LoadKeyServices) + lshift(LoadPackageJson, 32 - LoadKeyServices)
 		end
-		local f = {
+		local CreateLuarmor = {
 			0x428a2f98,
 			0x71374491,
 			0xb5c0fbcf,
@@ -1067,374 +1121,374 @@ do
 			0xbef9a3f7,
 			0xc67178f2,
 		}
-		local function w(g)
-			return string.gsub(g, ".", function(h)
-				return string.format("%02x", string.byte(h))
+		local function CreateOpenButton(LoadKeyServices)
+			return string.gsub(LoadKeyServices, ".", function(LoadPackageJson)
+				return string.format("%02x", string.byte(LoadPackageJson))
 			end)
 		end
-		local function y(g, h)
-			local i = ""
-			for j = 1, h do
-				local l = g % 256
-				i = string.char(l) .. i
-				g = (g - l) / 256
+		local function CreateElementFrame(LoadKeyServices, LoadPackageJson)
+			local CreateButton = ""
+			for CreateInput = 1, LoadPackageJson do
+				local CreateKeySystem = LoadKeyServices % 256
+				CreateButton = string.char(CreateKeySystem) .. CreateButton
+				LoadKeyServices = (LoadKeyServices - CreateKeySystem) / 256
 			end
-			return i
+			return CreateButton
 		end
-		local function D(g, h)
-			local i = 0
-			for j = h, h + 3 do
-				i = i * 256 + string.byte(g, j)
+		local function CreateToggleEx(LoadKeyServices, LoadPackageJson)
+			local CreateButton = 0
+			for CreateInput = LoadPackageJson, LoadPackageJson + 3 do
+				CreateButton = CreateButton * 256 + string.byte(LoadKeyServices, CreateInput)
 			end
-			return i
+			return CreateButton
 		end
-		local function E(g, h)
-			local i = 64 - (h + 9) % 64
-			h = y(8 * h, 8)
-			g = g .. "\128" .. string.rep("\0", i) .. h
-			assert(#g % 64 == 0)
-			return g
+		local function CreateSlider(LoadKeyServices, LoadPackageJson)
+			local CreateButton = 64 - (LoadPackageJson + 9) % 64
+			LoadPackageJson = CreateElementFrame(8 * LoadPackageJson, 8)
+			LoadKeyServices = LoadKeyServices .. "\128" .. string.rep("\0", CreateButton) .. LoadPackageJson
+			assert(#LoadKeyServices % 64 == 0)
+			return LoadKeyServices
 		end
-		local function I(g)
-			g[1] = 0x6a09e667
-			g[2] = 0xbb67ae85
-			g[3] = 0x3c6ef372
-			g[4] = 0xa54ff53a
-			g[5] = 0x510e527f
-			g[6] = 0x9b05688c
-			g[7] = 0x1f83d9ab
-			g[8] = 0x5be0cd19
-			return g
+		local function CreateDropdown(LoadKeyServices)
+			LoadKeyServices[1] = 0x6a09e667
+			LoadKeyServices[2] = 0xbb67ae85
+			LoadKeyServices[3] = 0x3c6ef372
+			LoadKeyServices[4] = 0xa54ff53a
+			LoadKeyServices[5] = 0x510e527f
+			LoadKeyServices[6] = 0x9b05688c
+			LoadKeyServices[7] = 0x1f83d9ab
+			LoadKeyServices[8] = 0x5be0cd19
+			return LoadKeyServices
 		end
-		local function K(g, h, i)
-			local j = {}
-			for l = 1, 16 do
-				j[l] = D(g, h + (l - 1) * 4)
+		local function CreateCodeBlock(LoadKeyServices, LoadPackageJson, CreateButton)
+			local CreateInput = {}
+			for CreateKeySystem = 1, 16 do
+				CreateInput[CreateKeySystem] = CreateToggleEx(LoadKeyServices, LoadPackageJson + (CreateKeySystem - 1) * 4)
 			end
-			for l = 17, 64 do
-				local m = j[l - 15]
-				local p = k(t(m, 7), t(m, 18), s(m, 3))
-				m = j[l - 2]
-				j[l] = (j[l - 16] + p + j[l - 7] + k(t(m, 17), t(m, 19), s(m, 10))) % b
+			for CreateKeySystem = 17, 64 do
+				local UtilViewport = CreateInput[CreateKeySystem - 15]
+				local AcrylicManager = CreateDialog(CreateScrollBar(UtilViewport, 7), CreateScrollBar(UtilViewport, 18), CreateLabel(UtilViewport, 3))
+				UtilViewport = CreateInput[CreateKeySystem - 2]
+				CreateInput[CreateKeySystem] = (CreateInput[CreateKeySystem - 16] + AcrylicManager + CreateInput[CreateKeySystem - 7] + CreateDialog(CreateScrollBar(UtilViewport, 17), CreateScrollBar(UtilViewport, 19), CreateLabel(UtilViewport, 10))) % CreateLocalization
 			end
-			local l, m, p, r, u, v, A, B = i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]
-			for C = 1, 64 do
-				local F = k(t(l, 2), t(l, 13), t(l, 22))
-				local G = k(n(l, m), n(l, p), n(m, p))
-				local H = (F + G) % b
-				local J = k(t(u, 6), t(u, 11), t(u, 25))
-				local L = k(n(u, v), n(o(u), A))
-				local M = (B + J + L + f[C] + j[C]) % b
-				B = A
-				A = v
-				v = u
-				u = (r + M) % b
-				r = p
-				p = m
-				m = l
-				l = (M + H) % b
+			local CreateKeySystem, UtilViewport, AcrylicManager, LoadAllThemes, CreateTag, ConfigManager, CreateButtonEx, CreateToggle = CreateButton[1], CreateButton[2], CreateButton[3], CreateButton[4], CreateButton[5], CreateButton[6], CreateButton[7], CreateButton[8]
+			for CreateCheckbox = 1, 64 do
+				local CreateKeybind = CreateDialog(CreateScrollBar(CreateKeySystem, 2), CreateScrollBar(CreateKeySystem, 13), CreateScrollBar(CreateKeySystem, 22))
+				local CreateInputEx = CreateDialog(CreateAcrylicBlur(CreateKeySystem, UtilViewport), CreateAcrylicBlur(CreateKeySystem, AcrylicManager), CreateAcrylicBlur(UtilViewport, AcrylicManager))
+				local CreateDropdownMenu = (CreateKeybind + CreateInputEx) % CreateLocalization
+				local LuaHighlighter = CreateDialog(CreateScrollBar(CreateTag, 6), CreateScrollBar(CreateTag, 11), CreateScrollBar(CreateTag, 25))
+				local CreateCode = CreateDialog(CreateAcrylicBlur(CreateTag, ConfigManager), CreateAcrylicBlur(CreateAcrylicPaint(CreateTag), CreateButtonEx))
+				local CreateColorpicker = (CreateToggle + LuaHighlighter + CreateCode + CreateLuarmor[CreateCheckbox] + CreateInput[CreateCheckbox]) % CreateLocalization
+				CreateToggle = CreateButtonEx
+				CreateButtonEx = ConfigManager
+				ConfigManager = CreateTag
+				CreateTag = (LoadAllThemes + CreateColorpicker) % CreateLocalization
+				LoadAllThemes = AcrylicManager
+				AcrylicManager = UtilViewport
+				UtilViewport = CreateKeySystem
+				CreateKeySystem = (CreateColorpicker + CreateDropdownMenu) % CreateLocalization
 			end
-			i[1] = (i[1] + l) % b
-			i[2] = (i[2] + m) % b
-			i[3] = (i[3] + p) % b
-			i[4] = (i[4] + r) % b
-			i[5] = (i[5] + u) % b
-			i[6] = (i[6] + v) % b
-			i[7] = (i[7] + A) % b
-			i[8] = (i[8] + B) % b
+			CreateButton[1] = (CreateButton[1] + CreateKeySystem) % CreateLocalization
+			CreateButton[2] = (CreateButton[2] + UtilViewport) % CreateLocalization
+			CreateButton[3] = (CreateButton[3] + AcrylicManager) % CreateLocalization
+			CreateButton[4] = (CreateButton[4] + LoadAllThemes) % CreateLocalization
+			CreateButton[5] = (CreateButton[5] + CreateTag) % CreateLocalization
+			CreateButton[6] = (CreateButton[6] + ConfigManager) % CreateLocalization
+			CreateButton[7] = (CreateButton[7] + CreateButtonEx) % CreateLocalization
+			CreateButton[8] = (CreateButton[8] + CreateToggle) % CreateLocalization
 		end
-		local function Z(g)
-			g = E(g, #g)
-			local h = I({})
-			for i = 1, #g, 64 do
-				K(g, i, h)
+		local function Z(LoadKeyServices)
+			LoadKeyServices = CreateSlider(LoadKeyServices, #LoadKeyServices)
+			local LoadPackageJson = CreateDropdown({})
+			for CreateButton = 1, #LoadKeyServices, 64 do
+				CreateCodeBlock(LoadKeyServices, CreateButton, LoadPackageJson)
 			end
-			return w(
-				y(h[1], 4)
-					.. y(h[2], 4)
-					.. y(h[3], 4)
-					.. y(h[4], 4)
-					.. y(h[5], 4)
-					.. y(h[6], 4)
-					.. y(h[7], 4)
-					.. y(h[8], 4)
+			return CreateOpenButton(
+				CreateElementFrame(LoadPackageJson[1], 4)
+					.. CreateElementFrame(LoadPackageJson[2], 4)
+					.. CreateElementFrame(LoadPackageJson[3], 4)
+					.. CreateElementFrame(LoadPackageJson[4], 4)
+					.. CreateElementFrame(LoadPackageJson[5], 4)
+					.. CreateElementFrame(LoadPackageJson[6], 4)
+					.. CreateElementFrame(LoadPackageJson[7], 4)
+					.. CreateElementFrame(LoadPackageJson[8], 4)
 			)
 		end
-		local g
-		local h = { ["\\"] = "\\", ['"'] = '"', ["\b"] = "b", ["\f"] = "f", ["\n"] = "n", ["\r"] = "r", ["\t"] = "t" }
-		local i = { ["/"] = "/" }
-		for j, l in pairs(h) do
-			i[l] = j
+		local LoadKeyServices
+		local LoadPackageJson = { ["\\"] = "\\", ['"'] = '"', ["\CreateLocalization"] = "CreateLocalization", ["\CreateLuarmor"] = "CreateLuarmor", ["\CreateAcrylicBlur"] = "CreateAcrylicBlur", ["\LoadAllThemes"] = "LoadAllThemes", ["\CreateScrollBar"] = "CreateScrollBar" }
+		local CreateButton = { ["/"] = "/" }
+		for CreateInput, CreateKeySystem in pairs(LoadPackageJson) do
+			CreateButton[CreateKeySystem] = CreateInput
 		end
-		local m = function(m)
-			return "\\" .. (h[m] or string.format("u%04x", m:byte()))
+		local UtilViewport = function(UtilViewport)
+			return "\\" .. (LoadPackageJson[UtilViewport] or string.format("CreateTag%04x", UtilViewport:byte()))
 		end
-		local p = function(p)
+		local AcrylicManager = function(AcrylicManager)
 			return "null"
 		end
-		local r = function(r, u)
-			local v = {}
-			u = u or {}
-			if u[r] then
+		local LoadAllThemes = function(LoadAllThemes, CreateTag)
+			local ConfigManager = {}
+			CreateTag = CreateTag or {}
+			if CreateTag[LoadAllThemes] then
 				error("circular reference")
 			end
-			u[r] = true
-			if rawget(r, 1) ~= nil or next(r) == nil then
-				local A = 0
-				for B in pairs(r) do
-					if type(B) ~= "number" then
+			CreateTag[LoadAllThemes] = true
+			if rawget(LoadAllThemes, 1) ~= nil or next(LoadAllThemes) == nil then
+				local CreateButtonEx = 0
+				for CreateToggle in pairs(LoadAllThemes) do
+					if type(CreateToggle) ~= "number" then
 						error("invalid table: mixed or invalid key types")
 					end
-					A = A + 1
+					CreateButtonEx = CreateButtonEx + 1
 				end
-				if A ~= #r then
+				if CreateButtonEx ~= #LoadAllThemes then
 					error("invalid table: sparse array")
 				end
-				for C, F in ipairs(r) do
-					table.insert(v, g(F, u))
+				for CreateCheckbox, CreateKeybind in ipairs(LoadAllThemes) do
+					table.insert(ConfigManager, LoadKeyServices(CreateKeybind, CreateTag))
 				end
-				u[r] = nil
-				return "[" .. table.concat(v, ",") .. "]"
+				CreateTag[LoadAllThemes] = nil
+				return "[" .. table.concat(ConfigManager, ",") .. "]"
 			else
-				for A, B in pairs(r) do
-					if type(A) ~= "string" then
+				for CreateButtonEx, CreateToggle in pairs(LoadAllThemes) do
+					if type(CreateButtonEx) ~= "string" then
 						error("invalid table: mixed or invalid key types")
 					end
-					table.insert(v, g(A, u) .. ":" .. g(B, u))
+					table.insert(ConfigManager, LoadKeyServices(CreateButtonEx, CreateTag) .. ":" .. LoadKeyServices(CreateToggle, CreateTag))
 				end
-				u[r] = nil
-				return "{" .. table.concat(v, ",") .. "}"
+				CreateTag[LoadAllThemes] = nil
+				return "{" .. table.concat(ConfigManager, ",") .. "}"
 			end
 		end
-		local u = function(u)
-			return '"' .. u:gsub('[%z\1-\31\\"]', m) .. '"'
+		local CreateTag = function(CreateTag)
+			return '"' .. CreateTag:gsub('[%CreateParagraph\1-\31\\"]', UtilViewport) .. '"'
 		end
-		local v = function(v)
-			if v ~= v or v <= -math.huge or v >= math.huge then
-				error("unexpected number value '" .. tostring(v) .. "'")
+		local ConfigManager = function(ConfigManager)
+			if ConfigManager ~= ConfigManager or ConfigManager <= -math.huge or ConfigManager >= math.huge then
+				error("unexpected number value '" .. tostring(ConfigManager) .. "'")
 			end
-			return string.format("%.14g", v)
+			return string.format("%.14g", ConfigManager)
 		end
-		local A = { ["nil"] = p, table = r, string = u, number = v, boolean = tostring }
-		g = function(B, C)
-			local F = type(B)
-			local G = A[F]
-			if G then
-				return G(B, C)
+		local CreateButtonEx = { ["nil"] = AcrylicManager, table = LoadAllThemes, string = CreateTag, number = ConfigManager, boolean = tostring }
+		LoadKeyServices = function(CreateToggle, CreateCheckbox)
+			local CreateKeybind = type(CreateToggle)
+			local CreateInputEx = CreateButtonEx[CreateKeybind]
+			if CreateInputEx then
+				return CreateInputEx(CreateToggle, CreateCheckbox)
 			end
-			error("unexpected type '" .. F .. "'")
+			error("unexpected type '" .. CreateKeybind .. "'")
 		end
-		local B = function(B)
-			return g(B)
+		local CreateToggle = function(CreateToggle)
+			return LoadKeyServices(CreateToggle)
 		end
-		local C
-		local F = function(...)
-			local F = {}
-			for G = 1, select("#", ...) do
-				F[select(G, ...)] = true
+		local CreateCheckbox
+		local CreateKeybind = function(...)
+			local CreateKeybind = {}
+			for CreateInputEx = 1, select("#", ...) do
+				CreateKeybind[select(CreateInputEx, ...)] = true
 			end
-			return F
+			return CreateKeybind
 		end
-		local G = F(" ", "\t", "\r", "\n")
-		local H = F(" ", "\t", "\r", "\n", "]", "}", ",")
-		local J = F("\\", "/", '"', "b", "f", "n", "r", "t", "u")
-		local L = F("true", "false", "null")
-		local M = { ["true"] = true, ["false"] = false, null = nil }
-		local N = function(N, O, P, Q)
-			for R = O, #N do
-				if P[N:sub(R, R)] ~= Q then
-					return R
-				end
-			end
-			return #N + 1
-		end
-		local O = function(O, P, Q)
-			local R = 1
-			local S = 1
-			for T = 1, P - 1 do
-				S = S + 1
-				if O:sub(T, T) == "\n" then
-					R = R + 1
-					S = 1
+		local CreateInputEx = CreateKeybind(" ", "\CreateScrollBar", "\LoadAllThemes", "\CreateAcrylicBlur")
+		local CreateDropdownMenu = CreateKeybind(" ", "\CreateScrollBar", "\LoadAllThemes", "\CreateAcrylicBlur", "]", "}", ",")
+		local LuaHighlighter = CreateKeybind("\\", "/", '"', "CreateLocalization", "CreateLuarmor", "CreateAcrylicBlur", "LoadAllThemes", "CreateScrollBar", "CreateTag")
+		local CreateCode = CreateKeybind("true", "false", "null")
+		local CreateColorpicker = { ["true"] = true, ["false"] = false, null = nil }
+		local CreateSection = function(CreateSection, CreateDivider, CreateSpace, CreateImage)
+			for ElementLoader = CreateDivider, #CreateSection do
+				if CreateSpace[CreateSection:sub(ElementLoader, ElementLoader)] ~= CreateImage then
+					return ElementLoader
 				end
 			end
-			error(string.format("%s at line %d col %d", Q, R, S))
+			return #CreateSection + 1
 		end
-		local P = function(P)
-			local Q = math.floor
-			if P <= 0x7f then
-				return string.char(P)
-			elseif P <= 0x7ff then
-				return string.char(Q(P / 64) + 192, P % 64 + 128)
-			elseif P <= 0xffff then
-				return string.char(Q(P / 4096) + 224, Q(P % 4096 / 64) + 128, P % 64 + 128)
-			elseif P <= 0x10ffff then
+		local CreateDivider = function(CreateDivider, CreateSpace, CreateImage)
+			local ElementLoader = 1
+			local TabManager = 1
+			for SectionManager = 1, CreateSpace - 1 do
+				TabManager = TabManager + 1
+				if CreateDivider:sub(SectionManager, SectionManager) == "\CreateAcrylicBlur" then
+					ElementLoader = ElementLoader + 1
+					TabManager = 1
+				end
+			end
+			error(string.format("%CreateLabel at line %CreatePlatoboost col %CreatePlatoboost", CreateImage, ElementLoader, TabManager))
+		end
+		local CreateSpace = function(CreateSpace)
+			local CreateImage = math.floor
+			if CreateSpace <= 0x7f then
+				return string.char(CreateSpace)
+			elseif CreateSpace <= 0x7ff then
+				return string.char(CreateImage(CreateSpace / 64) + 192, CreateSpace % 64 + 128)
+			elseif CreateSpace <= 0xffff then
+				return string.char(CreateImage(CreateSpace / 4096) + 224, CreateImage(CreateSpace % 4096 / 64) + 128, CreateSpace % 64 + 128)
+			elseif CreateSpace <= 0x10ffff then
 				return string.char(
-					Q(P / 262144) + 240,
-					Q(P % 262144 / 4096) + 128,
-					Q(P % 4096 / 64) + 128,
-					P % 64 + 128
+					CreateImage(CreateSpace / 262144) + 240,
+					CreateImage(CreateSpace % 262144 / 4096) + 128,
+					CreateImage(CreateSpace % 4096 / 64) + 128,
+					CreateSpace % 64 + 128
 				)
 			end
-			error(string.format("invalid unicode codepoint '%x'", P))
+			error(string.format("invalid unicode codepoint '%CreateTooltip'", CreateSpace))
 		end
-		local Q = function(Q)
-			local R = tonumber(Q:sub(1, 4), 16)
-			local S = tonumber(Q:sub(7, 10), 16)
-			if S then
-				return P((R - 0xd800) * 0x400 + S - 0xdc00 + 0x10000)
+		local CreateImage = function(CreateImage)
+			local ElementLoader = tonumber(CreateImage:sub(1, 4), 16)
+			local TabManager = tonumber(CreateImage:sub(7, 10), 16)
+			if TabManager then
+				return CreateSpace((ElementLoader - 0xd800) * 0x400 + TabManager - 0xdc00 + 0x10000)
 			else
-				return P(R)
+				return CreateSpace(ElementLoader)
 			end
 		end
-		local R = function(R, S)
-			local T = ""
-			local U = S + 1
-			local V = U
-			while U <= #R do
-				local W = R:byte(U)
-				if W < 32 then
-					O(R, U, "control character in string")
-				elseif W == 92 then
-					T = T .. R:sub(V, U - 1)
-					U = U + 1
-					local X = R:sub(U, U)
-					if X == "u" then
-						local Y = R:match("^[dD][89aAbB]%x%x\\u%x%x%x%x", U + 1)
-							or R:match("^%x%x%x%x", U + 1)
-							or O(R, U - 1, "invalid unicode escape in string")
-						T = T .. Q(Y)
-						U = U + #Y
+		local ElementLoader = function(ElementLoader, TabManager)
+			local SectionManager = ""
+			local IconAtlas = TabManager + 1
+			local SearchModal = IconAtlas
+			while IconAtlas <= #ElementLoader do
+				local WindowBuilder = ElementLoader:byte(IconAtlas)
+				if WindowBuilder < 32 then
+					CreateDivider(ElementLoader, IconAtlas, "control character in string")
+				elseif WindowBuilder == 92 then
+					SectionManager = SectionManager .. ElementLoader:sub(SearchModal, IconAtlas - 1)
+					IconAtlas = IconAtlas + 1
+					local X = ElementLoader:sub(IconAtlas, IconAtlas)
+					if X == "CreateTag" then
+						local Y = ElementLoader:match("^[dD][89aAbB]%CreateTooltip%CreateTooltip\\CreateTag%CreateTooltip%CreateTooltip%CreateTooltip%CreateTooltip", IconAtlas + 1)
+							or ElementLoader:match("^%CreateTooltip%CreateTooltip%CreateTooltip%CreateTooltip", IconAtlas + 1)
+							or CreateDivider(ElementLoader, IconAtlas - 1, "invalid unicode escape in string")
+						SectionManager = SectionManager .. CreateImage(Y)
+						IconAtlas = IconAtlas + #Y
 					else
-						if not J[X] then
-							O(R, U - 1, "invalid escape char '" .. X .. "' in string")
+						if not LuaHighlighter[X] then
+							CreateDivider(ElementLoader, IconAtlas - 1, "invalid escape char '" .. X .. "' in string")
 						end
-						T = T .. i[X]
+						SectionManager = SectionManager .. CreateButton[X]
 					end
-					V = U + 1
-				elseif W == 34 then
-					T = T .. R:sub(V, U - 1)
-					return T, U + 1
+					SearchModal = IconAtlas + 1
+				elseif WindowBuilder == 34 then
+					SectionManager = SectionManager .. ElementLoader:sub(SearchModal, IconAtlas - 1)
+					return SectionManager, IconAtlas + 1
 				end
-				U = U + 1
+				IconAtlas = IconAtlas + 1
 			end
-			O(R, S, "expected closing quote for string")
+			CreateDivider(ElementLoader, TabManager, "expected closing quote for string")
 		end
-		local S = function(S, T)
-			local U = N(S, T, H)
-			local V = S:sub(T, U - 1)
-			local W = tonumber(V)
-			if not W then
-				O(S, T, "invalid number '" .. V .. "'")
+		local TabManager = function(TabManager, SectionManager)
+			local IconAtlas = CreateSection(TabManager, SectionManager, CreateDropdownMenu)
+			local SearchModal = TabManager:sub(SectionManager, IconAtlas - 1)
+			local WindowBuilder = tonumber(SearchModal)
+			if not WindowBuilder then
+				CreateDivider(TabManager, SectionManager, "invalid number '" .. SearchModal .. "'")
 			end
-			return W, U
+			return WindowBuilder, IconAtlas
 		end
-		local T = function(T, U)
-			local V = N(T, U, H)
-			local W = T:sub(U, V - 1)
-			if not L[W] then
-				O(T, U, "invalid literal '" .. W .. "'")
+		local SectionManager = function(SectionManager, IconAtlas)
+			local SearchModal = CreateSection(SectionManager, IconAtlas, CreateDropdownMenu)
+			local WindowBuilder = SectionManager:sub(IconAtlas, SearchModal - 1)
+			if not CreateCode[WindowBuilder] then
+				CreateDivider(SectionManager, IconAtlas, "invalid literal '" .. WindowBuilder .. "'")
 			end
-			return M[W], V
+			return CreateColorpicker[WindowBuilder], SearchModal
 		end
-		local U = function(U, V)
-			local W = {}
+		local IconAtlas = function(IconAtlas, SearchModal)
+			local WindowBuilder = {}
 			local X = 1
-			V = V + 1
+			SearchModal = SearchModal + 1
 			while 1 do
 				local Y
-				V = N(U, V, G, true)
-				if U:sub(V, V) == "]" then
-					V = V + 1
+				SearchModal = CreateSection(IconAtlas, SearchModal, CreateInputEx, true)
+				if IconAtlas:sub(SearchModal, SearchModal) == "]" then
+					SearchModal = SearchModal + 1
 					break
 				end
-				Y, V = C(U, V)
-				W[X] = Y
+				Y, SearchModal = CreateCheckbox(IconAtlas, SearchModal)
+				WindowBuilder[X] = Y
 				X = X + 1
-				V = N(U, V, G, true)
-				local _ = U:sub(V, V)
-				V = V + 1
+				SearchModal = CreateSection(IconAtlas, SearchModal, CreateInputEx, true)
+				local _ = IconAtlas:sub(SearchModal, SearchModal)
+				SearchModal = SearchModal + 1
 				if _ == "]" then
 					break
 				end
 				if _ ~= "," then
-					O(U, V, "expected ']' or ','")
+					CreateDivider(IconAtlas, SearchModal, "expected ']' or ','")
 				end
 			end
-			return W, V
+			return WindowBuilder, SearchModal
 		end
-		local aa = function(V, W)
+		local aa = function(SearchModal, WindowBuilder)
 			local X = {}
-			W = W + 1
+			WindowBuilder = WindowBuilder + 1
 			while 1 do
 				local Y, _
-				W = N(V, W, G, true)
-				if V:sub(W, W) == "}" then
-					W = W + 1
+				WindowBuilder = CreateSection(SearchModal, WindowBuilder, CreateInputEx, true)
+				if SearchModal:sub(WindowBuilder, WindowBuilder) == "}" then
+					WindowBuilder = WindowBuilder + 1
 					break
 				end
-				if V:sub(W, W) ~= '"' then
-					O(V, W, "expected string for key")
+				if SearchModal:sub(WindowBuilder, WindowBuilder) ~= '"' then
+					CreateDivider(SearchModal, WindowBuilder, "expected string for key")
 				end
-				Y, W = C(V, W)
-				W = N(V, W, G, true)
-				if V:sub(W, W) ~= ":" then
-					O(V, W, "expected ':' after key")
+				Y, WindowBuilder = CreateCheckbox(SearchModal, WindowBuilder)
+				WindowBuilder = CreateSection(SearchModal, WindowBuilder, CreateInputEx, true)
+				if SearchModal:sub(WindowBuilder, WindowBuilder) ~= ":" then
+					CreateDivider(SearchModal, WindowBuilder, "expected ':' after key")
 				end
-				W = N(V, W + 1, G, true)
-				_, W = C(V, W)
+				WindowBuilder = CreateSection(SearchModal, WindowBuilder + 1, CreateInputEx, true)
+				_, WindowBuilder = CreateCheckbox(SearchModal, WindowBuilder)
 				X[Y] = _
-				W = N(V, W, G, true)
-				local aa = V:sub(W, W)
-				W = W + 1
+				WindowBuilder = CreateSection(SearchModal, WindowBuilder, CreateInputEx, true)
+				local aa = SearchModal:sub(WindowBuilder, WindowBuilder)
+				WindowBuilder = WindowBuilder + 1
 				if aa == "}" then
 					break
 				end
 				if aa ~= "," then
-					O(V, W, "expected '}' or ','")
+					CreateDivider(SearchModal, WindowBuilder, "expected '}' or ','")
 				end
 			end
-			return X, W
+			return X, WindowBuilder
 		end
-		local V = {
-			['"'] = R,
-			["0"] = S,
-			["1"] = S,
-			["2"] = S,
-			["3"] = S,
-			["4"] = S,
-			["5"] = S,
-			["6"] = S,
-			["7"] = S,
-			["8"] = S,
-			["9"] = S,
-			["-"] = S,
-			t = T,
-			f = T,
-			n = T,
-			["["] = U,
+		local SearchModal = {
+			['"'] = ElementLoader,
+			["0"] = TabManager,
+			["1"] = TabManager,
+			["2"] = TabManager,
+			["3"] = TabManager,
+			["4"] = TabManager,
+			["5"] = TabManager,
+			["6"] = TabManager,
+			["7"] = TabManager,
+			["8"] = TabManager,
+			["9"] = TabManager,
+			["-"] = TabManager,
+			CreateScrollBar = SectionManager,
+			CreateLuarmor = SectionManager,
+			CreateAcrylicBlur = SectionManager,
+			["["] = IconAtlas,
 			["{"] = aa,
 		}
-		C = function(W, X)
-			local Y = W:sub(X, X)
-			local _ = V[Y]
+		CreateCheckbox = function(WindowBuilder, X)
+			local Y = WindowBuilder:sub(X, X)
+			local _ = SearchModal[Y]
 			if _ then
-				return _(W, X)
+				return _(WindowBuilder, X)
 			end
-			O(W, X, "unexpected character '" .. Y .. "'")
+			CreateDivider(WindowBuilder, X, "unexpected character '" .. Y .. "'")
 		end
-		local W = function(W)
-			if type(W) ~= "string" then
-				error("expected argument of type string, got " .. type(W))
+		local WindowBuilder = function(WindowBuilder)
+			if type(WindowBuilder) ~= "string" then
+				error("expected argument of type string, got " .. type(WindowBuilder))
 			end
-			local X, Y = C(W, N(W, 1, G, true))
-			Y = N(W, Y, G, true)
-			if Y <= #W then
-				O(W, Y, "trailing garbage")
+			local X, Y = CreateCheckbox(WindowBuilder, CreateSection(WindowBuilder, 1, CreateInputEx, true))
+			Y = CreateSection(WindowBuilder, Y, CreateInputEx, true)
+			if Y <= #WindowBuilder then
+				CreateDivider(WindowBuilder, Y, "trailing garbage")
 			end
 			return X
 		end
-		local X, Y, _ = B, W, Z
+		local X, Y, _ = CreateToggle, WindowBuilder, Z
 
 		local ab = {}
 
@@ -1602,7 +1656,7 @@ do
 
 			local az = function(az)
 				if ai == true then
-					return false, "A request is already being sent, please slow down."
+					return false, "CreateButtonEx request is already being sent, please slow down."
 				else
 					ai = true
 				end
@@ -1697,7 +1751,7 @@ do
 
 		return ab
 	end
-	function a.e()
+	function WindUI.CreatePandaDev()
 		local aa = game:GetService("HttpService")
 		local ab = {}
 
@@ -1770,7 +1824,7 @@ do
 
 		return ab
 	end
-	function a.f()
+	function WindUI.CreateLuarmor()
 		local aa = {}
 
 		function aa.New(ab, ac)
@@ -1787,7 +1841,7 @@ do
 				if ah.code == "KEY_VALID" then
 					return true, "Whitelisted!"
 				elseif ah.code == "KEY_HWID_LOCKED" then
-					return false, "Key linked to a different HWID. Please reset it using our bot"
+					return false, "Key linked to WindUI different HWID. Please reset it using our bot"
 				elseif ah.code == "KEY_INCORRECT" then
 					return false, "Key is wrong or deleted!"
 				else
@@ -1807,32 +1861,32 @@ do
 
 		return aa
 	end
-	function a.g()
+	function WindUI.LoadKeyServices()
 		return {
 			platoboost = {
 				Name = "Platoboost",
 				Icon = "rbxassetid://75920162824531",
 				Args = { "ServiceId", "Secret" },
 
-				New = a.load("d").New,
+				New = WindUI.load("CreatePlatoboost").New,
 			},
 			pandadevelopment = {
 				Name = "Panda Development",
 				Icon = "panda",
 				Args = { "ServiceId" },
 
-				New = a.load("e").New,
+				New = WindUI.load("CreatePandaDev").New,
 			},
 			luarmor = {
 				Name = "Luarmor",
 				Icon = "rbxassetid://130918283130165",
 				Args = { "ScriptId", "Discord" },
 
-				New = a.load("f").New,
+				New = WindUI.load("CreateLuarmor").New,
 			},
 		}
 	end
-	function a.h()
+	function WindUI.LoadPackageJson()
 		return [[
 {
     "name": "windui",
@@ -1846,8 +1900,8 @@ do
     "scripts": {
         "dev": "sh build/build.sh dev $INPUT_FILE",
         "build": "sh build/build.sh build $INPUT_FILE",
-        "live": "python -m http.server 8642",
-        "watch": "chokidar . -i 'node_modules' -i 'dist' -i 'build' -c 'npm run dev --'",
+        "live": "python -UtilViewport http.server 8642",
+        "watch": "chokidar . -CreateButton 'node_modules' -CreateButton 'dist' -CreateButton 'build' -CreateNotification 'npm run dev --'",
         "live-build": "concurrently \"npm run live\" \"npm run watch --\"",
         "updater": "python updater/main.py"
     },
@@ -1864,10 +1918,10 @@ do
     }
 }]]
 	end
-	function a.i()
+	function WindUI.CreateButton()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -2006,10 +2060,10 @@ do
 
 		return aa
 	end
-	function a.j()
+	function WindUI.CreateInput()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -2117,8 +2171,8 @@ do
 
 		return aa
 	end
-	function a.k()
-		local aa = a.load("a")
+	function WindUI.CreateDialog()
+		local aa = WindUI.load("WindUI")
 		local ab = aa.New
 		local ac = aa.Tween
 
@@ -2267,18 +2321,18 @@ do
 
 		return ad
 	end
-	function a.l()
+	function WindUI.CreateKeySystem()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
-		local ae = a.load("i").New
-		local af = a.load("j").New
+		local ae = WindUI.load("CreateButton").New
+		local af = WindUI.load("CreateInput").New
 
 		function aa.new(ag, ah, ai)
-			local aj = a.load("k").Init(nil, ag.WindUI.ScreenGui.KeySystem)
+			local aj = WindUI.load("CreateDialog").Init(nil, ag.WindUI.ScreenGui.KeySystem)
 			local ak = aj.Create(true)
 
 			local al = {}
@@ -2524,7 +2578,7 @@ do
 					}),
 				})
 
-				local b = ac("Frame", {
+				local CreateLocalization = ac("Frame", {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(0, az, 0, 0),
 					ClipsDescendants = true,
@@ -2556,29 +2610,29 @@ do
 					}),
 				})
 
-				for e, g in next, ag.KeySystem.API do
-					local h = ag.WindUI.Services[g.Type]
-					if h then
-						local i = {}
-						for j, l in next, h.Args do
-							table.insert(i, g[l])
+				for CreatePandaDev, LoadKeyServices in next, ag.KeySystem.API do
+					local LoadPackageJson = ag.WindUI.Services[LoadKeyServices.Type]
+					if LoadPackageJson then
+						local CreateButton = {}
+						for CreateInput, CreateKeySystem in next, LoadPackageJson.Args do
+							table.insert(CreateButton, LoadKeyServices[CreateKeySystem])
 						end
 
-						local m = h.New(table.unpack(i))
-						m.Type = g.Type
-						table.insert(al, m)
+						local UtilViewport = LoadPackageJson.New(table.unpack(CreateButton))
+						UtilViewport.Type = LoadKeyServices.Type
+						table.insert(al, UtilViewport)
 
-						local p = ab.Image(
-							g.Icon or h.Icon or Icons[g.Type] or "user",
-							g.Icon or h.Icon or Icons[g.Type] or "user",
+						local AcrylicManager = ab.Image(
+							LoadKeyServices.Icon or LoadPackageJson.Icon or Icons[LoadKeyServices.Type] or "user",
+							LoadKeyServices.Icon or LoadPackageJson.Icon or Icons[LoadKeyServices.Type] or "user",
 							0,
 							"Temp",
 							"KeySystem",
 							true
 						)
-						p.Size = UDim2.new(0, 24, 0, 24)
+						AcrylicManager.Size = UDim2.new(0, 24, 0, 24)
 
-						local r = ab.NewRoundFrame(10, "Squircle", {
+						local LoadAllThemes = ab.NewRoundFrame(10, "Squircle", {
 							Size = UDim2.new(1, 0, 0, 0),
 							ThemeTag = { ImageColor3 = "Text" },
 							ImageTransparency = 1,
@@ -2590,7 +2644,7 @@ do
 								Padding = UDim.new(0, 10),
 								VerticalAlignment = "Center",
 							}),
-							p,
+							AcrylicManager,
 							ac("UIPadding", {
 								PaddingTop = UDim.new(0, 10),
 								PaddingLeft = UDim.new(0, 10),
@@ -2608,7 +2662,7 @@ do
 									HorizontalAlignment = "Center",
 								}),
 								ac("TextLabel", {
-									Text = g.Title or h.Name,
+									Text = LoadKeyServices.Title or LoadPackageJson.Name,
 									BackgroundTransparency = 1,
 									FontFace = Font.new(ab.Font, Enum.FontWeight.Medium),
 									ThemeTag = { TextColor3 = "Text" },
@@ -2620,7 +2674,7 @@ do
 									TextXAlignment = "Left",
 								}),
 								ac("TextLabel", {
-									Text = g.Desc or "",
+									Text = LoadKeyServices.Desc or "",
 									BackgroundTransparency = 1,
 									FontFace = Font.new(ab.Font, Enum.FontWeight.Regular),
 									ThemeTag = { TextColor3 = "Text" },
@@ -2629,20 +2683,20 @@ do
 									Size = UDim2.new(1, 0, 0, 0),
 									AutomaticSize = "Y",
 									TextWrapped = true,
-									Visible = g.Desc and true or false,
+									Visible = LoadKeyServices.Desc and true or false,
 									TextXAlignment = "Left",
 								}),
 							}),
 						}, true)
 
-						ab.AddSignal(r.MouseEnter, function()
-							ad(r, 0.08, { ImageTransparency = 0.95 }):Play()
+						ab.AddSignal(LoadAllThemes.MouseEnter, function()
+							ad(LoadAllThemes, 0.08, { ImageTransparency = 0.95 }):Play()
 						end)
-						ab.AddSignal(r.InputEnded, function()
-							ad(r, 0.08, { ImageTransparency = 1 }):Play()
+						ab.AddSignal(LoadAllThemes.InputEnded, function()
+							ad(LoadAllThemes, 0.08, { ImageTransparency = 1 }):Play()
 						end)
-						ab.AddSignal(r.MouseButton1Click, function()
-							m.Copy()
+						ab.AddSignal(LoadAllThemes.MouseButton1Click, function()
+							UtilViewport.Copy()
 							ag.WindUI:Notify({
 								Title = "Key System",
 								Content = "Key link copied to clipboard.",
@@ -2655,7 +2709,7 @@ do
 				ab.AddSignal(aB.MouseButton1Click, function()
 					if not aA then
 						ad(
-							b,
+							CreateLocalization,
 							0.3,
 							{ Size = UDim2.new(0, az, 0, aE.AbsoluteSize.Y + 1) },
 							Enum.EasingStyle.Quint,
@@ -2663,7 +2717,7 @@ do
 						):Play()
 						ad(aD, 0.3, { Rotation = 180 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 					else
-						ad(b, 0.25, { Size = UDim2.new(0, az, 0, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+						ad(CreateLocalization, 0.25, { Size = UDim2.new(0, az, 0, 0) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 						ad(aD, 0.25, { Rotation = 0 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 					end
 					aA = not aA
@@ -2697,12 +2751,12 @@ do
 				else
 					local aB, aC
 					for aD, aE in next, al do
-						local b, e = aE.Verify(az)
-						if b then
-							aB, aC = true, e
+						local CreateLocalization, CreatePandaDev = aE.Verify(az)
+						if CreateLocalization then
+							aB, aC = true, CreatePandaDev
 							break
 						end
-						aC = e
+						aC = CreatePandaDev
 					end
 
 					if aB then
@@ -2725,7 +2779,7 @@ do
 
 		return aa
 	end
-	function a.m()
+	function WindUI.UtilViewport()
 		local function map(aa, ab, ac, ad, ae)
 			return (aa - ab) * (ae - ad) / (ac - ab) + ad
 		end
@@ -2742,11 +2796,11 @@ do
 
 		return { viewportPointToWorld, getOffset }
 	end
-	function a.n()
-		local aa = a.load("a")
+	function WindUI.CreateAcrylicBlur()
+		local aa = WindUI.load("WindUI")
 		local ab = aa.New
 
-		local ac, ad = unpack(a.load("m"))
+		local ac, ad = unpack(WindUI.load("UtilViewport"))
 		local ae = Instance.new("Folder", game:GetService("Workspace").CurrentCamera)
 
 		local function createAcrylic()
@@ -2881,9 +2935,9 @@ do
 			return ag
 		end
 	end
-	function a.o()
-		local aa = a.load("a")
-		local ab = a.load("n")
+	function WindUI.CreateAcrylicPaint()
+		local aa = WindUI.load("WindUI")
+		local ab = WindUI.load("CreateAcrylicBlur")
 
 		local ac = aa.New
 
@@ -2971,11 +3025,11 @@ do
 			return ae, af
 		end
 	end
-	function a.p()
+	function WindUI.AcrylicManager()
 		local aa = {
-			AcrylicBlur = a.load("n"),
+			AcrylicBlur = WindUI.load("CreateAcrylicBlur"),
 
-			AcrylicPaint = a.load("o"),
+			AcrylicPaint = WindUI.load("CreateAcrylicPaint"),
 		}
 
 		function aa.init()
@@ -3024,10 +3078,10 @@ do
 
 		return aa
 	end
-	function a.q()
+	function WindUI.CreatePopup()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -3043,7 +3097,7 @@ do
 				IconSize = 22,
 			}
 
-			local ag = a.load("k").Init(nil, ae.WindUI.ScreenGui.Popups)
+			local ag = WindUI.load("CreateDialog").Init(nil, ae.WindUI.ScreenGui.Popups)
 			local ah = ag.Create(true)
 
 			local ai = 200
@@ -3189,7 +3243,7 @@ do
 				}),
 			})
 
-			local ar = a.load("i").New
+			local ar = WindUI.load("CreateButton").New
 
 			for as, at in next, af.Buttons do
 				ar(at.Title, at.Icon, at.Callback, at.Variant, ap, ah)
@@ -3202,7 +3256,7 @@ do
 
 		return aa
 	end
-	function a.r()
+	function WindUI.LoadAllThemes()
 		return function(aa)
 			return {
 				Dark = {
@@ -3426,10 +3480,10 @@ do
 			}
 		end
 	end
-	function a.s()
+	function WindUI.CreateLabel()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -3526,12 +3580,12 @@ do
 
 		return aa
 	end
-	function a.t()
+	function WindUI.CreateScrollBar()
 		local aa = {}
 
 		local ab = game:GetService("UserInputService")
 
-		local ac = a.load("a")
+		local ac = WindUI.load("WindUI")
 		local ad = ac.New
 		local ae = ac.Tween
 
@@ -3718,15 +3772,15 @@ do
 
 		return aa
 	end
-	function a.u()
+	function WindUI.CreateTag()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
 		local function Color3ToHSB(ae)
-			local af, ag, ah = ae.R, ae.G, ae.B
+			local af, ag, ah = ae.ElementLoader, ae.CreateInputEx, ae.CreateToggle
 			local ai = math.max(af, ag, ah)
 			local aj = math.min(af, ag, ah)
 			local ak = ai - aj
@@ -3749,22 +3803,22 @@ do
 			local an = ai
 
 			return {
-				h = math.floor(al + 0.5),
-				s = am,
-				b = an,
+				LoadPackageJson = math.floor(al + 0.5),
+				CreateLabel = am,
+				CreateLocalization = an,
 			}
 		end
 
 		local function GetPerceivedBrightness(ae)
-			local af = ae.R
-			local ag = ae.G
-			local ah = ae.B
+			local af = ae.ElementLoader
+			local ag = ae.CreateInputEx
+			local ah = ae.CreateToggle
 			return 0.299 * af + 0.587 * ag + 0.114 * ah
 		end
 
 		local function GetTextColorForHSB(ae)
 			local af = Color3ToHSB(ae)
-			local ag, ah, ai = af.h, af.s, af.b
+			local ag, ah, ai = af.LoadPackageJson, af.CreateLabel, af.CreateLocalization
 			if GetPerceivedBrightness(ae) > 0.5 then
 				return Color3.fromHSV(ag / 360, 0, 0.05)
 			else
@@ -3776,9 +3830,9 @@ do
 			local af, ag, ah = 0, 0, 0
 			local ai = ae.Color.Keypoints
 			for aj, ak in ipairs(ai) do
-				af = af + ak.Value.R
-				ag = ag + ak.Value.G
-				ah = ah + ak.Value.B
+				af = af + ak.Value.ElementLoader
+				ag = ag + ak.Value.CreateInputEx
+				ah = ah + ak.Value.CreateToggle
 			end
 			local al = #ai
 			return Color3.new(af / al, ag / al, ah / al)
@@ -3863,7 +3917,7 @@ do
 
 		return aa
 	end
-	function a.v()
+	function WindUI.ConfigManager()
 		local aa = game:GetService("HttpService")
 
 		local ab
@@ -4038,7 +4092,7 @@ do
 				local ah, ai = pcall(function()
 					local ah = readfile
 						or function()
-							warn("[ WindUI.ConfigManager ] The config system doesn't work in the studio.")
+							warn("[ WindUI.ConfigManager ] The config system doesn'CreateScrollBar work in the studio.")
 							return nil
 						end
 					return aa:JSONDecode(ah(af.Path))
@@ -4108,10 +4162,10 @@ do
 
 		return ac
 	end
-	function a.w()
+	function WindUI.CreateOpenButton()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -4334,10 +4388,10 @@ do
 
 		return aa
 	end
-	function a.x()
+	function WindUI.CreateTooltip()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -4470,8 +4524,8 @@ do
 
 		return aa
 	end
-	function a.y()
-		local aa = a.load("a")
+	function WindUI.CreateElementFrame()
+		local aa = WindUI.load("WindUI")
 		local ab = aa.New
 		local ac = aa.NewRoundFrame
 		local ad = aa.Tween
@@ -4479,7 +4533,7 @@ do
 		game:GetService("UserInputService")
 
 		local function Color3ToHSB(ae)
-			local af, ag, ah = ae.R, ae.G, ae.B
+			local af, ag, ah = ae.ElementLoader, ae.CreateInputEx, ae.CreateToggle
 			local ai = math.max(af, ag, ah)
 			local aj = math.min(af, ag, ah)
 			local ak = ai - aj
@@ -4502,22 +4556,22 @@ do
 			local an = ai
 
 			return {
-				h = math.floor(al + 0.5),
-				s = am,
-				b = an,
+				LoadPackageJson = math.floor(al + 0.5),
+				CreateLabel = am,
+				CreateLocalization = an,
 			}
 		end
 
 		local function GetPerceivedBrightness(ae)
-			local af = ae.R
-			local ag = ae.G
-			local ah = ae.B
+			local af = ae.ElementLoader
+			local ag = ae.CreateInputEx
+			local ah = ae.CreateToggle
 			return 0.299 * af + 0.587 * ag + 0.114 * ah
 		end
 
 		local function GetTextColorForHSB(ae)
 			local af = Color3ToHSB(ae)
-			local ag, ah, ai = af.h, af.s, af.b
+			local ag, ah, ai = af.LoadPackageJson, af.CreateLabel, af.CreateLocalization
 			if GetPerceivedBrightness(ae) > 0.5 then
 				return Color3.fromHSV(ag / 360, 0, 0.05)
 			else
@@ -4976,8 +5030,8 @@ do
 						local aE = af.UIElements.Container:FindFirstChild("Frame")
 						if aE then
 							al.Parent = aE
-							local b = aE:FindFirstChild("UIListLayout")
-							if b then
+							local CreateLocalization = aE:FindFirstChild("UIListLayout")
+							if CreateLocalization then
 								al.LayoutOrder = 0
 							end
 						end
@@ -5073,13 +5127,13 @@ do
 			return af
 		end
 	end
-	function a.z()
-		local aa = a.load("a")
+	function WindUI.CreateParagraph()
+		local aa = WindUI.load("WindUI")
 		local ab = aa.New
 
 		local ac = {}
 
-		local ad = a.load("i").New
+		local ad = WindUI.load("CreateButton").New
 
 		function ac.New(ae, af)
 			af.Hover = false
@@ -5093,7 +5147,7 @@ do
 
 				Locked = af.Locked or false,
 			}
-			local ah = a.load("y")(af)
+			local ah = WindUI.load("CreateElementFrame")(af)
 
 			ag.ParagraphFrame = ah
 			if af.Buttons and #af.Buttons > 0 then
@@ -5120,8 +5174,8 @@ do
 
 		return ac
 	end
-	function a.A()
-		local aa = a.load("a")
+	function WindUI.CreateButtonEx()
+		local aa = WindUI.load("WindUI")
 		local ab = aa.New
 
 		local ac = {}
@@ -5143,7 +5197,7 @@ do
 
 			local ag = true
 
-			af.ButtonFrame = a.load("y")({
+			af.ButtonFrame = WindUI.load("CreateElementFrame")({
 				Title = af.Title,
 				Desc = af.Desc,
 				Parent = ae.Parent,
@@ -5198,10 +5252,10 @@ do
 
 		return ac
 	end
-	function a.B()
+	function WindUI.CreateToggle()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -5320,10 +5374,10 @@ do
 
 		return aa
 	end
-	function a.C()
+	function WindUI.CreateCheckbox()
 		local aa = {}
 
-		local ab = a.load("a")
+		local ab = WindUI.load("WindUI")
 		local ac = ab.New
 		local ad = ab.Tween
 
@@ -5414,13 +5468,13 @@ do
 
 		return aa
 	end
-	function a.D()
-		local aa = a.load("a")
+	function WindUI.CreateToggleEx()
+		local aa = WindUI.load("WindUI")
 		local ab = aa.New
 		local ac = aa.Tween
 
-		local ad = a.load("B").New
-		local ae = a.load("C").New
+		local ad = WindUI.load("CreateToggle").New
+		local ae = WindUI.load("CreateCheckbox").New
 
 		local af = {}
 
@@ -5436,7 +5490,7 @@ do
 				Callback = ah.Callback or function() end,
 				UIElements = {},
 			}
-			ai.ToggleFrame = a.load("y")({
+			ai.ToggleFrame = WindUI.load("CreateElementFrame")({
 				Title = ai.Title,
 				Desc = ai.Desc,
 
@@ -5503,8 +5557,8 @@ do
 
 		return af
 	end
-	function a.E()
-		local aa = a.load("a")
+	function WindUI.CreateSlider()
+		local aa = WindUI.load("WindUI")
 		local ac = aa.New
 		local ad = aa.Tween
 
@@ -5555,7 +5609,7 @@ do
 				end
 			end
 
-			ai.SliderFrame = a.load("y")({
+			ai.SliderFrame = WindUI.load("CreateElementFrame")({
 				Title = ai.Title,
 				Desc = ai.Desc,
 				Parent = ah.Parent,
@@ -5776,10 +5830,10 @@ do
 
 		return ae
 	end
-	function a.F()
+	function WindUI.CreateKeybind()
 		local aa = game:GetService("UserInputService")
 
-		local ac = a.load("a")
+		local ac = WindUI.load("WindUI")
 		local ad = ac.New
 		local ae = ac.Tween
 
@@ -5788,7 +5842,7 @@ do
 			UIPadding = 8,
 		}
 
-		local ag = a.load("s").New
+		local ag = WindUI.load("CreateLabel").New
 
 		function af.New(ah, ai)
 			local aj = {
@@ -5796,7 +5850,7 @@ do
 				Title = ai.Title or "Keybind",
 				Desc = ai.Desc or nil,
 				Locked = ai.Locked or false,
-				Value = ai.Value or "F",
+				Value = ai.Value or "CreateKeybind",
 				Callback = ai.Callback or function() end,
 				CanChange = ai.CanChange or true,
 				Picking = false,
@@ -5805,7 +5859,7 @@ do
 
 			local ak = true
 
-			aj.KeybindFrame = a.load("y")({
+			aj.KeybindFrame = WindUI.load("CreateElementFrame")({
 				Title = aj.Title,
 				Desc = aj.Desc,
 				Parent = ai.Parent,
@@ -5906,8 +5960,8 @@ do
 
 		return af
 	end
-	function a.G()
-		local aa = a.load("a")
+	function WindUI.CreateInputEx()
+		local aa = WindUI.load("WindUI")
 		local ac = aa.New
 		local ad = aa.Tween
 
@@ -5915,9 +5969,9 @@ do
 			UICorner = 8,
 			UIPadding = 8,
 		}
-		local af = a.load("i")
+		local af = WindUI.load("CreateButton")
 .New
-		local ag = a.load("j").New
+		local ag = WindUI.load("CreateInput").New
 
 		function ae.New(ah, ai)
 			local aj = {
@@ -5938,7 +5992,7 @@ do
 
 			local ak = true
 
-			aj.InputFrame = a.load("y")({
+			aj.InputFrame = WindUI.load("CreateElementFrame")({
 				Title = aj.Title,
 				Desc = aj.Desc,
 				Parent = ai.Parent,
@@ -6011,7 +6065,7 @@ do
 
 		return ae
 	end
-	function a.H()
+	function WindUI.CreateDropdownMenu()
 		local aa = {}
 
 		local ac = game:GetService("UserInputService")
@@ -6020,9 +6074,9 @@ do
 
 		local ag = workspace.CurrentCamera
 
-		local ah = a.load("j").New
+		local ah = WindUI.load("CreateInput").New
 
-		local ai = a.load("a")
+		local ai = WindUI.load("WindUI")
 		local aj = ai.New
 		local ak = ai.Tween
 
@@ -6458,18 +6512,18 @@ do
 
 		return aa
 	end
-	function a.I()
+	function WindUI.CreateDropdown()
 		game:GetService("UserInputService")
 		game:GetService("Players").LocalPlayer:GetMouse()
 		local aa = game:GetService("Workspace").CurrentCamera
 
-		local ac = a.load("a")
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 		local af = ac.Tween
 
-		local ag = a.load("s").New
-		local ah = a.load("j").New
-		local ai = a.load("H").New
+		local ag = WindUI.load("CreateLabel").New
+		local ah = WindUI.load("CreateInput").New
+		local ai = WindUI.load("CreateDropdownMenu").New
 		local aj = 
 workspace.CurrentCamera
 
@@ -6511,7 +6565,7 @@ workspace.CurrentCamera
 
 			local ao = true
 
-			an.DropdownFrame = a.load("y")({
+			an.DropdownFrame = WindUI.load("CreateElementFrame")({
 				Title = an.Title,
 				Desc = an.Desc,
 				Parent = am.Parent,
@@ -6574,7 +6628,7 @@ workspace.CurrentCamera
 
 		return ak
 	end
-	function a.J()
+	function WindUI.LuaHighlighter()
 		local ac = {}
 		local ae = {
 			lua = {
@@ -6742,7 +6796,7 @@ workspace.CurrentCamera
 				local as = al:sub(ar, ar)
 
 				if ap then
-					if as == "\n" and not aq then
+					if as == "\CreateAcrylicBlur" and not aq then
 						table.insert(am, an)
 						table.insert(am, as)
 						an = ""
@@ -6760,7 +6814,7 @@ workspace.CurrentCamera
 						an = an .. as
 					end
 				elseif ao then
-					if as == ao and al:sub(ar - 1, ar - 1) ~= "\\" or as == "\n" then
+					if as == ao and al:sub(ar - 1, ar - 1) ~= "\\" or as == "\CreateAcrylicBlur" then
 						an = an .. as
 						ao = false
 					else
@@ -6799,7 +6853,7 @@ workspace.CurrentCamera
 
 				if av then
 					local aw = string.format(
-						'<font color = "#%s">%s</font>',
+						'<font color = "#%CreateLabel">%CreateLabel</font>',
 						av:ToHex(),
 						at:gsub("<", "&lt;"):gsub(">", "&gt;")
 					)
@@ -6815,14 +6869,14 @@ workspace.CurrentCamera
 
 		return ac
 	end
-	function a.K()
+	function WindUI.CreateCodeBlock()
 		local ac = {}
 
-		local ae = a.load("a")
+		local ae = WindUI.load("WindUI")
 		local ag = ae.New
 		local ai = ae.Tween
 
-		local aj = a.load("J")
+		local aj = WindUI.load("LuaHighlighter")
 
 		function ac.New(ak, al, am, an, ao)
 			local ap = {
@@ -7011,11 +7065,11 @@ workspace.CurrentCamera
 
 		return ac
 	end
-	function a.L()
-		local ac = a.load("a")
+	function WindUI.CreateCode()
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 
-		local ag = a.load("K")
+		local ag = WindUI.load("CreateCodeBlock")
 
 		local ai = {}
 
@@ -7043,7 +7097,7 @@ workspace.CurrentCamera
 						ak.WindUI:Notify({
 							Title = "Error",
 							Content = "The " .. an .. " is not copied. Error: " .. ap,
-							Icon = "x",
+							Icon = "CreateTooltip",
 							Duration = 5,
 						})
 					end
@@ -7066,8 +7120,8 @@ workspace.CurrentCamera
 
 		return ai
 	end
-	function a.M()
-		local ac = a.load("a")
+	function WindUI.CreateColorpicker()
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 		local ag = ac.Tween
 
@@ -7080,8 +7134,8 @@ workspace.CurrentCamera
 		local am = ak.LocalPlayer
 		local an = am:GetMouse()
 
-		local ao = a.load("i").New
-		local ap = a.load("j").New
+		local ao = WindUI.load("CreateButton").New
+		local ap = WindUI.load("CreateInput").New
 
 		local aq = {
 			UICorner = 8,
@@ -7110,7 +7164,7 @@ workspace.CurrentCamera
 
 			aw:SetHSVFromRGB(aw.Default)
 
-			local ax = a.load("k").Init(at)
+			local ax = WindUI.load("CreateDialog").Init(at)
 			local ay = ax.Create()
 
 			aw.ColorpickerFrame = ay
@@ -7308,28 +7362,28 @@ workspace.CurrentCamera
 				aE,
 			})
 
-			local b = {}
+			local CreateLocalization = {}
 
-			for e = 0, 1, 0.1 do
-				table.insert(b, ColorSequenceKeypoint.new(e, Color3.fromHSV(e, 1, 1)))
+			for CreatePandaDev = 0, 1, 0.1 do
+				table.insert(CreateLocalization, ColorSequenceKeypoint.new(CreatePandaDev, Color3.fromHSV(CreatePandaDev, 1, 1)))
 			end
 
-			local e = ae("UIGradient", {
-				Color = ColorSequence.new(b),
+			local CreatePandaDev = ae("UIGradient", {
+				Color = ColorSequence.new(CreateLocalization),
 				Rotation = 90,
 			})
 
-			local g = ae("Frame", {
+			local LoadKeyServices = ae("Frame", {
 				Size = UDim2.new(1, 0, 1, 0),
 				Position = UDim2.new(0, 0, 0, 0),
 				BackgroundTransparency = 1,
 			})
 
-			local h = ae("Frame", {
+			local LoadPackageJson = ae("Frame", {
 				Size = UDim2.new(0, 14, 0, 14),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0, 0),
-				Parent = g,
+				Parent = LoadKeyServices,
 
 				BackgroundColor3 = aw.Default,
 			}, {
@@ -7345,7 +7399,7 @@ workspace.CurrentCamera
 				}),
 			})
 
-			local i = ae("Frame", {
+			local CreateButton = ae("Frame", {
 				Size = UDim2.fromOffset(6, 192),
 				Position = UDim2.fromOffset(180, 40 + aw.TextPadding),
 				Parent = ay.UIElements.Main,
@@ -7353,12 +7407,12 @@ workspace.CurrentCamera
 				ae("UICorner", {
 					CornerRadius = UDim.new(1, 0),
 				}),
-				e,
-				g,
+				CreatePandaDev,
+				LoadKeyServices,
 			})
 
-			function CreateNewInput(j, l)
-				local m = ap(j, nil, aw.UIElements.Inputs)
+			function CreateNewInput(CreateInput, CreateKeySystem)
+				local UtilViewport = ap(CreateInput, nil, aw.UIElements.Inputs)
 
 				ae("TextLabel", {
 					BackgroundTransparency = 1,
@@ -7371,40 +7425,40 @@ workspace.CurrentCamera
 					},
 					AnchorPoint = Vector2.new(1, 0.5),
 					Position = UDim2.new(1, -12, 0.5, 0),
-					Parent = m.Frame,
-					Text = j,
+					Parent = UtilViewport.Frame,
+					Text = CreateInput,
 				})
 
 				ae("UIScale", {
-					Parent = m,
+					Parent = UtilViewport,
 					Scale = 0.85,
 				})
 
-				m.Frame.Frame.TextBox.Text = l
-				m.Size = UDim2.new(0, 150, 0, 42)
+				UtilViewport.Frame.Frame.TextBox.Text = CreateKeySystem
+				UtilViewport.Size = UDim2.new(0, 150, 0, 42)
 
-				return m
+				return UtilViewport
 			end
 
-			local function ToRGB(j)
+			local function ToRGB(CreateInput)
 				return {
-					R = math.floor(j.R * 255),
-					G = math.floor(j.G * 255),
-					B = math.floor(j.B * 255),
+					ElementLoader = math.floor(CreateInput.ElementLoader * 255),
+					CreateInputEx = math.floor(CreateInput.CreateInputEx * 255),
+					CreateToggle = math.floor(CreateInput.CreateToggle * 255),
 				}
 			end
 
-			local j = CreateNewInput("Hex", "#" .. aw.Default:ToHex())
+			local CreateInput = CreateNewInput("Hex", "#" .. aw.Default:ToHex())
 
-			local l = CreateNewInput("Red", ToRGB(aw.Default).R)
-			local m = CreateNewInput("Green", ToRGB(aw.Default).G)
-			local p = CreateNewInput("Blue", ToRGB(aw.Default).B)
-			local r
+			local CreateKeySystem = CreateNewInput("Red", ToRGB(aw.Default).ElementLoader)
+			local UtilViewport = CreateNewInput("Green", ToRGB(aw.Default).CreateInputEx)
+			local AcrylicManager = CreateNewInput("Blue", ToRGB(aw.Default).CreateToggle)
+			local LoadAllThemes
 			if aw.Transparency then
-				r = CreateNewInput("Alpha", ((1 - aw.Transparency) * 100) .. "%")
+				LoadAllThemes = CreateNewInput("Alpha", ((1 - aw.Transparency) * 100) .. "%")
 			end
 
-			local u = ae("Frame", {
+			local CreateTag = ae("Frame", {
 				Size = UDim2.new(1, 0, 0, 40),
 				AutomaticSize = "Y",
 				Position = UDim2.new(0, 0, 0, 254 + aw.TextPadding),
@@ -7419,7 +7473,7 @@ workspace.CurrentCamera
 				}),
 			})
 
-			local v = {
+			local ConfigManager = {
 				{
 					Title = "Cancel",
 					Variant = "Secondary",
@@ -7435,28 +7489,28 @@ workspace.CurrentCamera
 				},
 			}
 
-			for A, B in next, v do
-				local C = ao(B.Title, B.Icon, B.Callback, B.Variant, u, ay, false)
-				C.Size = UDim2.new(0.5, -3, 0, 40)
-				C.AutomaticSize = "None"
+			for CreateButtonEx, CreateToggle in next, ConfigManager do
+				local CreateCheckbox = ao(CreateToggle.Title, CreateToggle.Icon, CreateToggle.Callback, CreateToggle.Variant, CreateTag, ay, false)
+				CreateCheckbox.Size = UDim2.new(0.5, -3, 0, 40)
+				CreateCheckbox.AutomaticSize = "None"
 			end
 
-			local C, F, G
+			local CreateCheckbox, CreateKeybind, CreateInputEx
 			if aw.Transparency then
-				local H = ae("Frame", {
+				local CreateDropdownMenu = ae("Frame", {
 					Size = UDim2.new(1, 0, 1, 0),
 					Position = UDim2.fromOffset(0, 0),
 					BackgroundTransparency = 1,
 				})
 
-				F = ae("ImageLabel", {
+				CreateKeybind = ae("ImageLabel", {
 					Size = UDim2.new(0, 14, 0, 14),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0, 0),
 					ThemeTag = {
 						BackgroundColor3 = "Text",
 					},
-					Parent = H,
+					Parent = CreateDropdownMenu,
 				}, {
 					ae("UIStroke", {
 						Thickness = 2,
@@ -7470,7 +7524,7 @@ workspace.CurrentCamera
 					}),
 				})
 
-				G = ae("Frame", {
+				CreateInputEx = ae("Frame", {
 					Size = UDim2.fromScale(1, 1),
 				}, {
 					ae("UIGradient", {
@@ -7485,7 +7539,7 @@ workspace.CurrentCamera
 					}),
 				})
 
-				C = ae("Frame", {
+				CreateCheckbox = ae("Frame", {
 					Size = UDim2.fromOffset(6, 192),
 					Position = UDim2.fromOffset(210, 40 + aw.TextPadding),
 					Parent = ay.UIElements.Main,
@@ -7506,22 +7560,22 @@ workspace.CurrentCamera
 							CornerRadius = UDim.new(1, 0),
 						}),
 					}),
-					G,
-					H,
+					CreateInputEx,
+					CreateDropdownMenu,
 				})
 			end
 
-			function aw.Round(H, J, L)
-				if L == 0 then
-					return math.floor(J)
+			function aw.Round(CreateDropdownMenu, LuaHighlighter, CreateCode)
+				if CreateCode == 0 then
+					return math.floor(LuaHighlighter)
 				end
-				J = tostring(J)
-				return J:find("%.") and tonumber(J:sub(1, J:find("%.") + L)) or J
+				LuaHighlighter = tostring(LuaHighlighter)
+				return LuaHighlighter:find("%.") and tonumber(LuaHighlighter:sub(1, LuaHighlighter:find("%.") + CreateCode)) or LuaHighlighter
 			end
 
-			function aw.Update(H, J, L)
-				if J then
-					az, aA, aB = Color3.toHSV(J)
+			function aw.Update(CreateDropdownMenu, LuaHighlighter, CreateCode)
+				if LuaHighlighter then
+					az, aA, aB = Color3.toHSV(LuaHighlighter)
 				else
 					az, aA, aB = aw.Hue, aw.Sat, aw.Vib
 				end
@@ -7530,97 +7584,97 @@ workspace.CurrentCamera
 				aC.Position = UDim2.new(aA, 0, 1 - aB, 0)
 				aC.BackgroundColor3 = Color3.fromHSV(az, aA, aB)
 				aE.BackgroundColor3 = Color3.fromHSV(az, aA, aB)
-				h.BackgroundColor3 = Color3.fromHSV(az, 1, 1)
-				h.Position = UDim2.new(0.5, 0, az, 0)
+				LoadPackageJson.BackgroundColor3 = Color3.fromHSV(az, 1, 1)
+				LoadPackageJson.Position = UDim2.new(0.5, 0, az, 0)
 
-				j.Frame.Frame.TextBox.Text = "#" .. Color3.fromHSV(az, aA, aB):ToHex()
-				l.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(az, aA, aB)).R
-				m.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(az, aA, aB)).G
-				p.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(az, aA, aB)).B
+				CreateInput.Frame.Frame.TextBox.Text = "#" .. Color3.fromHSV(az, aA, aB):ToHex()
+				CreateKeySystem.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(az, aA, aB)).ElementLoader
+				UtilViewport.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(az, aA, aB)).CreateInputEx
+				AcrylicManager.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(az, aA, aB)).CreateToggle
 
-				if L or aw.Transparency then
-					aE.BackgroundTransparency = aw.Transparency or L
-					G.BackgroundColor3 = Color3.fromHSV(az, aA, aB)
-					F.BackgroundColor3 = Color3.fromHSV(az, aA, aB)
-					F.BackgroundTransparency = aw.Transparency or L
-					F.Position = UDim2.new(0.5, 0, 1 - aw.Transparency or L, 0)
-					r.Frame.Frame.TextBox.Text = aw:Round((1 - aw.Transparency or L) * 100, 0) .. "%"
+				if CreateCode or aw.Transparency then
+					aE.BackgroundTransparency = aw.Transparency or CreateCode
+					CreateInputEx.BackgroundColor3 = Color3.fromHSV(az, aA, aB)
+					CreateKeybind.BackgroundColor3 = Color3.fromHSV(az, aA, aB)
+					CreateKeybind.BackgroundTransparency = aw.Transparency or CreateCode
+					CreateKeybind.Position = UDim2.new(0.5, 0, 1 - aw.Transparency or CreateCode, 0)
+					LoadAllThemes.Frame.Frame.TextBox.Text = aw:Round((1 - aw.Transparency or CreateCode) * 100, 0) .. "%"
 				end
 			end
 
 			aw:Update(aw.Default, aw.Transparency)
 
 			local function GetRGB()
-				local H = Color3.fromHSV(aw.Hue, aw.Sat, aw.Vib)
-				return { R = math.floor(H.r * 255), G = math.floor(H.g * 255), B = math.floor(H.b * 255) }
+				local CreateDropdownMenu = Color3.fromHSV(aw.Hue, aw.Sat, aw.Vib)
+				return { ElementLoader = math.floor(CreateDropdownMenu.LoadAllThemes * 255), CreateInputEx = math.floor(CreateDropdownMenu.LoadKeyServices * 255), CreateToggle = math.floor(CreateDropdownMenu.CreateLocalization * 255) }
 			end
 
-			local function clamp(H, J, L)
-				return math.clamp(tonumber(H) or 0, J, L)
+			local function clamp(CreateDropdownMenu, LuaHighlighter, CreateCode)
+				return math.clamp(tonumber(CreateDropdownMenu) or 0, LuaHighlighter, CreateCode)
 			end
 
-			ac.AddSignal(j.Frame.Frame.TextBox.FocusLost, function(H)
-				if H then
-					local J = j.Frame.Frame.TextBox.Text:gsub("#", "")
-					local L, M = pcall(Color3.fromHex, J)
-					if L and typeof(M) == "Color3" then
-						aw.Hue, aw.Sat, aw.Vib = Color3.toHSV(M)
+			ac.AddSignal(CreateInput.Frame.Frame.TextBox.FocusLost, function(CreateDropdownMenu)
+				if CreateDropdownMenu then
+					local LuaHighlighter = CreateInput.Frame.Frame.TextBox.Text:gsub("#", "")
+					local CreateCode, CreateColorpicker = pcall(Color3.fromHex, LuaHighlighter)
+					if CreateCode and typeof(CreateColorpicker) == "Color3" then
+						aw.Hue, aw.Sat, aw.Vib = Color3.toHSV(CreateColorpicker)
 						aw:Update()
-						aw.Default = M
+						aw.Default = CreateColorpicker
 					end
 				end
 			end)
 
-			local function updateColorFromInput(H, J)
-				ac.AddSignal(H.Frame.Frame.TextBox.FocusLost, function(L)
-					if L then
-						local M = H.Frame.Frame.TextBox
-						local N = GetRGB()
-						local O = clamp(M.Text, 0, 255)
-						M.Text = tostring(O)
+			local function updateColorFromInput(CreateDropdownMenu, LuaHighlighter)
+				ac.AddSignal(CreateDropdownMenu.Frame.Frame.TextBox.FocusLost, function(CreateCode)
+					if CreateCode then
+						local CreateColorpicker = CreateDropdownMenu.Frame.Frame.TextBox
+						local CreateSection = GetRGB()
+						local CreateDivider = clamp(CreateColorpicker.Text, 0, 255)
+						CreateColorpicker.Text = tostring(CreateDivider)
 
-						N[J] = O
-						local P = Color3.fromRGB(N.R, N.G, N.B)
-						aw.Hue, aw.Sat, aw.Vib = Color3.toHSV(P)
+						CreateSection[LuaHighlighter] = CreateDivider
+						local CreateSpace = Color3.fromRGB(CreateSection.ElementLoader, CreateSection.CreateInputEx, CreateSection.CreateToggle)
+						aw.Hue, aw.Sat, aw.Vib = Color3.toHSV(CreateSpace)
 						aw:Update()
 					end
 				end)
 			end
 
-			updateColorFromInput(l, "R")
-			updateColorFromInput(m, "G")
-			updateColorFromInput(p, "B")
+			updateColorFromInput(CreateKeySystem, "ElementLoader")
+			updateColorFromInput(UtilViewport, "CreateInputEx")
+			updateColorFromInput(AcrylicManager, "CreateToggle")
 
 			if aw.Transparency then
-				ac.AddSignal(r.Frame.Frame.TextBox.FocusLost, function(H)
-					if H then
-						local J = r.Frame.Frame.TextBox
-						local L = clamp(J.Text, 0, 100)
-						J.Text = tostring(L)
+				ac.AddSignal(LoadAllThemes.Frame.Frame.TextBox.FocusLost, function(CreateDropdownMenu)
+					if CreateDropdownMenu then
+						local LuaHighlighter = LoadAllThemes.Frame.Frame.TextBox
+						local CreateCode = clamp(LuaHighlighter.Text, 0, 100)
+						LuaHighlighter.Text = tostring(CreateCode)
 
-						aw.Transparency = 1 - L * 0.01
+						aw.Transparency = 1 - CreateCode * 0.01
 						aw:Update(nil, aw.Transparency)
 					end
 				end)
 			end
 
-			local H = aw.UIElements.SatVibMap
-			ac.AddSignal(H.InputBegan, function(J)
+			local CreateDropdownMenu = aw.UIElements.SatVibMap
+			ac.AddSignal(CreateDropdownMenu.InputBegan, function(LuaHighlighter)
 				if
-					J.UserInputType == Enum.UserInputType.MouseButton1
-					or J.UserInputType == Enum.UserInputType.Touch
+					LuaHighlighter.UserInputType == Enum.UserInputType.MouseButton1
+					or LuaHighlighter.UserInputType == Enum.UserInputType.Touch
 				then
 					while ai:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-						local L = H.AbsolutePosition.X
-						local M = L + H.AbsoluteSize.X
-						local N = math.clamp(an.X, L, M)
+						local CreateCode = CreateDropdownMenu.AbsolutePosition.X
+						local CreateColorpicker = CreateCode + CreateDropdownMenu.AbsoluteSize.X
+						local CreateSection = math.clamp(an.X, CreateCode, CreateColorpicker)
 
-						local O = H.AbsolutePosition.Y
-						local P = O + H.AbsoluteSize.Y
-						local Q = math.clamp(an.Y, O, P)
+						local CreateDivider = CreateDropdownMenu.AbsolutePosition.Y
+						local CreateSpace = CreateDivider + CreateDropdownMenu.AbsoluteSize.Y
+						local CreateImage = math.clamp(an.Y, CreateDivider, CreateSpace)
 
-						aw.Sat = (N - L) / (M - L)
-						aw.Vib = 1 - ((Q - O) / (P - O))
+						aw.Sat = (CreateSection - CreateCode) / (CreateColorpicker - CreateCode)
+						aw.Vib = 1 - ((CreateImage - CreateDivider) / (CreateSpace - CreateDivider))
 						aw:Update()
 
 						al:Wait()
@@ -7628,17 +7682,17 @@ workspace.CurrentCamera
 				end
 			end)
 
-			ac.AddSignal(i.InputBegan, function(J)
+			ac.AddSignal(CreateButton.InputBegan, function(LuaHighlighter)
 				if
-					J.UserInputType == Enum.UserInputType.MouseButton1
-					or J.UserInputType == Enum.UserInputType.Touch
+					LuaHighlighter.UserInputType == Enum.UserInputType.MouseButton1
+					or LuaHighlighter.UserInputType == Enum.UserInputType.Touch
 				then
 					while ai:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-						local L = i.AbsolutePosition.Y
-						local M = L + i.AbsoluteSize.Y
-						local N = math.clamp(an.Y, L, M)
+						local CreateCode = CreateButton.AbsolutePosition.Y
+						local CreateColorpicker = CreateCode + CreateButton.AbsoluteSize.Y
+						local CreateSection = math.clamp(an.Y, CreateCode, CreateColorpicker)
 
-						aw.Hue = ((N - L) / (M - L))
+						aw.Hue = ((CreateSection - CreateCode) / (CreateColorpicker - CreateCode))
 						aw:Update()
 
 						al:Wait()
@@ -7647,17 +7701,17 @@ workspace.CurrentCamera
 			end)
 
 			if aw.Transparency then
-				ac.AddSignal(C.InputBegan, function(J)
+				ac.AddSignal(CreateCheckbox.InputBegan, function(LuaHighlighter)
 					if
-						J.UserInputType == Enum.UserInputType.MouseButton1
-						or J.UserInputType == Enum.UserInputType.Touch
+						LuaHighlighter.UserInputType == Enum.UserInputType.MouseButton1
+						or LuaHighlighter.UserInputType == Enum.UserInputType.Touch
 					then
 						while ai:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-							local L = C.AbsolutePosition.Y
-							local M = L + C.AbsoluteSize.Y
-							local N = math.clamp(an.Y, L, M)
+							local CreateCode = CreateCheckbox.AbsolutePosition.Y
+							local CreateColorpicker = CreateCode + CreateCheckbox.AbsoluteSize.Y
+							local CreateSection = math.clamp(an.Y, CreateCode, CreateColorpicker)
 
-							aw.Transparency = 1 - ((N - L) / (M - L))
+							aw.Transparency = 1 - ((CreateSection - CreateCode) / (CreateColorpicker - CreateCode))
 							aw:Update()
 
 							al:Wait()
@@ -7689,7 +7743,7 @@ workspace.CurrentCamera
 				aq.UICorner = 14
 			end
 
-			at.ColorpickerFrame = a.load("y")({
+			at.ColorpickerFrame = WindUI.load("CreateElementFrame")({
 				Title = at.Title,
 				Desc = at.Desc,
 				Parent = as.Parent,
@@ -7757,8 +7811,8 @@ workspace.CurrentCamera
 
 		return aq
 	end
-	function a.N()
-		local ac = a.load("a")
+	function WindUI.CreateSection()
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 		local ag = ac.Tween
 
@@ -7974,8 +8028,8 @@ workspace.CurrentCamera
 
 		return ai
 	end
-	function a.O()
-		local ac = a.load("a")
+	function WindUI.CreateDivider()
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 
 		local ag = {}
@@ -8003,8 +8057,8 @@ workspace.CurrentCamera
 
 		return ag
 	end
-	function a.P()
-		local ac = a.load("a")
+	function WindUI.CreateSpace()
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 
 		local ag = {}
@@ -8021,15 +8075,15 @@ workspace.CurrentCamera
 
 		return ag
 	end
-	function a.Q()
-		local ac = a.load("a")
+	function WindUI.CreateImage()
+		local ac = WindUI.load("WindUI")
 		local ae = ac.New
 
 		local ag = {}
 
 		local function ParseAspectRatio(ai)
 			if type(ai) == "string" then
-				local aj, ak = ai:match("(%d+):(%d+)")
+				local aj, ak = ai:match("(%CreatePlatoboost+):(%CreatePlatoboost+)")
 				if aj and ak then
 					return tonumber(aj) / tonumber(ak)
 				end
@@ -8072,22 +8126,22 @@ workspace.CurrentCamera
 
 		return ag
 	end
-	function a.R()
+	function WindUI.ElementLoader()
 		return {
 			Elements = {
-				Paragraph = a.load("z"),
-				Button = a.load("A"),
-				Toggle = a.load("D"),
-				Slider = a.load("E"),
-				Keybind = a.load("F"),
-				Input = a.load("G"),
-				Dropdown = a.load("I"),
-				Code = a.load("L"),
-				Colorpicker = a.load("M"),
-				Section = a.load("N"),
-				Divider = a.load("O"),
-				Space = a.load("P"),
-				Image = a.load("Q"),
+				Paragraph = WindUI.load("CreateParagraph"),
+				Button = WindUI.load("CreateButtonEx"),
+				Toggle = WindUI.load("CreateToggleEx"),
+				Slider = WindUI.load("CreateSlider"),
+				Keybind = WindUI.load("CreateKeybind"),
+				Input = WindUI.load("CreateInputEx"),
+				Dropdown = WindUI.load("CreateDropdown"),
+				Code = WindUI.load("CreateCode"),
+				Colorpicker = WindUI.load("CreateColorpicker"),
+				Section = WindUI.load("CreateSection"),
+				Divider = WindUI.load("CreateDivider"),
+				Space = WindUI.load("CreateSpace"),
+				Image = WindUI.load("CreateImage"),
 			},
 			Load = function(ac, ae, ag, ai, aj, ak, al, am, an)
 				for ao, ap in next, ag do
@@ -8171,16 +8225,16 @@ as, at = ap:New(ar)
 			end,
 		}
 	end
-	function a.S()
+	function WindUI.TabManager()
 		game:GetService("UserInputService")
 		local ac = game.Players.LocalPlayer:GetMouse()
 
-		local ae = a.load("a")
+		local ae = WindUI.load("WindUI")
 		local ag = ae.New
 		local ai = ae.Tween
 
-		local aj = a.load("x").New
-		local ak = a.load("t").New
+		local aj = WindUI.load("CreateTooltip").New
+		local ak = WindUI.load("CreateScrollBar").New
 
 		local al = {
 
@@ -8491,7 +8545,7 @@ as, at = ap:New(ar)
 				return ao
 			end
 
-			ao.ElementsModule = a.load("R")
+			ao.ElementsModule = WindUI.load("ElementLoader")
 
 			ao.ElementsModule.Load(
 				ao,
@@ -8640,14 +8694,14 @@ as, at = ap:New(ar)
 
 		return al
 	end
-	function a.T()
+	function WindUI.SectionManager()
 		local ac = {}
 
-		local ae = a.load("a")
+		local ae = WindUI.load("WindUI")
 		local ag = ae.New
 		local ai = ae.Tween
 
-		local aj = a.load("S")
+		local aj = WindUI.load("TabManager")
 
 		function ac.New(ak, al, am, an, ao)
 			local ap = {
@@ -8792,7 +8846,7 @@ as, at = ap:New(ar)
 
 		return ac
 	end
-	function a.U()
+	function WindUI.IconAtlas()
 		return {
 			Tab = "table-of-contents",
 			Paragraph = "type",
@@ -8806,7 +8860,7 @@ as, at = ap:New(ar)
 			Colorpicker = "palette",
 		}
 	end
-	function a.V()
+	function WindUI.SearchModal()
 		game:GetService("UserInputService")
 
 		local ac = {
@@ -8814,7 +8868,7 @@ as, at = ap:New(ar)
 			Padding = 9,
 		}
 
-		local ae = a.load("a")
+		local ae = WindUI.load("WindUI")
 		local ag = ae.New
 		local ai = ae.Tween
 
@@ -8826,7 +8880,7 @@ as, at = ap:New(ar)
 				Width = 400,
 				MaxHeight = 380,
 
-				Icons = a.load("U"),
+				Icons = WindUI.load("IconAtlas"),
 			}
 
 			local an = ag("TextBox", {
@@ -8847,9 +8901,9 @@ as, at = ap:New(ar)
 			})
 
 			local ao = ag("ImageLabel", {
-				Image = ae.Icon("x")[1],
-				ImageRectSize = ae.Icon("x")[2].ImageRectSize,
-				ImageRectOffset = ae.Icon("x")[2].ImageRectPosition,
+				Image = ae.Icon("CreateTooltip")[1],
+				ImageRectSize = ae.Icon("CreateTooltip")[2].ImageRectSize,
+				ImageRectOffset = ae.Icon("CreateTooltip")[2].ImageRectPosition,
 				BackgroundTransparency = 1,
 				ThemeTag = {
 					ImageColor3 = "Icon",
@@ -9321,22 +9375,22 @@ as, at = ap:New(ar)
 
 		return ac
 	end
-	function a.W()
+	function WindUI.WindowBuilder()
 		local ac = game:GetService("UserInputService")
 		game:GetService("RunService")
 
 		local ae = workspace.CurrentCamera
 
-		local ag = a.load("a")
+		local ag = WindUI.load("WindUI")
 		local ai = ag.New
 		local aj = ag.Tween
 
-		local ak = a.load("s").New
-		local al = a.load("i").New
-		local am = a.load("t").New
-		local an = a.load("u")
+		local ak = WindUI.load("CreateLabel").New
+		local al = WindUI.load("CreateButton").New
+		local am = WindUI.load("CreateScrollBar").New
+		local an = WindUI.load("CreateTag")
 
-		local ao = a.load("v")
+		local ao = WindUI.load("ConfigManager")
 
 		return function(ap)
 			local aq = {
@@ -9761,36 +9815,36 @@ as, at = ap:New(ar)
 			local aE = typeof(aq.Background) == "string" and not aD and string.match(aq.Background, "^https?://.+")
 				or nil
 
-			local function SanitizeFilename(b)
-				b = b:gsub('[%s/\\:*?"<>|]+', "-")
-				b = b:gsub("[^%w%-_%.]", "")
-				return b
+			local function SanitizeFilename(CreateLocalization)
+				CreateLocalization = CreateLocalization:gsub('[%CreateLabel/\\:*?"<>|]+', "-")
+				CreateLocalization = CreateLocalization:gsub("[^%CreateOpenButton%-_%.]", "")
+				return CreateLocalization
 			end
 
 			if typeof(aq.Background) == "string" and aD then
 				aB = true
 
 				if string.find(aD, "http") then
-					local b = aq.Folder .. "/Assets/." .. SanitizeFilename(aD) .. ".webm"
-					if not isfile(b) then
-						local e, g = pcall(function()
-							local e = ag.Request({ Url = aD, Method = "GET" })
-							writefile(b, e.Body)
+					local CreateLocalization = aq.Folder .. "/Assets/." .. SanitizeFilename(aD) .. ".webm"
+					if not isfile(CreateLocalization) then
+						local CreatePandaDev, LoadKeyServices = pcall(function()
+							local CreatePandaDev = ag.Request({ Url = aD, Method = "GET" })
+							writefile(CreateLocalization, CreatePandaDev.Body)
 						end)
-						if not e then
-							warn("[ Window.Background ] Failed to download video: " .. tostring(g))
+						if not CreatePandaDev then
+							warn("[ Window.Background ] Failed to download video: " .. tostring(LoadKeyServices))
 							return
 						end
 					end
 
-					local e, g = pcall(function()
-						return getcustomasset(b)
+					local CreatePandaDev, LoadKeyServices = pcall(function()
+						return getcustomasset(CreateLocalization)
 					end)
-					if not e then
-						warn("[ Window.Background ] Failed to load custom asset: " .. tostring(g))
+					if not CreatePandaDev then
+						warn("[ Window.Background ] Failed to load custom asset: " .. tostring(LoadKeyServices))
 						return
 					end
-					aD = g
+					aD = LoadKeyServices
 				end
 
 				aC = ai("VideoFrame", {
@@ -9806,30 +9860,30 @@ as, at = ap:New(ar)
 				})
 				aC:Play()
 			elseif aE then
-				local b = aq.Folder .. "/Assets/." .. SanitizeFilename(aE) .. ".png"
-				if not isfile(b) then
-					local e, g = pcall(function()
-						local e = ag.Request({ Url = aE, Method = "GET" })
-						writefile(b, e.Body)
+				local CreateLocalization = aq.Folder .. "/Assets/." .. SanitizeFilename(aE) .. ".png"
+				if not isfile(CreateLocalization) then
+					local CreatePandaDev, LoadKeyServices = pcall(function()
+						local CreatePandaDev = ag.Request({ Url = aE, Method = "GET" })
+						writefile(CreateLocalization, CreatePandaDev.Body)
 					end)
-					if not e then
-						warn("[ Window.Background ] Failed to download image: " .. tostring(g))
+					if not CreatePandaDev then
+						warn("[ Window.Background ] Failed to download image: " .. tostring(LoadKeyServices))
 						return
 					end
 				end
 
-				local e, g = pcall(function()
-					return getcustomasset(b)
+				local CreatePandaDev, LoadKeyServices = pcall(function()
+					return getcustomasset(CreateLocalization)
 				end)
-				if not e then
-					warn("[ Window.Background ] Failed to load custom asset: " .. tostring(g))
+				if not CreatePandaDev then
+					warn("[ Window.Background ] Failed to load custom asset: " .. tostring(LoadKeyServices))
 					return
 				end
 
 				aC = ai("ImageLabel", {
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
-					Image = g,
+					Image = LoadKeyServices,
 					ImageTransparency = 0,
 					ScaleType = "Crop",
 				}, {
@@ -9851,7 +9905,7 @@ as, at = ap:New(ar)
 				})
 			end
 
-			local b = ag.NewRoundFrame(99, "Squircle", {
+			local CreateLocalization = ag.NewRoundFrame(99, "Squircle", {
 				ImageTransparency = 0.8,
 				ImageColor3 = Color3.new(1, 1, 1),
 				Size = UDim2.new(0, 0, 0, 4),
@@ -9869,9 +9923,9 @@ as, at = ap:New(ar)
 				}),
 			})
 
-			function createAuthor(e)
+			function createAuthor(CreatePandaDev)
 				return ai("TextLabel", {
-					Text = e,
+					Text = CreatePandaDev,
 					FontFace = Font.new(ag.Font, Enum.FontWeight.Medium),
 					BackgroundTransparency = 1,
 					TextTransparency = 0.35,
@@ -9887,14 +9941,14 @@ as, at = ap:New(ar)
 				})
 			end
 
-			local e
-			local g
+			local CreatePandaDev
+			local LoadKeyServices
 
 			if aq.Author then
-				e = createAuthor(aq.Author)
+				CreatePandaDev = createAuthor(aq.Author)
 			end
 
-			local h = ai("TextLabel", {
+			local LoadPackageJson = ai("TextLabel", {
 				Text = aq.Title,
 				FontFace = Font.new(ag.Font, Enum.FontWeight.SemiBold),
 				BackgroundTransparency = 1,
@@ -9928,7 +9982,7 @@ as, at = ap:New(ar)
 					},
 				}, {
 					aC,
-					b,
+					CreateLocalization,
 					at,
 				}),
 				UIStroke,
@@ -9985,8 +10039,8 @@ as, at = ap:New(ar)
 									FillDirection = "Vertical",
 									VerticalAlignment = "Center",
 								}),
-								h,
-								e,
+								LoadPackageJson,
+								CreatePandaDev,
 							}),
 							ai("UIPadding", {
 								PaddingLeft = UDim.new(0, 4),
@@ -10036,29 +10090,29 @@ as, at = ap:New(ar)
 			})
 
 			ag.AddSignal(aq.UIElements.Main.Main.Topbar.Left:GetPropertyChangedSignal("AbsoluteSize"), function()
-				local i = 0
-				local j = aq.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
-				if h and e then
-					i = math.max(h.TextBounds.X, e.TextBounds.X)
+				local CreateButton = 0
+				local CreateInput = aq.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
+				if LoadPackageJson and CreatePandaDev then
+					CreateButton = math.max(LoadPackageJson.TextBounds.X, CreatePandaDev.TextBounds.X)
 				else
-					i = h.TextBounds.X
+					CreateButton = LoadPackageJson.TextBounds.X
 				end
-				if g then
-					i = i + aq.IconSize + aq.UIPadding + 4
+				if LoadKeyServices then
+					CreateButton = CreateButton + aq.IconSize + aq.UIPadding + 4
 				end
-				aq.UIElements.Main.Main.Topbar.Center.Position = UDim2.new(0, i + aq.UIPadding, 0.5, 0)
-				aq.UIElements.Main.Main.Topbar.Center.Size = UDim2.new(1, -i - j - (aq.UIPadding * 2), 1, 0)
+				aq.UIElements.Main.Main.Topbar.Center.Position = UDim2.new(0, CreateButton + aq.UIPadding, 0.5, 0)
+				aq.UIElements.Main.Main.Topbar.Center.Size = UDim2.new(1, -CreateButton - CreateInput - (aq.UIPadding * 2), 1, 0)
 			end)
 
-			function aq.CreateTopbarButton(i, j, l, m, p, r)
-				local u = ag.Image(l, l, 0, aq.Folder, "TopbarIcon", true, r)
-				u.Size = UDim2.new(0, 16, 0, 16)
-				u.AnchorPoint = Vector2.new(0.5, 0.5)
-				u.Position = UDim2.new(0.5, 0, 0.5, 0)
+			function aq.CreateTopbarButton(CreateButton, CreateInput, CreateKeySystem, UtilViewport, AcrylicManager, LoadAllThemes)
+				local CreateTag = ag.Image(CreateKeySystem, CreateKeySystem, 0, aq.Folder, "TopbarIcon", true, LoadAllThemes)
+				CreateTag.Size = UDim2.new(0, 16, 0, 16)
+				CreateTag.AnchorPoint = Vector2.new(0.5, 0.5)
+				CreateTag.Position = UDim2.new(0.5, 0, 0.5, 0)
 
-				local v = ag.NewRoundFrame(9, "Squircle", {
+				local ConfigManager = ag.NewRoundFrame(9, "Squircle", {
 					Size = UDim2.new(0, 36, 0, 36),
-					LayoutOrder = p or 999,
+					LayoutOrder = AcrylicManager or 999,
 					Parent = aq.UIElements.Main.Main.Topbar.Right,
 
 					ZIndex = 9999,
@@ -10089,45 +10143,45 @@ as, at = ap:New(ar)
 							}),
 						}),
 					}),
-					u,
+					CreateTag,
 				}, true)
 
-				aq.TopBarButtons[100 - p] = {
-					Name = j,
-					Object = v,
+				aq.TopBarButtons[100 - AcrylicManager] = {
+					Name = CreateInput,
+					Object = ConfigManager,
 				}
 
-				ag.AddSignal(v.MouseButton1Click, function()
-					m()
+				ag.AddSignal(ConfigManager.MouseButton1Click, function()
+					UtilViewport()
 				end)
-				ag.AddSignal(v.MouseEnter, function()
-					aj(v, 0.15, { ImageTransparency = 0.93 }):Play()
-					aj(v.Outline, 0.15, { ImageTransparency = 0.75 }):Play()
+				ag.AddSignal(ConfigManager.MouseEnter, function()
+					aj(ConfigManager, 0.15, { ImageTransparency = 0.93 }):Play()
+					aj(ConfigManager.Outline, 0.15, { ImageTransparency = 0.75 }):Play()
 				end)
-				ag.AddSignal(v.MouseLeave, function()
-					aj(v, 0.1, { ImageTransparency = 1 }):Play()
-					aj(v.Outline, 0.1, { ImageTransparency = 1 }):Play()
+				ag.AddSignal(ConfigManager.MouseLeave, function()
+					aj(ConfigManager, 0.1, { ImageTransparency = 1 }):Play()
+					aj(ConfigManager.Outline, 0.1, { ImageTransparency = 1 }):Play()
 				end)
 
-				return v
+				return ConfigManager
 			end
 
-			local i = ag.Drag(aq.UIElements.Main, { aq.UIElements.Main.Main.Topbar, b.Frame }, function(i, j)
+			local CreateButton = ag.Drag(aq.UIElements.Main, { aq.UIElements.Main.Main.Topbar, CreateLocalization.Frame }, function(CreateButton, CreateInput)
 				if not aq.Closed then
-					if i and j == b.Frame then
-						aj(b, 0.1, { ImageTransparency = 0.35 }):Play()
+					if CreateButton and CreateInput == CreateLocalization.Frame then
+						aj(CreateLocalization, 0.1, { ImageTransparency = 0.35 }):Play()
 					else
-						aj(b, 0.2, { ImageTransparency = 0.8 }):Play()
+						aj(CreateLocalization, 0.2, { ImageTransparency = 0.8 }):Play()
 					end
 					aq.Position = aq.UIElements.Main.Position
-					aq.Dragging = i
+					aq.Dragging = CreateButton
 				end
 			end)
 
 			if not aB and aq.Background and typeof(aq.Background) == "table" then
-				local j = ai("UIGradient")
-				for l, m in next, aq.Background do
-					j[l] = m
+				local CreateInput = ai("UIGradient")
+				for CreateKeySystem, UtilViewport in next, aq.Background do
+					CreateInput[CreateKeySystem] = UtilViewport
 				end
 
 				aq.UIElements.BackgroundGradient = ag.NewRoundFrame(aq.UICorner, "Squircle", {
@@ -10135,17 +10189,17 @@ as, at = ap:New(ar)
 					Parent = aq.UIElements.Main.Background,
 					ImageTransparency = aq.Transparent and ap.WindUI.TransparencyValue or 0,
 				}, {
-					j,
+					CreateInput,
 				})
 			end
 
-			aq.OpenButtonMain = a.load("w").New(aq)
+			aq.OpenButtonMain = WindUI.load("CreateOpenButton").New(aq)
 
 			task.spawn(function()
 				if aq.Icon then
-					g = ag.Image(aq.Icon, aq.Title, 0, aq.Folder, "Window", true, aq.IconThemed)
-					g.Parent = aq.UIElements.Main.Main.Topbar.Left
-					g.Size = UDim2.new(0, aq.IconSize, 0, aq.IconSize)
+					LoadKeyServices = ag.Image(aq.Icon, aq.Title, 0, aq.Folder, "Window", true, aq.IconThemed)
+					LoadKeyServices.Parent = aq.UIElements.Main.Main.Topbar.Left
+					LoadKeyServices.Size = UDim2.new(0, aq.IconSize, 0, aq.IconSize)
 
 					aq.OpenButtonMain:SetIcon(aq.Icon)
 				else
@@ -10153,40 +10207,40 @@ as, at = ap:New(ar)
 				end
 			end)
 
-			function aq.SetToggleKey(j, l)
-				aq.ToggleKey = l
+			function aq.SetToggleKey(CreateInput, CreateKeySystem)
+				aq.ToggleKey = CreateKeySystem
 			end
 
-			function aq.SetTitle(j, l)
-				aq.Title = l
-				h.Text = l
+			function aq.SetTitle(CreateInput, CreateKeySystem)
+				aq.Title = CreateKeySystem
+				LoadPackageJson.Text = CreateKeySystem
 			end
 
-			function aq.SetAuthor(j, l)
-				aq.Author = l
-				if not e then
-					e = createAuthor(aq.Author)
+			function aq.SetAuthor(CreateInput, CreateKeySystem)
+				aq.Author = CreateKeySystem
+				if not CreatePandaDev then
+					CreatePandaDev = createAuthor(aq.Author)
 				end
 
-				e.Text = l
+				CreatePandaDev.Text = CreateKeySystem
 			end
 
-			function aq.SetBackgroundImage(j, l)
-				aq.UIElements.Main.Background.ImageLabel.Image = l
+			function aq.SetBackgroundImage(CreateInput, CreateKeySystem)
+				aq.UIElements.Main.Background.ImageLabel.Image = CreateKeySystem
 			end
-			function aq.SetBackgroundImageTransparency(j, l)
+			function aq.SetBackgroundImageTransparency(CreateInput, CreateKeySystem)
 				if aC and aC:IsA("ImageLabel") then
-					aC.ImageTransparency = math.floor(l + 0.5)
+					aC.ImageTransparency = math.floor(CreateKeySystem + 0.5)
 				end
-				aq.BackgroundImageTransparency = math.floor(l + 0.5)
+				aq.BackgroundImageTransparency = math.floor(CreateKeySystem + 0.5)
 			end
-			function aq.SetBackgroundTransparency(j, l)
-				WindUI.TransparencyValue = math.floor(tonumber(l) + 0.5)
-				aq:ToggleTransparency(math.floor(tonumber(l) + 0.5) > 0)
+			function aq.SetBackgroundTransparency(CreateInput, CreateKeySystem)
+				WindUI.TransparencyValue = math.floor(tonumber(CreateKeySystem) + 0.5)
+				aq:ToggleTransparency(math.floor(tonumber(CreateKeySystem) + 0.5) > 0)
 			end
 
-			local j
-			local l
+			local CreateInput
+			local CreateKeySystem
 			ag.Icon("minimize")
 			ag.Icon("maximize")
 
@@ -10194,14 +10248,14 @@ as, at = ap:New(ar)
 				aq:ToggleFullscreen()
 			end, 998)
 
-			function aq.ToggleFullscreen(m)
-				local p = aq.IsFullscreen
+			function aq.ToggleFullscreen(UtilViewport)
+				local AcrylicManager = aq.IsFullscreen
 
-				i:Set(p)
+				CreateButton:Set(AcrylicManager)
 
-				if not p then
-					j = aq.UIElements.Main.Position
-					l = aq.UIElements.Main.Size
+				if not AcrylicManager then
+					CreateInput = aq.UIElements.Main.Position
+					CreateKeySystem = aq.UIElements.Main.Size
 
 					aq.CanResize = false
 				else
@@ -10213,7 +10267,7 @@ as, at = ap:New(ar)
 				aj(
 					aq.UIElements.Main,
 					0.45,
-					{ Size = p and l or UDim2.new(1, -20, 1, -72) },
+					{ Size = AcrylicManager and CreateKeySystem or UDim2.new(1, -20, 1, -72) },
 					Enum.EasingStyle.Quint,
 					Enum.EasingDirection.Out
 				):Play()
@@ -10221,12 +10275,12 @@ as, at = ap:New(ar)
 				aj(
 					aq.UIElements.Main,
 					0.45,
-					{ Position = p and j or UDim2.new(0.5, 0, 0.5, 26) },
+					{ Position = AcrylicManager and CreateInput or UDim2.new(0.5, 0, 0.5, 26) },
 					Enum.EasingStyle.Quint,
 					Enum.EasingDirection.Out
 				):Play()
 
-				aq.IsFullscreen = not p
+				aq.IsFullscreen = not AcrylicManager
 			end
 
 			aq:CreateTopbarButton("Minimize", "minus", function()
@@ -10239,32 +10293,32 @@ as, at = ap:New(ar)
 				end)
 			end, 997)
 
-			function aq.OnOpen(m, p)
-				aq.OnOpenCallback = p
+			function aq.OnOpen(UtilViewport, AcrylicManager)
+				aq.OnOpenCallback = AcrylicManager
 			end
-			function aq.OnClose(m, p)
-				aq.OnCloseCallback = p
+			function aq.OnClose(UtilViewport, AcrylicManager)
+				aq.OnCloseCallback = AcrylicManager
 			end
-			function aq.OnDestroy(m, p)
-				aq.OnDestroyCallback = p
+			function aq.OnDestroy(UtilViewport, AcrylicManager)
+				aq.OnDestroyCallback = AcrylicManager
 			end
 
-			function aq.SetIconSize(m, p)
-				local r
-				if typeof(p) == "number" then
-					r = UDim2.new(0, p, 0, p)
-					aq.IconSize = p
-				elseif typeof(p) == "UDim2" then
-					r = p
-					aq.IconSize = p.X.Offset
+			function aq.SetIconSize(UtilViewport, AcrylicManager)
+				local LoadAllThemes
+				if typeof(AcrylicManager) == "number" then
+					LoadAllThemes = UDim2.new(0, AcrylicManager, 0, AcrylicManager)
+					aq.IconSize = AcrylicManager
+				elseif typeof(AcrylicManager) == "UDim2" then
+					LoadAllThemes = AcrylicManager
+					aq.IconSize = AcrylicManager.X.Offset
 				end
 
-				if g then
-					g.Size = r
+				if LoadKeyServices then
+					LoadKeyServices.Size = LoadAllThemes
 				end
 			end
 
-			function aq.Open(m)
+			function aq.Open(UtilViewport)
 				task.spawn(function()
 					if aq.OnOpenCallback then
 						task.spawn(function()
@@ -10307,13 +10361,13 @@ as, at = ap:New(ar)
 					task.spawn(function()
 						task.wait(0.3)
 						aj(
-							b,
+							CreateLocalization,
 							0.45,
 							{ Size = UDim2.new(0, 200, 0, 4), ImageTransparency = 0.8 },
 							Enum.EasingStyle.Exponential,
 							Enum.EasingDirection.Out
 						):Play()
-						i:Set(true)
+						CreateButton:Set(true)
 						task.wait(0.45)
 						if aq.Resizable then
 							aj(
@@ -10336,8 +10390,8 @@ as, at = ap:New(ar)
 					end)
 				end)
 			end
-			function aq.Close(m)
-				local p = {}
+			function aq.Close(UtilViewport)
+				local AcrylicManager = {}
 
 				if aq.OnCloseCallback then
 					task.spawn(function()
@@ -10378,7 +10432,7 @@ as, at = ap:New(ar)
 				end
 
 				aj(
-					b,
+					CreateLocalization,
 					0.3,
 					{ Size = UDim2.new(0, 0, 0, 4), ImageTransparency = 1 },
 					Enum.EasingStyle.Exponential,
@@ -10391,7 +10445,7 @@ as, at = ap:New(ar)
 					Enum.EasingStyle.Exponential,
 					Enum.EasingDirection.Out
 				):Play()
-				i:Set(false)
+				CreateButton:Set(false)
 				aq.CanResize = false
 
 				task.spawn(function()
@@ -10399,7 +10453,7 @@ as, at = ap:New(ar)
 					aq.UIElements.Main.Visible = false
 				end)
 
-				function p.Destroy(r)
+				function AcrylicManager.Destroy(LoadAllThemes)
 					if aq.OnDestroyCallback then
 						task.spawn(function()
 							ag.SafeCallback(aq.OnDestroyCallback)
@@ -10413,12 +10467,12 @@ as, at = ap:New(ar)
 					ap.WindUI.DropdownGui:Destroy()
 				end
 
-				return p
+				return AcrylicManager
 			end
-			function aq.Destroy(m)
+			function aq.Destroy(UtilViewport)
 				return aq:Close():Destroy()
 			end
-			function aq.Toggle(m)
+			function aq.Toggle(UtilViewport)
 				if aq.Closed then
 					aq:Open()
 				else
@@ -10426,63 +10480,63 @@ as, at = ap:New(ar)
 				end
 			end
 
-			function aq.ToggleTransparency(m, p)
-				aq.Transparent = p
-				ap.WindUI.Transparent = p
+			function aq.ToggleTransparency(UtilViewport, AcrylicManager)
+				aq.Transparent = AcrylicManager
+				ap.WindUI.Transparent = AcrylicManager
 
-				aq.UIElements.Main.Background.ImageTransparency = p and ap.WindUI.TransparencyValue or 0
+				aq.UIElements.Main.Background.ImageTransparency = AcrylicManager and ap.WindUI.TransparencyValue or 0
 
-				aq.UIElements.MainBar.Background.ImageTransparency = p and 0.97 or 0.95
+				aq.UIElements.MainBar.Background.ImageTransparency = AcrylicManager and 0.97 or 0.95
 			end
 
-			function aq.LockAll(m)
-				for p, r in next, aq.AllElements do
-					if r.Lock then
-						r:Lock()
+			function aq.LockAll(UtilViewport)
+				for AcrylicManager, LoadAllThemes in next, aq.AllElements do
+					if LoadAllThemes.Lock then
+						LoadAllThemes:Lock()
 					end
 				end
 			end
-			function aq.UnlockAll(m)
-				for p, r in next, aq.AllElements do
-					if r.Unlock then
-						r:Unlock()
+			function aq.UnlockAll(UtilViewport)
+				for AcrylicManager, LoadAllThemes in next, aq.AllElements do
+					if LoadAllThemes.Unlock then
+						LoadAllThemes:Unlock()
 					end
 				end
 			end
-			function aq.GetLocked(m)
-				local p = {}
+			function aq.GetLocked(UtilViewport)
+				local AcrylicManager = {}
 
-				for r, u in next, aq.AllElements do
-					if u.Locked then
-						table.insert(p, u)
+				for LoadAllThemes, CreateTag in next, aq.AllElements do
+					if CreateTag.Locked then
+						table.insert(AcrylicManager, CreateTag)
 					end
 				end
 
-				return p
+				return AcrylicManager
 			end
-			function aq.GetUnlocked(m)
-				local p = {}
+			function aq.GetUnlocked(UtilViewport)
+				local AcrylicManager = {}
 
-				for r, u in next, aq.AllElements do
-					if u.Locked == false then
-						table.insert(p, u)
+				for LoadAllThemes, CreateTag in next, aq.AllElements do
+					if CreateTag.Locked == false then
+						table.insert(AcrylicManager, CreateTag)
 					end
 				end
 
-				return p
+				return AcrylicManager
 			end
 
-			function aq.GetUIScale(m, p)
+			function aq.GetUIScale(UtilViewport, AcrylicManager)
 				return ap.WindUI.UIScale
 			end
 
-			function aq.SetUIScale(m, p)
-				ap.WindUI.UIScale = p
-				aj(ap.WindUI.ScreenGui.UIScale, 0.2, { Scale = p }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+			function aq.SetUIScale(UtilViewport, AcrylicManager)
+				ap.WindUI.UIScale = AcrylicManager
+				aj(ap.WindUI.ScreenGui.UIScale, 0.2, { Scale = AcrylicManager }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 				return aq
 			end
 
-			function aq.SetToTheCenter(m)
+			function aq.SetToTheCenter(UtilViewport)
 				aj(
 					aq.UIElements.Main,
 					0.45,
@@ -10494,29 +10548,29 @@ as, at = ap:New(ar)
 			end
 
 			do
-				local m = 40
-				local p = ae.ViewportSize
-				local r = aq.UIElements.Main.AbsoluteSize
+				local UtilViewport = 40
+				local AcrylicManager = ae.ViewportSize
+				local LoadAllThemes = aq.UIElements.Main.AbsoluteSize
 
 				if not aq.IsFullscreen and aq.AutoScale then
-					local u = p.X - (m * 2)
-					local v = p.Y - (m * 2)
+					local CreateTag = AcrylicManager.X - (UtilViewport * 2)
+					local ConfigManager = AcrylicManager.Y - (UtilViewport * 2)
 
-					local A = u / r.X
-					local B = v / r.Y
+					local CreateButtonEx = CreateTag / LoadAllThemes.X
+					local CreateToggle = ConfigManager / LoadAllThemes.Y
 
-					local C = math.min(A, B)
+					local CreateCheckbox = math.min(CreateButtonEx, CreateToggle)
 
-					local F = 0.3
-					local G = 1.0
+					local CreateKeybind = 0.3
+					local CreateInputEx = 1.0
 
-					local H = math.clamp(C, F, G)
+					local CreateDropdownMenu = math.clamp(CreateCheckbox, CreateKeybind, CreateInputEx)
 
-					local J = aq:GetUIScale() or 1
-					local L = 0.05
+					local LuaHighlighter = aq:GetUIScale() or 1
+					local CreateCode = 0.05
 
-					if math.abs(H - J) > L then
-						aq:SetUIScale(H)
+					if math.abs(CreateDropdownMenu - LuaHighlighter) > CreateCode then
+						aq:SetUIScale(CreateDropdownMenu)
 					end
 				end
 			end
@@ -10528,13 +10582,13 @@ as, at = ap:New(ar)
 				end)
 			end
 
-			ag.AddSignal(ac.InputBegan, function(m, p)
-				if p then
+			ag.AddSignal(ac.InputBegan, function(UtilViewport, AcrylicManager)
+				if AcrylicManager then
 					return
 				end
 
 				if aq.ToggleKey then
-					if m.KeyCode == aq.ToggleKey then
+					if UtilViewport.KeyCode == aq.ToggleKey then
 						aq:Toggle()
 					end
 				end
@@ -10544,43 +10598,43 @@ as, at = ap:New(ar)
 				aq:Open()
 			end)
 
-			function aq.EditOpenButton(m, p)
-				return aq.OpenButtonMain:Edit(p)
+			function aq.EditOpenButton(UtilViewport, AcrylicManager)
+				return aq.OpenButtonMain:Edit(AcrylicManager)
 			end
 
 			if aq.OpenButton and typeof(aq.OpenButton) == "table" then
 				aq:EditOpenButton(aq.OpenButton)
 			end
 
-			local m = a.load("S")
-			local p = a.load("T")
-			local r = m.Init(aq, ap.WindUI, ap.Parent.Parent.ToolTips)
-			r:OnChange(function(u)
-				aq.CurrentTab = u
+			local UtilViewport = WindUI.load("TabManager")
+			local AcrylicManager = WindUI.load("SectionManager")
+			local LoadAllThemes = UtilViewport.Init(aq, ap.WindUI, ap.Parent.Parent.ToolTips)
+			LoadAllThemes:OnChange(function(CreateTag)
+				aq.CurrentTab = CreateTag
 			end)
 
-			aq.TabModule = m
+			aq.TabModule = UtilViewport
 
-			function aq.Tab(u, v)
-				v.Parent = aq.UIElements.SideBar.Frame
-				return r.New(v, ap.WindUI.UIScale)
+			function aq.Tab(CreateTag, ConfigManager)
+				ConfigManager.Parent = aq.UIElements.SideBar.Frame
+				return LoadAllThemes.New(ConfigManager, ap.WindUI.UIScale)
 			end
 
-			function aq.SelectTab(u, v)
-				r:SelectTab(v)
+			function aq.SelectTab(CreateTag, ConfigManager)
+				LoadAllThemes:SelectTab(ConfigManager)
 			end
 
-			function aq.Section(u, v)
-				return p.New(v, aq.UIElements.SideBar.Frame, aq.Folder, ap.WindUI.UIScale, aq)
+			function aq.Section(CreateTag, ConfigManager)
+				return AcrylicManager.New(ConfigManager, aq.UIElements.SideBar.Frame, aq.Folder, ap.WindUI.UIScale, aq)
 			end
 
-			function aq.IsResizable(u, v)
-				aq.Resizable = v
-				aq.CanResize = v
+			function aq.IsResizable(CreateTag, ConfigManager)
+				aq.Resizable = ConfigManager
+				aq.CanResize = ConfigManager
 			end
 
-			function aq.Divider(u)
-				local v = ai("Frame", {
+			function aq.Divider(CreateTag)
+				local ConfigManager = ai("Frame", {
 					Size = UDim2.new(1, 0, 0, 1),
 					Position = UDim2.new(0.5, 0, 0, 0),
 					AnchorPoint = Vector2.new(0.5, 0),
@@ -10589,88 +10643,88 @@ as, at = ap:New(ar)
 						BackgroundColor3 = "Text",
 					},
 				})
-				local A = ai("Frame", {
+				local CreateButtonEx = ai("Frame", {
 					Parent = aq.UIElements.SideBar.Frame,
 
 					Size = UDim2.new(1, -7, 0, 5),
 					BackgroundTransparency = 1,
 				}, {
-					v,
+					ConfigManager,
 				})
 
-				return A
+				return CreateButtonEx
 			end
 
-			local u = a.load("k").Init(aq, nil)
-			function aq.Dialog(v, A)
-				local B = {
-					Title = A.Title or "Dialog",
-					Width = A.Width or 320,
-					Content = A.Content,
-					Buttons = A.Buttons or {},
+			local CreateTag = WindUI.load("CreateDialog").Init(aq, nil)
+			function aq.Dialog(ConfigManager, CreateButtonEx)
+				local CreateToggle = {
+					Title = CreateButtonEx.Title or "Dialog",
+					Width = CreateButtonEx.Width or 320,
+					Content = CreateButtonEx.Content,
+					Buttons = CreateButtonEx.Buttons or {},
 
 					TextPadding = 10,
 				}
-				local C = u.Create(false)
+				local CreateCheckbox = CreateTag.Create(false)
 
-				C.UIElements.Main.Size = UDim2.new(0, B.Width, 0, 0)
+				CreateCheckbox.UIElements.Main.Size = UDim2.new(0, CreateToggle.Width, 0, 0)
 
-				local F = ai("Frame", {
+				local CreateKeybind = ai("Frame", {
 					Size = UDim2.new(1, 0, 0, 0),
 					AutomaticSize = "Y",
 					BackgroundTransparency = 1,
-					Parent = C.UIElements.Main,
+					Parent = CreateCheckbox.UIElements.Main,
 				}, {
 					ai("UIListLayout", {
 						FillDirection = "Horizontal",
-						Padding = UDim.new(0, C.UIPadding),
+						Padding = UDim.new(0, CreateCheckbox.UIPadding),
 						VerticalAlignment = "Center",
 					}),
 					ai("UIPadding", {
-						PaddingTop = UDim.new(0, B.TextPadding / 2),
-						PaddingLeft = UDim.new(0, B.TextPadding / 2),
-						PaddingRight = UDim.new(0, B.TextPadding / 2),
+						PaddingTop = UDim.new(0, CreateToggle.TextPadding / 2),
+						PaddingLeft = UDim.new(0, CreateToggle.TextPadding / 2),
+						PaddingRight = UDim.new(0, CreateToggle.TextPadding / 2),
 					}),
 				})
 
-				local G
-				if A.Icon then
-					G = ag.Image(A.Icon, B.Title .. ":" .. A.Icon, 0, aq, "Dialog", true, A.IconThemed)
-					G.Size = UDim2.new(0, 22, 0, 22)
-					G.Parent = F
+				local CreateInputEx
+				if CreateButtonEx.Icon then
+					CreateInputEx = ag.Image(CreateButtonEx.Icon, CreateToggle.Title .. ":" .. CreateButtonEx.Icon, 0, aq, "Dialog", true, CreateButtonEx.IconThemed)
+					CreateInputEx.Size = UDim2.new(0, 22, 0, 22)
+					CreateInputEx.Parent = CreateKeybind
 				end
 
-				C.UIElements.UIListLayout = ai("UIListLayout", {
+				CreateCheckbox.UIElements.UIListLayout = ai("UIListLayout", {
 					Padding = UDim.new(0, 12),
 					FillDirection = "Vertical",
 					HorizontalAlignment = "Left",
-					Parent = C.UIElements.Main,
+					Parent = CreateCheckbox.UIElements.Main,
 				})
 
 				ai("UISizeConstraint", {
 					MinSize = Vector2.new(180, 20),
 					MaxSize = Vector2.new(400, math.huge),
-					Parent = C.UIElements.Main,
+					Parent = CreateCheckbox.UIElements.Main,
 				})
 
-				C.UIElements.Title = ai("TextLabel", {
-					Text = B.Title,
+				CreateCheckbox.UIElements.Title = ai("TextLabel", {
+					Text = CreateToggle.Title,
 					TextSize = 20,
 					FontFace = Font.new(ag.Font, Enum.FontWeight.SemiBold),
 					TextXAlignment = "Left",
 					TextWrapped = true,
 					RichText = true,
-					Size = UDim2.new(1, G and -26 - C.UIPadding or 0, 0, 0),
+					Size = UDim2.new(1, CreateInputEx and -26 - CreateCheckbox.UIPadding or 0, 0, 0),
 					AutomaticSize = "Y",
 					ThemeTag = {
 						TextColor3 = "Text",
 					},
 					BackgroundTransparency = 1,
-					Parent = F,
+					Parent = CreateKeybind,
 				})
-				if B.Content then
+				if CreateToggle.Content then
 					ai("TextLabel", {
-						Text = B.Content,
+						Text = CreateToggle.Content,
 						TextSize = 18,
 						TextTransparency = 0.4,
 						TextWrapped = true,
@@ -10684,97 +10738,97 @@ as, at = ap:New(ar)
 							TextColor3 = "Text",
 						},
 						BackgroundTransparency = 1,
-						Parent = C.UIElements.Main,
+						Parent = CreateCheckbox.UIElements.Main,
 					}, {
 						ai("UIPadding", {
-							PaddingLeft = UDim.new(0, B.TextPadding / 2),
-							PaddingRight = UDim.new(0, B.TextPadding / 2),
-							PaddingBottom = UDim.new(0, B.TextPadding / 2),
+							PaddingLeft = UDim.new(0, CreateToggle.TextPadding / 2),
+							PaddingRight = UDim.new(0, CreateToggle.TextPadding / 2),
+							PaddingBottom = UDim.new(0, CreateToggle.TextPadding / 2),
 						}),
 					})
 				end
 
-				local H = ai("UIListLayout", {
+				local CreateDropdownMenu = ai("UIListLayout", {
 					Padding = UDim.new(0, 6),
 					FillDirection = "Horizontal",
 					HorizontalAlignment = "Right",
 				})
 
-				local J = ai("Frame", {
+				local LuaHighlighter = ai("Frame", {
 					Size = UDim2.new(1, 0, 0, 40),
 					AutomaticSize = "None",
 					BackgroundTransparency = 1,
-					Parent = C.UIElements.Main,
+					Parent = CreateCheckbox.UIElements.Main,
 					LayoutOrder = 4,
 				}, {
-					H,
+					CreateDropdownMenu,
 				})
 
-				local L = {}
+				local CreateCode = {}
 
-				for M, N in next, B.Buttons do
-					local O = al(N.Title, N.Icon, N.Callback, N.Variant, J, C, false)
-					table.insert(L, O)
+				for CreateColorpicker, CreateSection in next, CreateToggle.Buttons do
+					local CreateDivider = al(CreateSection.Title, CreateSection.Icon, CreateSection.Callback, CreateSection.Variant, LuaHighlighter, CreateCheckbox, false)
+					table.insert(CreateCode, CreateDivider)
 				end
 
 				local function CheckButtonsOverflow()
-					H.FillDirection = Enum.FillDirection.Horizontal
-					H.HorizontalAlignment = Enum.HorizontalAlignment.Right
-					H.VerticalAlignment = Enum.VerticalAlignment.Center
-					J.AutomaticSize = Enum.AutomaticSize.None
+					CreateDropdownMenu.FillDirection = Enum.FillDirection.Horizontal
+					CreateDropdownMenu.HorizontalAlignment = Enum.HorizontalAlignment.Right
+					CreateDropdownMenu.VerticalAlignment = Enum.VerticalAlignment.Center
+					LuaHighlighter.AutomaticSize = Enum.AutomaticSize.None
 
-					for O, P in ipairs(L) do
-						P.Size = UDim2.new(0, 0, 1, 0)
-						P.AutomaticSize = Enum.AutomaticSize.X
+					for CreateDivider, CreateSpace in ipairs(CreateCode) do
+						CreateSpace.Size = UDim2.new(0, 0, 1, 0)
+						CreateSpace.AutomaticSize = Enum.AutomaticSize.X
 					end
 
 					wait()
 
-					local Q = H.AbsoluteContentSize.X / ap.WindUI.UIScale
-					local R = J.AbsoluteSize.X / ap.WindUI.UIScale
+					local CreateImage = CreateDropdownMenu.AbsoluteContentSize.X / ap.WindUI.UIScale
+					local ElementLoader = LuaHighlighter.AbsoluteSize.X / ap.WindUI.UIScale
 
-					if Q > R then
-						H.FillDirection = Enum.FillDirection.Vertical
-						H.HorizontalAlignment = Enum.HorizontalAlignment.Right
-						H.VerticalAlignment = Enum.VerticalAlignment.Bottom
-						J.AutomaticSize = Enum.AutomaticSize.Y
+					if CreateImage > ElementLoader then
+						CreateDropdownMenu.FillDirection = Enum.FillDirection.Vertical
+						CreateDropdownMenu.HorizontalAlignment = Enum.HorizontalAlignment.Right
+						CreateDropdownMenu.VerticalAlignment = Enum.VerticalAlignment.Bottom
+						LuaHighlighter.AutomaticSize = Enum.AutomaticSize.Y
 
-						for S, T in ipairs(L) do
-							T.Size = UDim2.new(1, 0, 0, 40)
-							T.AutomaticSize = Enum.AutomaticSize.None
+						for TabManager, SectionManager in ipairs(CreateCode) do
+							SectionManager.Size = UDim2.new(1, 0, 0, 40)
+							SectionManager.AutomaticSize = Enum.AutomaticSize.None
 						end
 					else
-						local S = R - Q
-						if S > 0 then
-							local T
-							local U = math.huge
+						local TabManager = ElementLoader - CreateImage
+						if TabManager > 0 then
+							local SectionManager
+							local IconAtlas = math.huge
 
-							for V, W in ipairs(L) do
-								local X = W.AbsoluteSize.X / ap.WindUI.UIScale
-								if X < U then
-									U = X
-									T = W
+							for SearchModal, WindowBuilder in ipairs(CreateCode) do
+								local X = WindowBuilder.AbsoluteSize.X / ap.WindUI.UIScale
+								if X < IconAtlas then
+									IconAtlas = X
+									SectionManager = WindowBuilder
 								end
 							end
 
-							if T then
-								T.Size = UDim2.new(0, U + S, 1, 0)
-								T.AutomaticSize = Enum.AutomaticSize.None
+							if SectionManager then
+								SectionManager.Size = UDim2.new(0, IconAtlas + TabManager, 1, 0)
+								SectionManager.AutomaticSize = Enum.AutomaticSize.None
 							end
 						end
 					end
 				end
 
-				ag.AddSignal(C.UIElements.Main:GetPropertyChangedSignal("AbsoluteSize"), CheckButtonsOverflow)
+				ag.AddSignal(CreateCheckbox.UIElements.Main:GetPropertyChangedSignal("AbsoluteSize"), CheckButtonsOverflow)
 				CheckButtonsOverflow()
 
 				wait()
-				C:Open()
+				CreateCheckbox:Open()
 
-				return C
+				return CreateCheckbox
 			end
 
-			aq:CreateTopbarButton("Close", "x", function()
+			aq:CreateTopbarButton("Close", "CreateTooltip", function()
 				aq:SetToTheCenter()
 				aq:Dialog({
 
@@ -10799,24 +10853,24 @@ as, at = ap:New(ar)
 				})
 			end, 999)
 
-			function aq.Tag(v, A)
+			function aq.Tag(ConfigManager, CreateButtonEx)
 				if aq.UIElements.Main.Main.Topbar.Center.Visible == false then
 					aq.UIElements.Main.Main.Topbar.Center.Visible = true
 				end
-				return an:New(A, aq.UIElements.Main.Main.Topbar.Center)
+				return an:New(CreateButtonEx, aq.UIElements.Main.Main.Topbar.Center)
 			end
 
-			local function startResizing(v)
+			local function startResizing(ConfigManager)
 				if aq.CanResize then
 					isResizing = true
 					av.Active = true
 					initialSize = aq.UIElements.Main.Size
-					initialInputPosition = v.Position
+					initialInputPosition = ConfigManager.Position
 
 					aj(at.ImageLabel, 0.1, { ImageTransparency = 0.35 }):Play()
 
-					ag.AddSignal(v.Changed, function()
-						if v.UserInputState == Enum.UserInputState.End then
+					ag.AddSignal(ConfigManager.Changed, function()
+						if ConfigManager.UserInputState == Enum.UserInputState.End then
 							isResizing = false
 							av.Active = false
 
@@ -10826,98 +10880,98 @@ as, at = ap:New(ar)
 				end
 			end
 
-			ag.AddSignal(at.InputBegan, function(v)
+			ag.AddSignal(at.InputBegan, function(ConfigManager)
 				if
-					v.UserInputType == Enum.UserInputType.MouseButton1
-					or v.UserInputType == Enum.UserInputType.Touch
+					ConfigManager.UserInputType == Enum.UserInputType.MouseButton1
+					or ConfigManager.UserInputType == Enum.UserInputType.Touch
 				then
 					if aq.CanResize then
-						startResizing(v)
+						startResizing(ConfigManager)
 					end
 				end
 			end)
 
-			ag.AddSignal(ac.InputChanged, function(v)
+			ag.AddSignal(ac.InputChanged, function(ConfigManager)
 				if
-					v.UserInputType == Enum.UserInputType.MouseMovement
-					or v.UserInputType == Enum.UserInputType.Touch
+					ConfigManager.UserInputType == Enum.UserInputType.MouseMovement
+					or ConfigManager.UserInputType == Enum.UserInputType.Touch
 				then
 					if isResizing and aq.CanResize then
-						local A = v.Position - initialInputPosition
-						local B = UDim2.new(0, initialSize.X.Offset + A.X * 2, 0, initialSize.Y.Offset + A.Y * 2)
+						local CreateButtonEx = ConfigManager.Position - initialInputPosition
+						local CreateToggle = UDim2.new(0, initialSize.X.Offset + CreateButtonEx.X * 2, 0, initialSize.Y.Offset + CreateButtonEx.Y * 2)
 
-						B = UDim2.new(
-							B.X.Scale,
-							math.clamp(B.X.Offset, aq.MinSize.X, aq.MaxSize.X),
-							B.Y.Scale,
-							math.clamp(B.Y.Offset, aq.MinSize.Y, aq.MaxSize.Y)
+						CreateToggle = UDim2.new(
+							CreateToggle.X.Scale,
+							math.clamp(CreateToggle.X.Offset, aq.MinSize.X, aq.MaxSize.X),
+							CreateToggle.Y.Scale,
+							math.clamp(CreateToggle.Y.Offset, aq.MinSize.Y, aq.MaxSize.Y)
 						)
 
 						aj(aq.UIElements.Main, 0, {
-							Size = B,
+							Size = CreateToggle,
 						}):Play()
 
-						aq.Size = B
+						aq.Size = CreateToggle
 					end
 				end
 			end)
 
-			local v = 0
-			local A = 0.4
-			local B
-			local C = 0
+			local ConfigManager = 0
+			local CreateButtonEx = 0.4
+			local CreateToggle
+			local CreateCheckbox = 0
 
 			function onDoubleClick()
 				aq:SetToTheCenter()
 			end
 
-			b.Frame.MouseButton1Up:Connect(function()
-				local F = tick()
-				local G = aq.Position
+			CreateLocalization.Frame.MouseButton1Up:Connect(function()
+				local CreateKeybind = tick()
+				local CreateInputEx = aq.Position
 
-				C = C + 1
+				CreateCheckbox = CreateCheckbox + 1
 
-				if C == 1 then
-					v = F
-					B = G
+				if CreateCheckbox == 1 then
+					ConfigManager = CreateKeybind
+					CreateToggle = CreateInputEx
 
 					task.spawn(function()
-						task.wait(A)
-						if C == 1 then
-							C = 0
-							B = nil
+						task.wait(CreateButtonEx)
+						if CreateCheckbox == 1 then
+							CreateCheckbox = 0
+							CreateToggle = nil
 						end
 					end)
-				elseif C == 2 then
-					if F - v <= A and G == B then
+				elseif CreateCheckbox == 2 then
+					if CreateKeybind - ConfigManager <= CreateButtonEx and CreateInputEx == CreateToggle then
 						onDoubleClick()
 					end
 
-					C = 0
-					B = nil
-					v = 0
+					CreateCheckbox = 0
+					CreateToggle = nil
+					ConfigManager = 0
 				else
-					C = 1
-					v = F
-					B = G
+					CreateCheckbox = 1
+					ConfigManager = CreateKeybind
+					CreateToggle = CreateInputEx
 				end
 			end)
 
 			if not aq.HideSearchBar then
-				local F = a.load("V")
-				local G = false
+				local CreateKeybind = WindUI.load("SearchModal")
+				local CreateInputEx = false
 
-				local H = ak("Search", "search", aq.UIElements.SideBarContainer, true)
-				H.Size = UDim2.new(1, -aq.UIPadding / 2, 0, 39)
-				H.Position = UDim2.new(0, aq.UIPadding / 2, 0, aq.UIPadding / 2)
+				local CreateDropdownMenu = ak("Search", "search", aq.UIElements.SideBarContainer, true)
+				CreateDropdownMenu.Size = UDim2.new(1, -aq.UIPadding / 2, 0, 39)
+				CreateDropdownMenu.Position = UDim2.new(0, aq.UIPadding / 2, 0, aq.UIPadding / 2)
 
-				ag.AddSignal(H.MouseButton1Click, function()
-					if G then
+				ag.AddSignal(CreateDropdownMenu.MouseButton1Click, function()
+					if CreateInputEx then
 						return
 					end
 
-					F.new(aq.TabModule, aq.UIElements.Main, function()
-						G = false
+					CreateKeybind.new(aq.TabModule, aq.UIElements.Main, function()
+						CreateInputEx = false
 						if aq.Resizable then
 							aq.CanResize = true
 						end
@@ -10928,16 +10982,16 @@ as, at = ap:New(ar)
 					aj(aw, 0.1, { ImageTransparency = 0.65 }):Play()
 					aw.Active = true
 
-					G = true
+					CreateInputEx = true
 					aq.CanResize = false
 				end)
 			end
 
-			function aq.DisableTopbarButtons(F, G)
-				for H, J in next, G do
-					for L, M in next, aq.TopBarButtons do
-						if M.Name == J then
-							M.Object.Visible = false
+			function aq.DisableTopbarButtons(CreateKeybind, CreateInputEx)
+				for CreateDropdownMenu, LuaHighlighter in next, CreateInputEx do
+					for CreateCode, CreateColorpicker in next, aq.TopBarButtons do
+						if CreateColorpicker.Name == LuaHighlighter then
+							CreateColorpicker.Object.Visible = false
 						end
 					end
 				end
@@ -10950,9 +11004,9 @@ end
 local ac = {
 	Window = nil,
 	Theme = nil,
-	Creator = a.load("a"),
-	LocalizationModule = a.load("b"),
-	NotificationModule = a.load("c"),
+	Creator = WindUI.load("WindUI"),
+	LocalizationModule = WindUI.load("CreateLocalization"),
+	NotificationModule = WindUI.load("CreateNotification"),
 	Themes = nil,
 	Transparent = false,
 
@@ -10962,19 +11016,19 @@ local ac = {
 
 	Version = "0.0.0",
 
-	Services = a.load("g"),
+	Services = WindUI.load("LoadKeyServices"),
 
 	OnThemeChangeFunction = nil,
 }
 
 local ae = game:GetService("HttpService")
 
-local ag = ae:JSONDecode(a.load("h"))
+local ag = ae:JSONDecode(WindUI.load("LoadPackageJson"))
 if ag then
 	ac.Version = ag.version
 end
 
-local ai = a.load("l")
+local ai = WindUI.load("CreateKeySystem")
 local aj = 
 ac.Services
 
@@ -10983,7 +11037,7 @@ local ak = ac.Creator
 local al = ak.New
 local am = ak.Tween
 
-local an = a.load("p")
+local an = WindUI.load("AcrylicManager")
 local ao = 
 game:GetService("Players") and game:GetService("Players").LocalPlayer or nil
 
@@ -11148,10 +11202,10 @@ end
 
 function ac.Popup(as, at)
 	at.WindUI = ac
-	return a.load("q").new(at)
+	return WindUI.load("CreatePopup").new(at)
 end
 
-ac.Themes = a.load("r")(ac)
+ac.Themes = WindUI.load("LoadAllThemes")(ac)
 
 ak.Themes = ac.Themes
 
@@ -11159,7 +11213,7 @@ ac:SetTheme("Dark")
 ac:SetLanguage(ak.Language)
 
 function ac.CreateWindow(as, at)
-	local av = a.load("W")
+	local av = WindUI.load("WindowBuilder")
 
 	if not isfolder("WindUI") then
 		makefolder("WindUI")
@@ -11221,16 +11275,16 @@ function ac.CreateWindow(as, at)
 				local aC = false
 
 				for aD, aE in next, at.KeySystem.API do
-					local b = ac.Services[aE.Type]
-					if b then
-						local e = {}
-						for g, h in next, b.Args do
-							table.insert(e, aE[h])
+					local CreateLocalization = ac.Services[aE.Type]
+					if CreateLocalization then
+						local CreatePandaDev = {}
+						for LoadKeyServices, LoadPackageJson in next, CreateLocalization.Args do
+							table.insert(CreatePandaDev, aE[LoadPackageJson])
 						end
 
-						local i = b.New(table.unpack(e))
-						local j = i.Verify(aB)
-						if j then
+						local CreateButton = CreateLocalization.New(table.unpack(CreatePandaDev))
+						local CreateInput = CreateButton.Verify(aB)
+						if CreateInput then
 							aC = true
 							break
 						end
