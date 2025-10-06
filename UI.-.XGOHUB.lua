@@ -2535,7 +2535,6 @@ Library.LocalPlayer = game:GetService("Players").LocalPlayer
 Library.CoreGui = (game:FindFirstChild("CoreGui") and Library.Cloneref(game:GetService("CoreGui")))
 	or Library.LocalPlayer.PlayerGui
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
-
 Library.SizeLibrary = {
     Default = UDim2.fromOffset(460, 308),
     Auth    = UDim2.new(0.05, 200, 0.05, 100),
@@ -2545,14 +2544,20 @@ Library.SizeLibrary = {
 }
 
 Library.Theme = {}
+Library.Colors = {
+    Hightlight = Color3.fromRGB(0,255,255),
+    Default    = Color3.fromRGB(32,33,36),
+    Disable    = Color3.fromRGB(167,173,188),
+    TextColor  = Color3.fromRGB(220,224,234),
+}
 
 function Library:AddTheme(name, h, d, ds, t)
-    self.Theme[name] = function()
+    self.Theme[name] = function(_self)
         Library.Colors = {
-            Hightlight = Color3.fromRGB(h>>16, h>>8&0xFF, h&0xFF),
-            Default    = Color3.fromRGB(d>>16, d>>8&0xFF, d&0xFF),
-            Disable    = Color3.fromRGB(ds>>16,ds>>8&0xFF,ds&0xFF),
-            TextColor  = Color3.fromRGB(t>>16, t>>8&0xFF, t&0xFF),
+            Hightlight = Color3.fromRGB(bit.rshift(h,16), bit.band(bit.rshift(h,8),0xFF), bit.band(h,0xFF)),
+            Default    = Color3.fromRGB(bit.rshift(d,16), bit.band(bit.rshift(d,8),0xFF), bit.band(d,0xFF)),
+            Disable    = Color3.fromRGB(bit.rshift(ds,16),bit.band(bit.rshift(ds,8),0xFF),bit.band(ds,0xFF)),
+            TextColor  = Color3.fromRGB(bit.rshift(t,16), bit.band(bit.rshift(t,8),0xFF), bit.band(t,0xFF)),
         }
     end
 end
@@ -2609,6 +2614,15 @@ Library:AddTheme("Elegant"        ,0xFFC107,0x461E14,0xC8A078,0xFFFFFF)
 Library:AddTheme("ChineseNewYear" ,0xFF0000,0xFFA500,0xFFD7CD,0x000000)
 Library:AddTheme("Celebration"    ,0xFA0101,0xFF0000,0xFFC0CB,0x000000)
 
+function Library.Theme:Custom(Hightlight, Default, Disable, TextColor)
+    Library.Colors = {
+        Hightlight = Hightlight,
+        Default    = Default,
+        Disable    = Disable,
+        TextColor  = TextColor,
+    }
+end
+
 function Library.Theme:RandomColor()
     local r = function() return math.random(0,255) end
     Library.Colors = {
@@ -2618,6 +2632,7 @@ function Library.Theme:RandomColor()
         TextColor  = Color3.fromRGB(r(),r(),r()),
     }
 end
+
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 function Library.Theme:Random()
 	local RNG = Random.new()
