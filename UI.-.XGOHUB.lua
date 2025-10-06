@@ -1,6 +1,7 @@
 -- 此源码不加密 | 也尽量保持更新 | UI.XGO修改更新 | 以内置独家水印 --
 -- UI版本: v2
 
+--  修复针对F9无限报错问题 // 增加粒子动态特效
 --  懒得更
 
 local a = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
@@ -10,12 +11,15 @@ local b = a.Value or 0
 b = b + 1
 a.Value = b
 local function c(d)
-	game.StarterGui:SetCore("SendNotification", {
-		Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
-		Text = d,
-		Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
-		Duration = 1.5,
-	})
+	game.StarterGui:SetCore(
+		"SendNotification",
+		{
+			Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
+			Text = d,
+			Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
+			Duration = 1.5,
+		}
+	)
 end
 local function e(f)
 	local g = Instance.new("Sound")
@@ -591,13 +595,8 @@ if b == 1 then
 		end)
 	end
 	_G.ThunderIntro_Stop = aD
-	local aL = {
-		rStroke = a3.Color,
-		gStroke = a6.Color,
-		titleGradient = a9.Color,
-		sub = ad.TextColor3,
-		orb = al.BackgroundColor3,
-	}
+	local aL =
+		{ rStroke = a3.Color, gStroke = a6.Color, titleGradient = a9.Color, sub = ad.TextColor3, orb = al.BackgroundColor3 }
 	local function aM(C, D, E)
 		return Color3.fromHSV(C % 1, D, E)
 	end
@@ -2537,7 +2536,9 @@ Library.CoreGui = (game:FindFirstChild("CoreGui") and Library.Cloneref(game:GetS
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 
 Library.SizeLibrary = {
+	-- 原Default：580,385 → 改小为 460,308（缩小80%）
 	Default = UDim2.fromOffset(460, 308),
+	-- 原Auth：250,125 → 改小为 200,100
 	Auth = UDim2.new(0.05, 200, 0.05, 100),
 	Max = UDim2.fromScale(1, 1),
 	Loading = UDim2.new(0, 70, 0, 70),
@@ -2625,10 +2626,15 @@ function Library.Theme:Custom(Hightlight, Default, Disable, TextColor)
 	}
 end
 function Library.Theme:HightGreen()
+	-- 定义库（Library）的颜色配置表（Colors），用于"HightGreen"（高亮绿色）主题
 	Library.Colors = {
+		-- 高亮色：用于突出显示的元素（如选中状态、按钮 hover 效果等），RGB值对应亮绿色
 		Hightlight = Color3.fromRGB(0, 255, 140),
+		-- 默认色：界面基础背景色或普通元素底色，RGB值对应深暗色（接近黑色）
 		Default = Color3.fromRGB(8, 13, 12),
+		-- 禁用色：用于不可交互状态的元素（如禁用按钮、失效选项等），RGB值对应浅灰绿色
 		Disable = Color3.fromRGB(163, 188, 165),
+		-- 文本色：界面中文字的颜色，RGB值对应纯白色，确保在深色背景上清晰可见
 		TextColor = Color3.fromRGB(255, 255, 255),
 	}
 end
@@ -4063,457 +4069,382 @@ function Library:Windowxgo(setup)
 	MainFrame.ClipsDescendants = true
 	MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 	MainFrame.Size = UDim2.fromScale(0, 0)
+	
+do
+	----------------------------------------------------------------
+	local particleFolder = Instance.new("Frame")
+	particleFolder.Name  = "PlayableStars"
+	particleFolder.Parent = MainFrame
+	particleFolder.AnchorPoint = Vector2.new(0.5, 0.5)
+	particleFolder.Position = UDim2.fromScale(0.5, 0.5)
+	particleFolder.Size = UDim2.fromScale(1, 1)
+	particleFolder.BackgroundTransparency = 1
+	particleFolder.ZIndex = 5
+	particleFolder.ClipsDescendants = true
 
-	do
-		----------------------------------------------------------------
-		local particleFolder = Instance.new("Frame")
-		particleFolder.Name = "PlayableStars"
-		particleFolder.Parent = MainFrame
-		particleFolder.AnchorPoint = Vector2.new(0.5, 0.5)
-		particleFolder.Position = UDim2.fromScale(0.5, 0.5)
-		particleFolder.Size = UDim2.fromScale(1, 1)
-		particleFolder.BackgroundTransparency = 1
-		particleFolder.ZIndex = 5
-		particleFolder.ClipsDescendants = true
+	local isParticleActive = true
+	local heartbeatConnection = nil
+	local rng = Random.new()
+	local run = game:GetService("RunService")
+	local uis = game:GetService("UserInputService")
+	local guiServ = game:GetService("GuiService")
 
-		local isParticleActive = true
-		local heartbeatConnection = nil
-		local rng = Random.new()
-		local run = game:GetService("RunService")
-		local uis = game:GetService("UserInputService")
-		local guiServ = game:GetService("GuiService")
+	---------------- 参数 ----------------
+	local TOTAL_COUNT = 20
+	local FIRST_BATCH = 8
+	local FADE_DELAY  = 16
+	local SPAWN_GAP   = 3
+	local FALL_SPEED  = 0.2
+	local HORIZONTAL_RANGE = 0.6
+	local MIN_SIZE, MAX_SIZE = 8, 14
+	local MIN_ROT_SPEED, MAX_ROT_SPEED = -0.5, 0.5
+	local STAR_ELASTICITY = 0.75
+	local COLLAPSED_THRESHOLD = 50
 
-		---------------- 参数 ----------------
-		local TOTAL_COUNT = 30
-		local FIRST_BATCH = 15
-		local FADE_DELAY = 13
-		local SPAWN_GAP = 3
-		local FALL_SPEED = 0.2
-		local HORIZONTAL_RANGE = 0.6
-		local MIN_SIZE, MAX_SIZE = 8, 14
-		local MIN_ROT_SPEED, MAX_ROT_SPEED = -0.5, 0.5
-		local STAR_ELASTICITY = 0.75
-		local COLLAPSED_THRESHOLD = 50
+	-- 波纹
+	local WAVE_MAX_RADIUS = 200
+	local WAVE_DURATION   = 0.4
+	local WAVE_PUSH_SPEED = 0.6
+	local WAVE_DECAY      = 0.88
 
-		-- 波纹
-		local WAVE_MAX_RADIUS = 200
-		local WAVE_DURATION = 0.4
-		local WAVE_PUSH_SPEED = 0.6
-		local WAVE_DECAY = 0.88
+	-- 公转
+	local ORBIT_SPEED   = 1.2         -- 弧度/秒
+	local ORBIT_RADIUS  = 0.25        -- 比例半径
+	local LONG_PRESS_TIME = 0.35      -- 长按判定时间
+	------------------------------------------
 
-		-- 公转
-		local ORBIT_SPEED = 1.2 -- 弧度/秒
-		local ORBIT_RADIUS = 0.25 -- 比例半径
-		local LONG_PRESS_TIME = 0.35 -- 长按判定时间
-		------------------------------------------
+	local particles   = {}
+	local dragging    = nil
+	local secondSpawned = false
+	local starImageIds = {
+		"rbxassetid://112950808406477",
+		"rbxassetid://126585145865309",
+		"rbxassetid://140049610411995",
+		"rbxassetid://127810956322486"
+	}
 
-		local particles = {}
-		local dragging = nil
-		local secondSpawned = false
-		local starImageIds = {
-			"rbxassetid://112950808406477",
-			"rbxassetid://126585145865309",
-			"rbxassetid://140049610411995",
-			"rbxassetid://127810956322486",
+	-- 冲击波
+	local waveActive = false
+	local waveCenter = Vector2.zero
+	local waveRadius = 0
+	local waveSpeed  = WAVE_MAX_RADIUS / WAVE_DURATION
+
+	-- 长按状态
+	local pressStart  = 0
+	local longPressing = false
+	local pressConn   = nil
+	local releaseConn = nil
+
+	----------------------------------------------------------------函数
+	local function getFallInitParams()
+		local initX = rng:NextNumber(0, 1)
+		local initY = rng:NextNumber(-0.1, 0)
+		local horizontalOffset = rng:NextNumber(-HORIZONTAL_RANGE, HORIZONTAL_RANGE) * FALL_SPEED
+		local verticalSpeed = FALL_SPEED
+		return initX, initY, horizontalOffset, verticalSpeed
+	end
+
+	local function spawnStar()
+		if not isParticleActive then return end
+		local star = Instance.new("ImageLabel")
+		star.Name = "Star"
+		star.Parent = particleFolder
+		star.AnchorPoint = Vector2.new(0.5, 0.5)
+		star.BackgroundTransparency = 1
+		star.Image = starImageIds[rng:NextInteger(1, #starImageIds)]
+		star.ScaleType = Enum.ScaleType.Fit
+		star.ZIndex = 5
+
+		local s = rng:NextInteger(MIN_SIZE, MAX_SIZE)
+		star.Size = UDim2.fromOffset(s, s)
+		local r = s * 0.5
+		local initRot = rng:NextNumber(0, 360)
+		star.Rotation = initRot
+		local rotSpeed = rng:NextNumber(MIN_ROT_SPEED, MAX_ROT_SPEED)
+
+		local initX, initY, vx, vy = getFallInitParams()
+		star.Position = UDim2.new(initX, 0, initY, 0)
+		star.ImageTransparency = rng:NextNumber(0.2, 0.5)
+		star.ImageColor3 = Color3.fromHSV(rng:NextNumber(), 1, 1)
+
+		local data = {
+			obj = star, vx = vx, vy = vy, life = 0,
+			rot = initRot, rotSpeed = rotSpeed, r = r,
+			waveVx = 0, waveVy = 0,
+			-- 公转
+			orbitAngle = rng:NextNumber(0, 2*math.pi),
+			orbitRadius = rng:NextNumber(ORBIT_RADIUS*0.7, ORBIT_RADIUS),
+			orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
 		}
 
-		-- 冲击波
-		local waveActive = false
-		local waveCenter = Vector2.zero
-		local waveRadius = 0
-		local waveSpeed = WAVE_MAX_RADIUS / WAVE_DURATION
-
-		-- 长按状态
-		local pressStart = 0
-		local longPressing = false
-		local pressConn = nil
-		local releaseConn = nil
-
-		----------------------------------------------------------------函数
-		local function getFallInitParams()
-			local initX = rng:NextNumber(0, 1)
-			local initY = rng:NextNumber(-0.1, 0)
-			local horizontalOffset = rng:NextNumber(-HORIZONTAL_RANGE, HORIZONTAL_RANGE) * FALL_SPEED
-			local verticalSpeed = FALL_SPEED
-			return initX, initY, horizontalOffset, verticalSpeed
+		-- 拖拽
+		local function onPress(input)
+			if not isParticleActive then return end
+			if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+				dragging = data
+				data.vx, data.vy = 0, 0
+			end
 		end
-
-		local function spawnStar()
-			if not isParticleActive then
-				return
+		local function onMove(input)
+			if not isParticleActive then return end
+			if dragging == data then
+				local pos = uis:GetMouseLocation()
+				local rel = MainFrame.AbsoluteSize
+				local x = math.clamp(pos.X - MainFrame.AbsolutePosition.X, 0, rel.X) / rel.X
+				local y = math.clamp(pos.Y - MainFrame.AbsolutePosition.Y, 0, rel.Y) / rel.Y
+				data.obj.Position = UDim2.new(x, 0, y, 0)
 			end
-			local star = Instance.new("ImageLabel")
-			star.Name = "Star"
-			star.Parent = particleFolder
-			star.AnchorPoint = Vector2.new(0.5, 0.5)
-			star.BackgroundTransparency = 1
-			star.Image = starImageIds[rng:NextInteger(1, #starImageIds)]
-			star.ScaleType = Enum.ScaleType.Fit
-			star.ZIndex = 5
-
-			local s = rng:NextInteger(MIN_SIZE, MAX_SIZE)
-			star.Size = UDim2.fromOffset(s, s)
-			local r = s * 0.5
-			local initRot = rng:NextNumber(0, 360)
-			star.Rotation = initRot
-			local rotSpeed = rng:NextNumber(MIN_ROT_SPEED, MAX_ROT_SPEED)
-
-			local initX, initY, vx, vy = getFallInitParams()
-			star.Position = UDim2.new(initX, 0, initY, 0)
-			star.ImageTransparency = rng:NextNumber(0.2, 0.5)
-			star.ImageColor3 = Color3.fromHSV(rng:NextNumber(), 1, 1)
-
-			local data = {
-				obj = star,
-				vx = vx,
-				vy = vy,
-				life = 0,
-				rot = initRot,
-				rotSpeed = rotSpeed,
-				r = r,
-				waveVx = 0,
-				waveVy = 0,
-				-- 公转
-				orbitAngle = rng:NextNumber(0, 2 * math.pi),
-				orbitRadius = rng:NextNumber(ORBIT_RADIUS * 0.7, ORBIT_RADIUS),
-				orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1),
-			}
-
-			-- 拖拽
-			local function onPress(input)
-				if not isParticleActive then
-					return
-				end
-				if
-					input.UserInputType == Enum.UserInputType.Touch
-					or input.UserInputType == Enum.UserInputType.MouseButton1
-				then
-					dragging = data
-					data.vx, data.vy = 0, 0
-				end
-			end
-			local function onMove(input)
-				if not isParticleActive then
-					return
-				end
-				if dragging == data then
-					local pos = uis:GetMouseLocation()
-					local rel = MainFrame.AbsoluteSize
-					local x = math.clamp(pos.X - MainFrame.AbsolutePosition.X, 0, rel.X) / rel.X
-					local y = math.clamp(pos.Y - MainFrame.AbsolutePosition.Y, 0, rel.Y) / rel.Y
-					data.obj.Position = UDim2.new(x, 0, y, 0)
-				end
-			end
-			local function onRelease()
-				if not isParticleActive then
-					return
-				end
-				if dragging == data then
-					dragging = nil
-					local _, _, newVx, newVy = getFallInitParams()
-					data.vx = newVx
-					data.vy = newVy
-				end
-			end
-			star.InputBegan:Connect(onPress)
-			uis.InputChanged:Connect(onMove)
-			uis.InputEnded:Connect(function(input)
-				if not isParticleActive then
-					return
-				end
-				if
-					input.UserInputType == Enum.UserInputType.Touch
-					or input.UserInputType == Enum.UserInputType.MouseButton1
-				then
-					onRelease()
-				end
-			end)
-
-			table.insert(particles, data)
-			return data
 		end
-
-		for _ = 1, FIRST_BATCH do
-			spawnStar()
+		local function onRelease()
+			if not isParticleActive then return end
+			if dragging == data then
+				dragging = nil
+				local _, _, newVx, newVy = getFallInitParams()
+				data.vx = newVx
+				data.vy = newVy
+			end
 		end
+		star.InputBegan:Connect(onPress)
+		uis.InputChanged:Connect(onMove)
+		uis.InputEnded:Connect(function(input)
+			if not isParticleActive then return end
+			if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+				onRelease()
+			end
+		end)
 
-		----------------------------------------------------------------
-		local function startWave(screenPos)
+		table.insert(particles, data)
+		return data
+	end
+
+	for _ = 1, FIRST_BATCH do
+		spawnStar()
+	end
+
+	----------------------------------------------------------------
+	local function startWave(screenPos)
+		local mainPos = MainFrame.AbsolutePosition
+		local mainSize = MainFrame.AbsoluteSize
+		local x = math.clamp((screenPos.X - mainPos.X) / mainSize.X, 0, 1)
+		local y = math.clamp((screenPos.Y - mainPos.Y) / mainSize.Y, 0, 1)
+		waveCenter = Vector2.new(x, y)
+		waveRadius = 0
+		waveActive = true
+	end
+
+	local clickLayer = Instance.new("TextButton")
+	clickLayer.Name = "WaveClickLayer"
+	clickLayer.Parent = MainFrame
+	clickLayer.Size = UDim2.fromScale(1, 1)
+	clickLayer.BackgroundTransparency = 1
+	clickLayer.Text = ""
+	clickLayer.ZIndex = 1
+	clickLayer.Active = true
+
+	clickLayer.InputBegan:Connect(function(input, gpe)
+		if gpe then return end
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			local objs = game:GetService("GuiService"):GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)
+			for _, obj in ipairs(objs) do
+				if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Active and obj ~= clickLayer then
+					return
+				end
+			end
+			startWave(input.Position)
+		end
+	end)
+	uis.InputBegan:Connect(function(input, gpe)
+		if gpe then return end
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			local mainPos = MainFrame.AbsolutePosition
 			local mainSize = MainFrame.AbsoluteSize
-			local x = math.clamp((screenPos.X - mainPos.X) / mainSize.X, 0, 1)
-			local y = math.clamp((screenPos.Y - mainPos.Y) / mainSize.Y, 0, 1)
-			waveCenter = Vector2.new(x, y)
-			waveRadius = 0
-			waveActive = true
-		end
-
-		local clickLayer = Instance.new("TextButton")
-		clickLayer.Name = "WaveClickLayer"
-		clickLayer.Parent = MainFrame
-		clickLayer.Size = UDim2.fromScale(1, 1)
-		clickLayer.BackgroundTransparency = 1
-		clickLayer.Text = ""
-		clickLayer.ZIndex = 1
-		clickLayer.Active = true
-
-		clickLayer.InputBegan:Connect(function(input, gpe)
-			if gpe then
-				return
-			end
-			if
-				input.UserInputType == Enum.UserInputType.MouseButton1
-				or input.UserInputType == Enum.UserInputType.Touch
-			then
-				local objs = game:GetService("GuiService"):GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)
-				for _, obj in ipairs(objs) do
-					if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Active and obj ~= clickLayer then
-						return
-					end
-				end
+			local x = input.Position.X - mainPos.X
+			local y = input.Position.Y - mainPos.Y
+			if x < 0 or x > mainSize.X or y < 0 or y > mainSize.Y then
 				startWave(input.Position)
 			end
-		end)
-		uis.InputBegan:Connect(function(input, gpe)
-			if gpe then
-				return
-			end
-			if
-				input.UserInputType == Enum.UserInputType.MouseButton1
-				or input.UserInputType == Enum.UserInputType.Touch
-			then
-				local mainPos = MainFrame.AbsolutePosition
-				local mainSize = MainFrame.AbsoluteSize
-				local x = input.Position.X - mainPos.X
-				local y = input.Position.Y - mainPos.Y
-				if x < 0 or x > mainSize.X or y < 0 or y > mainSize.Y then
-					startWave(input.Position)
-				end
-			end
-		end)
-
-		----------------------------------------------------------------
-		local function tryLongPress(input)
-			if
-				input.UserInputType == Enum.UserInputType.MouseButton1
-				or input.UserInputType == Enum.UserInputType.Touch
-			then
-				pressStart = tick()
-				longPressing = false
-				if pressConn then
-					pressConn:Disconnect()
-				end
-				if releaseConn then
-					releaseConn:Disconnect()
-				end
-				pressConn = run.Heartbeat:Connect(function()
-					if tick() - pressStart >= LONG_PRESS_TIME and not longPressing then
-						longPressing = true
-					end
-				end)
-				releaseConn = uis.InputEnded:Connect(function(endInput)
-					if endInput == input then
-						longPressing = false
-						if pressConn then
-							pressConn:Disconnect()
-							pressConn = nil
-						end
-						if releaseConn then
-							releaseConn:Disconnect()
-							releaseConn = nil
-						end
-					end
-				end)
-			end
 		end
-		uis.InputBegan:Connect(tryLongPress)
+	end)
 
-		----------------------------------------------------------------
-		local function particleMainLoop(dt)
-			isParticleActive = MainFrame.AbsoluteSize.Y > COLLAPSED_THRESHOLD
-			particleFolder.Visible = isParticleActive
-			if not isParticleActive then
-				return
-			end
-
-			-- 冲击波
-			if waveActive then
-				waveRadius = waveRadius + waveSpeed * dt
-				if waveRadius >= WAVE_MAX_RADIUS then
-					waveActive = false
+	----------------------------------------------------------------
+	local function tryLongPress(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			pressStart = tick()
+			longPressing = false
+			if pressConn then pressConn:Disconnect() end
+			if releaseConn then releaseConn:Disconnect() end
+			pressConn = run.Heartbeat:Connect(function()
+				if tick() - pressStart >= LONG_PRESS_TIME and not longPressing then
+					longPressing = true
 				end
-			end
-
-			local cx, cy = 0.5, 0.5
-
-			for _, p in ipairs(particles) do
-				if waveActive then
-					local px = p.obj.Position.X.Scale
-					local py = p.obj.Position.Y.Scale
-					local dx = px - waveCenter.X
-					local dy = py - waveCenter.Y
-					local dist = math.sqrt(dx * dx + dy * dy) * MainFrame.AbsoluteSize.X
-					if dist < waveRadius and dist > 0 then
-						local nx, ny = dx / (dist / MainFrame.AbsoluteSize.X), dy / (dist / MainFrame.AbsoluteSize.X)
-						local push = (1 - dist / waveRadius) * WAVE_PUSH_SPEED
-						p.waveVx = p.waveVx + nx * push
-						p.waveVy = p.waveVy + ny * push
-					end
+			end)
+			releaseConn = uis.InputEnded:Connect(function(endInput)
+				if endInput == input then
+					longPressing = false
+					if pressConn then pressConn:Disconnect(); pressConn = nil end
+					if releaseConn then releaseConn:Disconnect(); releaseConn = nil end
 				end
-				p.waveVx = p.waveVx * WAVE_DECAY
-				p.waveVy = p.waveVy * WAVE_DECAY
-
-				-- 长按公转模式
-				if longPressing then
-					p.orbitAngle = p.orbitAngle + p.orbitSpeed * dt
-					local ox = cx + math.cos(p.orbitAngle) * p.orbitRadius
-					local oy = cy + math.sin(p.orbitAngle) * p.orbitRadius
-					p.obj.Position = UDim2.new(ox, 0, oy, 0)
-					p.vx, p.vy = 0, 0
-					p.waveVx, p.waveVy = 0, 0
-				else
-					-- 正常运动
-					local totalVx = p.vx + p.waveVx
-					local totalVy = p.vy + p.waveVy
-					if dragging ~= p then
-						local x = p.obj.Position.X.Scale + totalVx * dt
-						local y = p.obj.Position.Y.Scale + totalVy * dt
-						-- 边缘反弹
-						if x < 0 then
-							x = 0
-							totalVx = -totalVx * STAR_ELASTICITY
-							p.waveVx = -p.waveVx * STAR_ELASTICITY
-						end
-						if x > 1 then
-							x = 1
-							totalVx = -totalVx * STAR_ELASTICITY
-							p.waveVx = -p.waveVx * STAR_ELASTICITY
-						end
-						if y < 0 then
-							y = 0
-							totalVy = -totalVy * STAR_ELASTICITY
-							p.waveVy = -p.waveVy * STAR_ELASTICITY
-						end
-						if y > 1 then
-							y = 1
-							totalVy = -totalVy * STAR_ELASTICITY
-							p.waveVy = -p.waveVy * STAR_ELASTICITY
-						end
-						p.obj.Position = UDim2.new(x, 0, y, 0)
-					end
-					p.vx = totalVx - p.waveVx
-					p.vy = totalVy - p.waveVy
-				end
-
-				p.rot = p.rot + p.rotSpeed * dt
-				p.obj.Rotation = p.rot
-
-				p.life = p.life + dt
-				if p.life > FADE_DELAY then
-					local t = p.obj.ImageTransparency + dt * 0.8
-					p.obj.ImageTransparency = math.min(1, t)
-					if t >= 1 then
-						local initX, initY, newVx, newVy = getFallInitParams()
-						p.obj.Position = UDim2.new(initX, 0, initY, 0)
-						p.obj.ImageTransparency = rng:NextNumber(0.2, 0.5)
-						p.life = 0
-						p.rot = rng:NextNumber(0, 360)
-						p.obj.Rotation = p.rot
-						p.vx = newVx
-						p.vy = newVy
-						p.waveVx, p.waveVy = 0, 0
-						-- 公转参数重新随机
-						p.orbitAngle = rng:NextNumber(0, 2 * math.pi)
-						p.orbitRadius = rng:NextNumber(ORBIT_RADIUS * 0.7, ORBIT_RADIUS)
-						p.orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
-					end
-				end
-			end
-
-			-- 第二段生成
-			if not secondSpawned then
-				local oldest = 0
-				for i = 1, FIRST_BATCH do
-					oldest = math.max(oldest, particles[i] and particles[i].life or 0)
-				end
-				if oldest >= FADE_DELAY - SPAWN_GAP then
-					secondSpawned = true
-					for i = 1, TOTAL_COUNT - FIRST_BATCH do
-						task.wait(0.15)
-						spawnStar()
-					end
-				end
-			end
-
-			-- 碰撞
-			for i = 1, #particles do
-				local a = particles[i]
-				if dragging == a or longPressing then
-					continue
-				end
-				local ax = a.obj.Position.X.Scale
-				local ay = a.obj.Position.Y.Scale
-				local ar = a.r / MainFrame.AbsoluteSize.X
-				for j = i + 1, #particles do
-					local b = particles[j]
-					if dragging == b or longPressing then
-						continue
-					end
-					local bx = b.obj.Position.X.Scale
-					local by = b.obj.Position.Y.Scale
-					local br = b.r / MainFrame.AbsoluteSize.X
-					local dx, dy = bx - ax, by - ay
-					local dist2 = dx * dx + dy * dy
-					local rad = ar + br
-					if dist2 < rad * rad and dist2 > 0 then
-						local dist = math.sqrt(dist2)
-						local nx, ny = dx / dist, dy / dist
-						local overlap = rad - dist
-						local ax_new = ax - nx * overlap * 0.5
-						local ay_new = ay - ny * overlap * 0.5
-						local bx_new = bx + nx * overlap * 0.5
-						local by_new = by + ny * overlap * 0.5
-						a.obj.Position = UDim2.new(ax_new, 0, ay_new, 0)
-						b.obj.Position = UDim2.new(bx_new, 0, by_new, 0)
-						local dvx = b.vx - a.vx
-						local dvy = b.vy - a.vy
-						local dvn = dvx * nx + dvy * ny
-						if dvn > 0 then
-							continue
-						end
-						local impulse = 2 * dvn / 2 * STAR_ELASTICITY
-						local ix, iy = impulse * nx, impulse * ny
-						a.vx = a.vx + ix
-						a.vy = a.vy + iy
-						b.vx = b.vx - ix
-						b.vy = b.vy - iy
-					end
-				end
-			end
+			end)
 		end
-
-		----------------------------------------------------------------
-		local function onClose()
-			if heartbeatConnection then
-				heartbeatConnection:Disconnect()
-			end
-			particleFolder:Destroy()
-			if clickLayer then
-				clickLayer:Destroy()
-			end
-		end
-
-		local oldStop = _G.ThunderIntro_Stop or function() end
-		_G.ThunderIntro_Stop = function()
-			oldStop()
-			onClose()
-		end
-
-		----------------------------------------------------------------
-		task.defer(function()
-			heartbeatConnection = run.Heartbeat:Connect(particleMainLoop)
-		end)
 	end
+	uis.InputBegan:Connect(tryLongPress)
+
+	----------------------------------------------------------------
+	local function particleMainLoop(dt)
+		isParticleActive = MainFrame.AbsoluteSize.Y > COLLAPSED_THRESHOLD
+		particleFolder.Visible = isParticleActive
+		if not isParticleActive then return end
+
+		-- 冲击波
+		if waveActive then
+			waveRadius = waveRadius + waveSpeed * dt
+			if waveRadius >= WAVE_MAX_RADIUS then waveActive = false end
+		end
+
+		local cx, cy = 0.5, 0.5
+
+		for _, p in ipairs(particles) do
+			if waveActive then
+				local px = p.obj.Position.X.Scale
+				local py = p.obj.Position.Y.Scale
+				local dx = px - waveCenter.X
+				local dy = py - waveCenter.Y
+				local dist = math.sqrt(dx*dx + dy*dy) * MainFrame.AbsoluteSize.X
+				if dist < waveRadius and dist > 0 then
+					local nx, ny = dx / (dist / MainFrame.AbsoluteSize.X), dy / (dist / MainFrame.AbsoluteSize.X)
+					local push = (1 - dist / waveRadius) * WAVE_PUSH_SPEED
+					p.waveVx = p.waveVx + nx * push
+					p.waveVy = p.waveVy + ny * push
+				end
+			end
+			p.waveVx = p.waveVx * WAVE_DECAY
+			p.waveVy = p.waveVy * WAVE_DECAY
+
+			-- 长按公转模式
+			if longPressing then
+				p.orbitAngle = p.orbitAngle + p.orbitSpeed * dt
+				local ox = cx + math.cos(p.orbitAngle) * p.orbitRadius
+				local oy = cy + math.sin(p.orbitAngle) * p.orbitRadius
+				p.obj.Position = UDim2.new(ox, 0, oy, 0)
+				p.vx, p.vy = 0, 0
+				p.waveVx, p.waveVy = 0, 0
+			else
+				-- 正常运动
+				local totalVx = p.vx + p.waveVx
+				local totalVy = p.vy + p.waveVy
+				if dragging ~= p then
+					local x = p.obj.Position.X.Scale + totalVx * dt
+					local y = p.obj.Position.Y.Scale + totalVy * dt
+					-- 边缘反弹
+					if x < 0 then x = 0; totalVx = -totalVx * STAR_ELASTICITY; p.waveVx = -p.waveVx * STAR_ELASTICITY end
+					if x > 1 then x = 1; totalVx = -totalVx * STAR_ELASTICITY; p.waveVx = -p.waveVx * STAR_ELASTICITY end
+					if y < 0 then y = 0; totalVy = -totalVy * STAR_ELASTICITY; p.waveVy = -p.waveVy * STAR_ELASTICITY end
+					if y > 1 then y = 1; totalVy = -totalVy * STAR_ELASTICITY; p.waveVy = -p.waveVy * STAR_ELASTICITY end
+					p.obj.Position = UDim2.new(x, 0, y, 0)
+				end
+				p.vx = totalVx - p.waveVx
+				p.vy = totalVy - p.waveVy
+			end
+
+			p.rot = p.rot + p.rotSpeed * dt
+			p.obj.Rotation = p.rot
+
+			p.life = p.life + dt
+			if p.life > FADE_DELAY then
+				local t = p.obj.ImageTransparency + dt * 0.8
+				p.obj.ImageTransparency = math.min(1, t)
+				if t >= 1 then
+					local initX, initY, newVx, newVy = getFallInitParams()
+					p.obj.Position = UDim2.new(initX, 0, initY, 0)
+					p.obj.ImageTransparency = rng:NextNumber(0.2, 0.5)
+					p.life = 0
+					p.rot = rng:NextNumber(0, 360)
+					p.obj.Rotation = p.rot
+					p.vx = newVx
+					p.vy = newVy
+					p.waveVx, p.waveVy = 0, 0
+					-- 公转参数重新随机
+					p.orbitAngle = rng:NextNumber(0, 2*math.pi)
+					p.orbitRadius = rng:NextNumber(ORBIT_RADIUS*0.7, ORBIT_RADIUS)
+					p.orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
+				end
+			end
+		end
+
+		-- 第二段生成
+		if not secondSpawned then
+			local oldest = 0
+			for i = 1, FIRST_BATCH do
+				oldest = math.max(oldest, particles[i] and particles[i].life or 0)
+			end
+			if oldest >= FADE_DELAY - SPAWN_GAP then
+				secondSpawned = true
+				for i = 1, TOTAL_COUNT - FIRST_BATCH do
+					task.wait(0.15)
+					spawnStar()
+				end
+			end
+		end
+
+		-- 碰撞
+		for i = 1, #particles do
+			local a = particles[i]
+			if dragging == a or longPressing then continue end
+			local ax = a.obj.Position.X.Scale
+			local ay = a.obj.Position.Y.Scale
+			local ar = a.r / MainFrame.AbsoluteSize.X
+			for j = i + 1, #particles do
+				local b = particles[j]
+				if dragging == b or longPressing then continue end
+				local bx = b.obj.Position.X.Scale
+				local by = b.obj.Position.Y.Scale
+				local br = b.r / MainFrame.AbsoluteSize.X
+				local dx, dy = bx - ax, by - ay
+				local dist2 = dx*dx + dy*dy
+				local rad = ar + br
+				if dist2 < rad*rad and dist2 > 0 then
+					local dist = math.sqrt(dist2)
+					local nx, ny = dx / dist, dy / dist
+					local overlap = rad - dist
+					local ax_new = ax - nx * overlap * 0.5
+					local ay_new = ay - ny * overlap * 0.5
+					local bx_new = bx + nx * overlap * 0.5
+					local by_new = by + ny * overlap * 0.5
+					a.obj.Position = UDim2.new(ax_new, 0, ay_new, 0)
+					b.obj.Position = UDim2.new(bx_new, 0, by_new, 0)
+					local dvx = b.vx - a.vx
+					local dvy = b.vy - a.vy
+					local dvn = dvx*nx + dvy*ny
+					if dvn > 0 then continue end
+					local impulse = 2 * dvn / 2 * STAR_ELASTICITY
+					local ix, iy = impulse * nx, impulse * ny
+					a.vx = a.vx + ix
+					a.vy = a.vy + iy
+					b.vx = b.vx - ix
+					b.vy = b.vy - iy
+				end
+			end
+		end
+	end
+
+	----------------------------------------------------------------
+	local function onClose()
+		if heartbeatConnection then heartbeatConnection:Disconnect() end
+		particleFolder:Destroy()
+		if clickLayer then clickLayer:Destroy() end
+	end
+
+	local oldStop = _G.ThunderIntro_Stop or function() end
+	_G.ThunderIntro_Stop = function()
+		oldStop()
+		onClose()
+	end
+
+	----------------------------------------------------------------
+	task.defer(function()
+		heartbeatConnection = run.Heartbeat:Connect(particleMainLoop)
+	end)
+end
 
 	initBackgrounds()
 
@@ -6154,11 +6085,13 @@ function Library:Windowxgo(setup)
 
 			return RootSkid
 		end
-		------ // 颜色选择器 未修改完 暂无法使用  ----------------------------------------------------------------------------------------
+		------ // 颜色选择器   ----------------------------------------------------------------------------------------
+		-- 补充颜色打包工具函数（适配配置保存）
 		local function PackColor(color)
 			return { R = color.R * 255, G = color.G * 255, B = color.B * 255 }
 		end
 
+		-- 配置保存函数（适配原UI库）
 		local function SaveConfiguration()
 			if not CEnabled then
 				return
@@ -6200,7 +6133,8 @@ function Library:Windowxgo(setup)
 				end
 			end
 		end
-		
+
+		-- 修复版：按钮触发式颜色选择器（确保颜色可选择）
 		function Root:ColorPickerButton(setup)
 			setup = setup or {}
 			local cfg = {
@@ -6211,6 +6145,7 @@ function Library:Windowxgo(setup)
 				FrameSize = setup.FrameSize or UDim2.new(0, 300, 0, 220),
 			}
 
+			-- ===================== 1. 颜色选择按钮（基础组件） =====================
 			local ColorBtn = Instance.new("Frame")
 			ColorBtn.Name = "ColorPickerButton"
 			ColorBtn.Parent = ScrollingFrame
@@ -6259,6 +6194,7 @@ function Library:Windowxgo(setup)
 			BtnClick.TextTransparency = 1
 			BtnClick.ZIndex = 15
 
+			-- ===================== 2. 颜色选择框架（修复交互核心） =====================
 			local ColorFrame = Instance.new("Frame")
 			ColorFrame.Name = "ColorPickerFrame"
 			ColorFrame.Parent = ScrollingFrame
@@ -6269,6 +6205,7 @@ function Library:Windowxgo(setup)
 			ColorFrame.ZIndex = 15
 			ColorFrame.Visible = false
 			ColorFrame.ClipsDescendants = true
+			-- 关键修复：确保框架可交互
 			ColorFrame.Active = true
 
 			local FrameShadow = Instance.new("ImageLabel")
@@ -6302,6 +6239,7 @@ function Library:Windowxgo(setup)
 			FrameTitle.TextStrokeColor3 = Library.Colors.TextColor
 			FrameTitle.TextStrokeTransparency = 0.95
 
+			-- ===================== 3. 颜色选择核心（修复拖动和坐标） =====================
 			local TweenService = game:GetService("TweenService")
 			local UserInputService = game:GetService("UserInputService")
 			local RunService = game:GetService("RunService")
@@ -6309,19 +6247,21 @@ function Library:Windowxgo(setup)
 			local LocalPlayer = Players.LocalPlayer
 			local mouse = LocalPlayer:GetMouse()
 
+			-- 3.1 颜色预览区
 			local Preview = Instance.new("Frame")
 			Preview.Parent = ColorFrame
 			Preview.Position = UDim2.new(0.02, 0, 0, 40)
 			Preview.Size = UDim2.new(0.96, 0, 0, 30)
 			Preview.BackgroundColor3 = cfg.DefaultColor
 			Preview.BorderSizePixel = 0
-
+			-- 增加预览区边框，让颜色更明显
 			local PreviewStroke = Instance.new("UIStroke")
 			PreviewStroke.Parent = Preview
 			PreviewStroke.Color = Color3.fromRGB(255, 255, 255)
 			PreviewStroke.Transparency = 0.5
 			PreviewStroke.Thickness = 1
 
+			-- 3.2 色相滑块（修复拖动检测）
 			local HueSlider = Instance.new("Frame")
 			HueSlider.Name = "HueSlider"
 			HueSlider.Parent = ColorFrame
@@ -6329,6 +6269,7 @@ function Library:Windowxgo(setup)
 			HueSlider.Size = UDim2.new(0.96, 0, 0, 8)
 			HueSlider.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 			HueSlider.BackgroundTransparency = 0.1
+			-- 关键修复：滑块可交互
 			HueSlider.Active = true
 
 			local HueGradient = Instance.new("UIGradient")
@@ -6348,12 +6289,13 @@ function Library:Windowxgo(setup)
 			HuePoint.Parent = HueSlider
 			HuePoint.Size = UDim2.new(0, 16, 0, 16)
 			HuePoint.AnchorPoint = Vector2.new(0.5, 0.5)
-			HuePoint.Position = UDim2.new(0, 0, 0.5, 0)
+			HuePoint.Position = UDim2.new(0, 0, 0.5, 0) -- 初始位置
 			HuePoint.BackgroundTransparency = 1
 			HuePoint.Image = "rbxassetid://7733710700"
 			HuePoint.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			HuePoint.ZIndex = 20
 
+			-- 3.3 饱和度/明度面板（修复坐标计算）
 			local SvPanel = Instance.new("Frame")
 			SvPanel.Name = "SvPanel"
 			SvPanel.Parent = ColorFrame
@@ -6361,8 +6303,10 @@ function Library:Windowxgo(setup)
 			SvPanel.Size = UDim2.new(0.6, 0, 0, 80)
 			SvPanel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 			SvPanel.BackgroundTransparency = 0.1
+			-- 关键修复：面板可交互
 			SvPanel.Active = true
 
+			-- 修复SV面板背景（增加饱和度-明度渐变，确保颜色显示正常）
 			local SvSatGradient = Instance.new("UIGradient")
 			SvSatGradient.Parent = SvPanel
 			SvSatGradient.Color = ColorSequence.new({
@@ -6384,12 +6328,13 @@ function Library:Windowxgo(setup)
 			SvPoint.Parent = SvPanel
 			SvPoint.Size = UDim2.new(0, 14, 0, 14)
 			SvPoint.AnchorPoint = Vector2.new(0.5, 0.5)
-			SvPoint.Position = UDim2.new(1, 0, 0, 0)
+			SvPoint.Position = UDim2.new(1, 0, 0, 0) -- 初始位置（100%饱和度，100%明度）
 			SvPoint.BackgroundTransparency = 1
 			SvPoint.Image = "rbxassetid://7733710700"
 			SvPoint.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			SvPoint.ZIndex = 20
 
+			-- 3.4 RGB输入区（修复数值同步）
 			local RgbContainer = Instance.new("Frame")
 			RgbContainer.Parent = ColorFrame
 			RgbContainer.Position = UDim2.new(0.65, 0, 0, 100)
@@ -6433,6 +6378,7 @@ function Library:Windowxgo(setup)
 				InputBox.TextColor3 = Library.Colors.TextColor
 				InputBox.TextSize = 12
 				InputBox.TextXAlignment = Enum.TextXAlignment.Center
+				-- 修复：只允许输入数字
 				InputBox:GetPropertyChangedSignal("Text"):Connect(function()
 					InputBox.Text = InputBox.Text:gsub("[^0-9]", "")
 					if #InputBox.Text > 3 then
@@ -6443,6 +6389,7 @@ function Library:Windowxgo(setup)
 				table.insert(RgbInputs, InputBox)
 			end
 
+			-- 3.5 确认按钮
 			local ConfirmBtn = Instance.new("Frame")
 			ConfirmBtn.Parent = ColorFrame
 			ConfirmBtn.Position = UDim2.new(0.02, 0, 0, 190)
@@ -6470,20 +6417,27 @@ function Library:Windowxgo(setup)
 			ConfirmClick.TextTransparency = 1
 			ConfirmClick.ZIndex = 20
 
+			-- ===================== 4. 修复颜色选择逻辑 =====================
 			local isFrameOpen = false
 			local h, s, v = cfg.DefaultColor:ToHSV()
 			local currentColor = cfg.DefaultColor
 
+			-- 修复：初始化UI（确保坐标和数值正确）
 			local function updateColorUI()
+				-- 1. 更新预览色
 				Preview.BackgroundColor3 = currentColor
+				-- 2. 更新色相滑块（关键：用绝对坐标计算，避免相对坐标错误）
 				local huePointX = math.clamp(h * HueSlider.AbsoluteSize.X, 0, HueSlider.AbsoluteSize.X)
 				HuePoint.Position = UDim2.new(0, huePointX, 0.5, 0)
+				-- 3. 更新SV面板（关键：修复饱和度/明度对应的坐标）
 				local svPointX = math.clamp(s * SvPanel.AbsoluteSize.X, 0, SvPanel.AbsoluteSize.X)
 				local svPointY = math.clamp((1 - v) * SvPanel.AbsoluteSize.Y, 0, SvPanel.AbsoluteSize.Y)
 				SvPoint.Position = UDim2.new(0, svPointX, 0, svPointY)
+				-- 4. 更新RGB输入框
 				local r = math.floor(currentColor.R * 255)
 				local g = math.floor(currentColor.G * 255)
 				local b = math.floor(currentColor.B * 255)
+				-- 避免输入框频繁刷新导致闪烁
 				if RgbInputs[1].Text ~= tostring(r) then
 					RgbInputs[1].Text = tostring(r)
 				end
@@ -6493,17 +6447,21 @@ function Library:Windowxgo(setup)
 				if RgbInputs[3].Text ~= tostring(b) then
 					RgbInputs[3].Text = tostring(b)
 				end
+				-- 5. 更新SV面板的色相叠加（让面板显示当前色相的饱和度-明度变化）
 				SvSatGradient.Color = ColorSequence.new({
 					ColorSequenceKeypoint.new(0, Color3.fromHSV(h, 0, 1)),
 					ColorSequenceKeypoint.new(1, Color3.fromHSV(h, 1, 1)),
 				})
 			end
+			-- 初始执行一次，确保UI正确
 			updateColorUI()
 
+			-- 修复：按钮点击展开/收起
 			BtnClick.MouseButton1Click:Connect(function()
 				isFrameOpen = not isFrameOpen
 				if isFrameOpen then
 					ColorFrame.Visible = true
+					-- 确保框架在按钮下方（用绝对位置避免滚动后错位）
 					local btnBottomY = ColorBtn.AbsolutePosition.Y + ColorBtn.AbsoluteSize.Y
 					ColorFrame.Position = UDim2.new(0, ColorBtn.AbsolutePosition.X, 0, btnBottomY + 10)
 					TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
@@ -6520,13 +6478,16 @@ function Library:Windowxgo(setup)
 				end
 			end)
 
+			-- 修复：色相滑块拖动（增加InputBegan/InputEnded直接绑定到滑块）
 			local isHueDragging = false
+			-- 用InputBegan替代MouseButton1Down，兼容触摸和鼠标
 			HueSlider.InputBegan:Connect(function(input)
 				if
 					input.UserInputType == Enum.UserInputType.MouseButton1
 					or input.UserInputType == Enum.UserInputType.Touch
 				then
 					isHueDragging = true
+					-- 拖动时立即更新一次，避免延迟
 					local sliderX =
 						math.clamp(input.Position.X - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
 					h = sliderX / HueSlider.AbsoluteSize.X
@@ -6535,6 +6496,7 @@ function Library:Windowxgo(setup)
 				end
 			end)
 
+			-- 修复：SV面板拖动
 			local isSvDragging = false
 			SvPanel.InputBegan:Connect(function(input)
 				if
@@ -6542,6 +6504,7 @@ function Library:Windowxgo(setup)
 					or input.UserInputType == Enum.UserInputType.Touch
 				then
 					isSvDragging = true
+					-- 拖动时立即更新
 					local panelX = math.clamp(input.Position.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
 					local panelY = math.clamp(input.Position.Y - SvPanel.AbsolutePosition.Y, 0, SvPanel.AbsoluteSize.Y)
 					s = panelX / SvPanel.AbsoluteSize.X
@@ -6551,6 +6514,7 @@ function Library:Windowxgo(setup)
 				end
 			end)
 
+			-- 修复：输入结束后取消拖动状态
 			UserInputService.InputEnded:Connect(function(input)
 				if
 					input.UserInputType == Enum.UserInputType.MouseButton1
@@ -6561,11 +6525,15 @@ function Library:Windowxgo(setup)
 				end
 			end)
 
+			-- 修复：实时拖动更新（用RenderStepped确保流畅）
 			RunService.RenderStepped:Connect(function()
 				if not isFrameOpen then
 					return
-				end
+				end -- 框架关闭时不执行
+
+				-- 1. 色相拖动更新
 				if isHueDragging then
+					-- 用鼠标绝对位置计算，避免InputChanged延迟
 					local mouseX = UserInputService:GetMouseLocation().X
 					local sliderX = math.clamp(mouseX - HueSlider.AbsolutePosition.X, 0, HueSlider.AbsoluteSize.X)
 					h = sliderX / HueSlider.AbsoluteSize.X
@@ -6573,6 +6541,7 @@ function Library:Windowxgo(setup)
 					updateColorUI()
 				end
 
+				-- 2. SV拖动更新
 				if isSvDragging then
 					local mousePos = UserInputService:GetMouseLocation()
 					local panelX = math.clamp(mousePos.X - SvPanel.AbsolutePosition.X, 0, SvPanel.AbsoluteSize.X)
@@ -6584,6 +6553,7 @@ function Library:Windowxgo(setup)
 				end
 			end)
 
+			-- 修复：RGB输入框更新颜色
 			local function updateColorFromRGB()
 				local r = tonumber(RgbInputs[1].Text) or 255
 				local g = tonumber(RgbInputs[2].Text) or 255
@@ -6592,23 +6562,29 @@ function Library:Windowxgo(setup)
 				g = math.clamp(g, 0, 255)
 				b = math.clamp(b, 0, 255)
 				currentColor = Color3.fromRGB(r, g, b)
+				-- 同步色相/饱和度/明度，确保滑块和面板同步
 				h, s, v = currentColor:ToHSV()
 				updateColorUI()
 			end
+			-- 给每个输入框绑定失去焦点事件
 			for _, box in ipairs(RgbInputs) do
 				box.FocusLost:Connect(updateColorFromRGB)
+				-- 增加回车确认（优化体验）
 				box.Focused:Connect(function()
 					box.Changed:Connect(function(property)
 						if property == "Text" then
+							-- 输入时实时更新（可选，优化体验）
 							updateColorFromRGB()
 						end
 					end)
 				end)
 			end
 
+			-- 确认按钮逻辑
 			ConfirmClick.MouseButton1Click:Connect(function()
 				cfg.Callback(currentColor)
 				SaveConfiguration()
+				-- 收起框架
 				isFrameOpen = false
 				TweenService:Create(ColorFrame, Library.TweenLibrary.SmallEffect, {
 					BackgroundTransparency = 1,
@@ -6617,7 +6593,8 @@ function Library:Windowxgo(setup)
 				ColorFrame.Visible = false
 				BtnStroke.Transparency = 0.85
 			end)
-			
+
+			-- ===================== 5. 外部接口 =====================
 			local api = {}
 			function api:SetColor(color)
 				currentColor = color
@@ -6837,7 +6814,8 @@ function Library:Windowxgo(setup)
 			return RootSkid
 		end
 
-		Library = Library or {}
+		------ // 切换按钮  ----------------------------------------------------------------------------------------
+Library = Library or {}
 
 function Library.ToggleCore(setup, skin)
     setup.Title    = setup.Title   or "切换按钮"
@@ -9315,7 +9293,6 @@ end
 			end
 		end
 	end)
-
 	do
 		local infoIco = Instance.new("ImageButton")
 		local card = Instance.new("Frame")
