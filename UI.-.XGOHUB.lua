@@ -2536,111 +2536,41 @@ Library.CoreGui = (game:FindFirstChild("CoreGui") and Library.Cloneref(game:GetS
 	or Library.LocalPlayer.PlayerGui
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 
-Library.SizeLibrary = {
-    Default = UDim2.fromOffset(460, 308),
-    Auth    = UDim2.new(0.05, 200, 0.05, 100),
-    Max     = UDim2.fromScale(1, 1),
-    Loading = UDim2.new(0, 70, 0, 70),
-    Close   = UDim2.new(0.01, 25, 0.01, 25),
-}
+local HttpService = game:GetService("HttpService")
 
-Library.Theme = {}
-Library.Colors = {
-    Hightlight = Color3.fromRGB(0, 255, 255),
-    Default    = Color3.fromRGB(32, 33, 36),
-    Disable    = Color3.fromRGB(167, 173, 188),
-    TextColor  = Color3.fromRGB(220, 224, 234),
-}
+local jsonSuccess, themeData = pcall(function()
+    return HttpService:JSONDecode(
+        game:HttpGetAsync("https://raw.githubusercontent.com/GTAFAW/UI/refs/heads/main/themse.json")
+    )
+end)
 
-local function hexToRgb(hex)
-    local hexStr = string.format("%06X", hex)
-    local r = tonumber(string.sub(hexStr, 1, 2), 16)
-    local g = tonumber(string.sub(hexStr, 3, 4), 16)
-    local b = tonumber(string.sub(hexStr, 5, 6), 16)
-    return Color3.fromRGB(r, g, b)
+if not jsonSuccess or type(themeData) ~= "table" then
+    warn("⚠️  远程主题加载失败，使用本地默认配置")
+    themeData = {
+        Default = {
+            Hightlight  = { 0 , 255 , 255 },
+            Default     = { 32, 33  , 36  },
+            Disable     = { 167,173 , 188 },
+            TextColor   = { 220,224 , 234 }
+        }
+    }
 end
 
-function Library:AddTheme(name, hHex, dHex, dsHex, tHex)
-    self.Theme[name] = function()
-        Library.Colors = {
-            Hightlight = hexToRgb(hHex),
-            Default    = hexToRgb(dHex),
-            Disable    = hexToRgb(dsHex),
-            TextColor  = hexToRgb(tHex),
-        }
+local function injectThemes()
+    for name, rgbTable in pairs(themeData) do
+        Library.Theme[name] = function()
+            Library.Colors = {
+                Hightlight  = Color3.fromRGB(unpack(rgbTable.Hightlight)),
+                Default     = Color3.fromRGB(unpack(rgbTable.Default)),
+                Disable     = Color3.fromRGB(unpack(rgbTable.Disable)),
+                TextColor   = Color3.fromRGB(unpack(rgbTable.TextColor))
+            }
+        end
     end
 end
 
-Library:AddTheme("Default"        , 0x00FFFF, 0x202124, 0xA7ADBC, 0xDCE0EA)
-Library:AddTheme("Dark"           , 0xFFFFFF, 0x141416, 0xA7ADBC, 0xDCE0EA)
-Library:AddTheme("Discord"        , 0x7289DA, 0x232528, 0xA7ADBC, 0xEAEAEA)
-Library:AddTheme("Discord1"       , 0x0073FF, 0xC6D3E5, 0x4A4D53, 0x000000)
-Library:AddTheme("Catppuccin"     , 0xC9A5F5, 0x1E1F2F, 0x6D7B9A, 0xCCCCCC)
-Library:AddTheme("Discord2"       , 0x5AD4B0, 0x16191D, 0x484853, 0xBFC1C3)
-Library:AddTheme("Matcha"         , 0x98846E, 0x263137, 0x3E5352, 0xA5B2AF)
-Library:AddTheme("Neverlose"      , 0x00FBFF, 0x000D1A, 0xA7ADBC, 0xFFFFFF)
-Library:AddTheme("HightGreen"     , 0x00FF8C, 0x080D0C, 0xA3BCA5, 0xFFFFFF)
-Library:AddTheme("Halloween"      , 0xFFA200, 0x0D0B0A, 0xBC9C9C, 0xFF0000)
-Library:AddTheme("Christmas"      , 0x8ADCFF, 0x0B0D0D, 0x516768, 0xF9F9F9)
-Library:AddTheme("Valentine"      , 0xFF0080, 0xC80F64, 0xCEA2A8, 0xFFFFFF)
-Library:AddTheme("Summer"         , 0x00FF7F, 0x008066, 0xADD8E6, 0xFFFFFF)
-Library:AddTheme("Autumn"         , 0xFF8C00, 0x8B4513, 0xBC8F8F, 0xFFFFFF)
-Library:AddTheme("Winter"         , 0xADD8E6, 0x4682B4, 0xC7DBF9, 0x000000)
-Library:AddTheme("Ocean"          , 0x009688, 0x003333, 0x6699FF, 0xFFFFFF)
-Library:AddTheme("Nord"           , 0x88C0D0, 0x2E3440, 0x586E75, 0xD8DEE3)
-Library:AddTheme("Mint"           , 0xBDFCC9, 0x27AE60, 0xBDDCBD, 0x2980B9)
-Library:AddTheme("Sunset"         , 0xFF4500, 0x8B4513, 0xCFCFCF, 0xFFFFFF)
-Library:AddTheme("Rose"           , 0xFF69B4, 0x60004D, 0xCCC0B3, 0xFFFFFF)
-Library:AddTheme("Cyberpunk"      , 0x00FCFF, 0x000000, 0x4B4B4B, 0xFFFFFF)
-Library:AddTheme("Lavender"       , 0xE6E6FA, 0x9696AA, 0xC8C8DC, 0xFFFFFF)
-Library:AddTheme("AquaMarine"     , 0x7FFFD4, 0x006464, 0x8FBC8F, 0x000000)
-Library:AddTheme("Midnight"       , 0x3A454D, 0x0A0A0A, 0x3A454D, 0xFFFFFF)
-Library:AddTheme("Sakura"         , 0xFFB6C1, 0xA0522D, 0xE9B9AA, 0xFFFFFF)
-Library:AddTheme("Desert"         , 0xFFDF81, 0x8B4513, 0xD2B48C, 0x000000)
-Library:AddTheme("Forest"         , 0x228B22, 0x006400, 0x90EE90, 0xFFFFFF)
-Library:AddTheme("Royal"          , 0x663399, 0x000000, 0xAD7FA8, 0xFFFFFF)
-Library:AddTheme("Ruby"           , 0xE0115F, 0x8B0000, 0xE9B9AA, 0xFFFFFF)
-Library:AddTheme("Tropical"       , 0xFFEFFD, 0x005F57, 0xDAE8DA, 0x0A0A0A)
-Library:AddTheme("Vintage"        , 0x8B4513, 0x708090, 0xBFBFBF, 0xFFFFFF)
-Library:AddTheme("Cobalt"         , 0x00FFFF, 0x000066, 0x6699CC, 0xFFFFFF)
-Library:AddTheme("Sage"           , 0x9EFB9B, 0x4B6446, 0xBCE2B8, 0x000000)
-Library:AddTheme("Bronze"         , 0xCD7F32, 0x8B4513, 0xDEB887, 0xFFFFFF)
-Library:AddTheme("Lagoon"         , 0x009688, 0x003333, 0x6699FF, 0xFFFFFF)
-Library:AddTheme("Amber"          , 0xFFBF00, 0x8B4513, 0xFFCC66, 0x000000)
-Library:AddTheme("Aurora"         , 0x8A2BE2, 0x1A1A1A, 0x484848, 0xFFFFFF)
-Library:AddTheme("Neon"           , 0x00FCFF, 0x191919, 0x646464, 0xFFFFFF)
-Library:AddTheme("Pastel"         , 0xFF9EB5, 0xCFCFCF, 0xEEEEEE, 0x333333)
-Library:AddTheme("Jungle"         , 0x008000, 0x222222, 0x669966, 0xFFFFFF)
-Library:AddTheme("OceanBreeze"    , 0x00ADEF, 0x29405A, 0x83AF9B, 0xFFFFFF)
-Library:AddTheme("Sunrise"        , 0xFF9F43, 0x222222, 0xCC9966, 0xFFFFFF)
-Library:AddTheme("StarryNight"    , 0x4682B4, 0x0C0C0C, 0x353535, 0xFFFFFF)
-Library:AddTheme("Twilight"       , 0x4B0082, 0x2D2D3C, 0x646478, 0xFFFFFF)
-Library:AddTheme("Frost"          , 0xB9E1FF, 0xF0FAFF, 0xC8D7E6, 0x000000)
-Library:AddTheme("Floral"         , 0xFFB6C1, 0x87CEEB, 0xE1E1E1, 0x0A0A0A)
-Library:AddTheme("SunsetBeach"    , 0xFF4500, 0xFF8C00, 0xFFD566, 0x000000)
-Library:AddTheme("Mystic"         , 0x4169E1, 0x28323C, 0x828AA5, 0xFFFFFF)
-Library:AddTheme("Elegant"        , 0xFFC107, 0x461E14, 0xC8A078, 0xFFFFFF)
-Library:AddTheme("ChineseNewYear" , 0xFF0000, 0xFFA500, 0xFFD7CD, 0x000000)
-Library:AddTheme("Celebration"    , 0xFA0101, 0xFF0000, 0xFFC0CB, 0x000000)
+injectThemes()
 
-function Library.Theme:Custom(Hightlight, Default, Disable, TextColor)
-    Library.Colors = {
-        Hightlight = Hightlight,
-        Default    = Default,
-        Disable    = Disable,
-        TextColor  = TextColor,
-    }
-end
-
-function Library.Theme:RandomColor()
-    local r = function() return math.random(0, 255) end
-    Library.Colors = {
-        Hightlight = Color3.fromRGB(r(), r(), r()),
-        Default    = Color3.fromRGB(r(), r(), r()),
-        Disable    = Color3.fromRGB(r(), r(), r()),
-        TextColor  = Color3.fromRGB(r(), r(), r()),
-    }
-end
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 function Library.Theme:Random()
 	local RNG = Random.new()
