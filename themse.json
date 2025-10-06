@@ -1,0 +1,308 @@
+{
+  "Default": {
+    "Hightlight": [0, 255, 255],
+    "Default": [32, 33, 36],
+    "Disable": [167, 173, 188],
+    "TextColor": [220, 224, 234]
+  },
+  "Dark": {
+    "Hightlight": [255, 255, 255],
+    "Default": [20, 20, 22],
+    "Disable": [167, 173, 188],
+    "TextColor": [220, 224, 234]
+  },
+  "Discord": {
+    "Hightlight": [114, 137, 218],
+    "Default": [35, 37, 40],
+    "Disable": [167, 173, 188],
+    "TextColor": [234, 234, 234]
+  },
+  "Discord1": {
+    "Hightlight": [0, 115, 255],
+    "Default": [198, 211, 229],
+    "Disable": [74, 77, 83],
+    "TextColor": [0, 0, 0]
+  },
+  "Catppuccin": {
+    "Hightlight": [201, 165, 245],
+    "Default": [30, 31, 47],
+    "Disable": [109, 123, 154],
+    "TextColor": [204, 204, 204]
+  },
+  "Discord2": {
+    "Hightlight": [90, 212, 176],
+    "Default": [22, 25, 29],
+    "Disable": [72, 72, 83],
+    "TextColor": [191, 193, 195]
+  },
+  "Matcha": {
+    "Hightlight": [152, 132, 110],
+    "Default": [38, 49, 55],
+    "Disable": [62, 83, 82],
+    "TextColor": [165, 178, 175]
+  },
+  "Neverlose": {
+    "Hightlight": [0, 251, 255],
+    "Default": [0, 13, 26],
+    "Disable": [167, 173, 188],
+    "TextColor": [255, 255, 255]
+  },
+  "HightGreen": {
+    "Hightlight": [0, 255, 140],
+    "Default": [8, 13, 12],
+    "Disable": [163, 188, 165],
+    "TextColor": [255, 255, 255]
+  },
+  "Halloween": {
+    "Hightlight": [255, 162, 0],
+    "Default": [13, 11, 10],
+    "Disable": [188, 156, 156],
+    "TextColor": [255, 0, 0]
+  },
+  "Christmas": {
+    "Hightlight": [138, 220, 255],
+    "Default": [11, 13, 13],
+    "Disable": [81, 103, 104],
+    "TextColor": [249, 249, 249]
+  },
+  "Valentine": {
+    "Hightlight": [255, 0, 128],
+    "Default": [200, 15, 100],
+    "Disable": [206, 162, 168],
+    "TextColor": [255, 255, 255]
+  },
+  "Summer": {
+    "Hightlight": [0, 255, 127],
+    "Default": [0, 128, 102],
+    "Disable": [173, 216, 230],
+    "TextColor": [255, 255, 255]
+  },
+  "Autumn": {
+    "Hightlight": [255, 140, 0],
+    "Default": [139, 69, 19],
+    "Disable": [188, 143, 143],
+    "TextColor": [255, 255, 255]
+  },
+  "Winter": {
+    "Hightlight": [173, 216, 230],
+    "Default": [70, 130, 180],
+    "Disable": [199, 219, 249],
+    "TextColor": [0, 0, 0]
+  },
+  "Ocean": {
+    "Hightlight": [0, 150, 136],
+    "Default": [0, 51, 51],
+    "Disable": [102, 153, 255],
+    "TextColor": [255, 255, 255]
+  },
+  "Nord": {
+    "Hightlight": [136, 192, 208],
+    "Default": [46, 52, 64],
+    "Disable": [88, 110, 117],
+    "TextColor": [216, 222, 227]
+  },
+  "Mint": {
+    "Hightlight": [189, 252, 201],
+    "Default": [39, 174, 96],
+    "Disable": [189, 220, 189],
+    "TextColor": [41, 128, 185]
+  },
+  "Sunset": {
+    "Hightlight": [255, 69, 0],
+    "Default": [139, 69, 19],
+    "Disable": [207, 207, 207],
+    "TextColor": [255, 255, 255]
+  },
+  "Rose": {
+    "Hightlight": [255, 105, 180],
+    "Default": [96, 0, 77],
+    "Disable": [204, 192, 179],
+    "TextColor": [255, 255, 255]
+  },
+  "Cyberpunk": {
+    "Hightlight": [0, 252, 255],
+    "Default": [0, 0, 0],
+    "Disable": [75, 75, 75],
+    "TextColor": [255, 255, 255]
+  },
+  "Lavender": {
+    "Hightlight": [230, 230, 250],
+    "Default": [150, 150, 170],
+    "Disable": [200, 200, 220],
+    "TextColor": [255, 255, 255]
+  },
+  "AquaMarine": {
+    "Hightlight": [127, 255, 212],
+    "Default": [0, 100, 100],
+    "Disable": [143, 188, 143],
+    "TextColor": [0, 0, 0]
+  },
+  "Midnight": {
+    "Hightlight": [58, 69, 77],
+    "Default": [10, 10, 10],
+    "Disable": [58, 69, 77],
+    "TextColor": [255, 255, 255]
+  },
+  "Sakura": {
+    "Hightlight": [255, 182, 193],
+    "Default": [160, 82, 45],
+    "Disable": [233, 185, 170],
+    "TextColor": [255, 255, 255]
+  },
+  "Desert": {
+    "Hightlight": [255, 223, 129],
+    "Default": [139, 69, 19],
+    "Disable": [210, 180, 140],
+    "TextColor": [0, 0, 0]
+  },
+  "Forest": {
+    "Hightlight": [34, 139, 34],
+    "Default": [0, 100, 0],
+    "Disable": [144, 238, 144],
+    "TextColor": [255, 255, 255]
+  },
+  "Royal": {
+    "Hightlight": [102, 51, 153],
+    "Default": [0, 0, 0],
+    "Disable": [173, 127, 168],
+    "TextColor": [255, 255, 255]
+  },
+  "Ruby": {
+    "Hightlight": [224, 17, 95],
+    "Default": [139, 0, 0],
+    "Disable": [233, 185, 170],
+    "TextColor": [255, 255, 255]
+  },
+  "Tropical": {
+    "Hightlight": [255, 239, 213],
+    "Default": [0, 95, 87],
+    "Disable": [218, 232, 218],
+    "TextColor": [10, 10, 10]
+  },
+  "Vintage": {
+    "Hightlight": [139, 69, 19],
+    "Default": [112, 128, 144],
+    "Disable": [191, 191, 191],
+    "TextColor": [255, 255, 255]
+  },
+  "Cobalt": {
+    "Hightlight": [0, 255, 255],
+    "Default": [0, 0, 102],
+    "Disable": [102, 153, 204],
+    "TextColor": [255, 255, 255]
+  },
+  "Sage": {
+    "Hightlight": [158, 251, 155],
+    "Default": [75, 100, 70],
+    "Disable": [188, 226, 184],
+    "TextColor": [0, 0, 0]
+  },
+  "Bronze": {
+    "Hightlight": [205, 127, 50],
+    "Default": [139, 69, 19],
+    "Disable": [222, 184, 135],
+    "TextColor": [255, 255, 255]
+  },
+  "Lagoon": {
+    "Hightlight": [0, 150, 136],
+    "Default": [0, 51, 51],
+    "Disable": [102, 153, 255],
+    "TextColor": [255, 255, 255]
+  },
+  "Amber": {
+    "Hightlight": [255, 191, 0],
+    "Default": [139, 69, 19],
+    "Disable": [255, 204, 102],
+    "TextColor": [0, 0, 0]
+  },
+  "Aurora": {
+    "Hightlight": [138, 43, 226],
+    "Default": [26, 26, 26],
+    "Disable": [72, 72, 72],
+    "TextColor": [255, 255, 255]
+  },
+  "Neon": {
+    "Hightlight": [0, 252, 255],
+    "Default": [25, 25, 25],
+    "Disable": [100, 100, 100],
+    "TextColor": [255, 255, 255]
+  },
+  "Pastel": {
+    "Hightlight": [255, 158, 181],
+    "Default": [207, 207, 207],
+    "Disable": [238, 238, 238],
+    "TextColor": [51, 51, 51]
+  },
+  "Jungle": {
+    "Hightlight": [0, 128, 0],
+    "Default": [34, 34, 34],
+    "Disable": [102, 153, 102],
+    "TextColor": [255, 255, 255]
+  },
+  "OceanBreeze": {
+    "Hightlight": [0, 173, 239],
+    "Default": [41, 64, 90],
+    "Disable": [131, 175, 155],
+    "TextColor": [255, 255, 255]
+  },
+  "Sunrise": {
+    "Hightlight": [255, 159, 67],
+    "Default": [34, 34, 34],
+    "Disable": [204, 153, 102],
+    "TextColor": [255, 255, 255]
+  },
+  "StarryNight": {
+    "Hightlight": [70, 130, 180],
+    "Default": [12, 12, 12],
+    "Disable": [53, 53, 53],
+    "TextColor": [255, 255, 255]
+  },
+  "Twilight": {
+    "Hightlight": [75, 0, 130],
+    "Default": [45, 45, 60],
+    "Disable": [100, 100, 120],
+    "TextColor": [255, 255, 255]
+  },
+  "Frost": {
+    "Hightlight": [185, 225, 255],
+    "Default": [240, 250, 255],
+    "Disable": [200, 215, 230],
+    "TextColor": [0, 0, 0]
+  },
+  "Floral": {
+    "Hightlight": [255, 182, 193],
+    "Default": [135, 206, 235],
+    "Disable": [225, 225, 225],
+    "TextColor": [10, 10, 10]
+  },
+  "SunsetBeach": {
+    "Hightlight": [255, 69, 0],
+    "Default": [255, 140, 0],
+    "Disable": [255, 213, 102],
+    "TextColor": [0, 0, 0]
+  },
+  "Mystic": {
+    "Hightlight": [65, 105, 225],
+    "Default": [40, 50, 60],
+    "Disable": [130, 140, 170],
+    "TextColor": [255, 255, 255]
+  },
+  "Elegant": {
+    "Hightlight": [255, 193, 7],
+    "Default": [70, 30, 20],
+    "Disable": [200, 160, 120],
+    "TextColor": [255, 255, 255]
+  },
+  "ChineseNewYear": {
+    "Hightlight": [255, 0, 0],
+    "Default": [255, 165, 0],
+    "Disable": [255, 215, 205],
+    "TextColor": [0, 0, 0]
+  },
+  "Celebration": {
+    "Hightlight": [250, 1, 1],
+    "Default": [255, 0, 0],
+    "Disable": [255, 192, 203],
+    "TextColor": [0, 0, 0]
+  }
+}
