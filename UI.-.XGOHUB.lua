@@ -1,7 +1,6 @@
 -- 此源码不加密 | 也尽量保持更新 | UI.XGO修改更新 | 以内置独家水印 --
 -- UI版本: v2
 
---  修复针对F9无限报错问题 // 增加粒子动态特效
 --  懒得更
 
 local a = game.ReplicatedStorage:FindFirstChild("ExecutionCount") or Instance.new("IntValue")
@@ -2538,455 +2537,86 @@ Library.CoreGui = (game:FindFirstChild("CoreGui") and Library.Cloneref(game:GetS
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 
 Library.SizeLibrary = {
-	-- 原Default：580,385 → 改小为 460,308（缩小80%）
-	Default = UDim2.fromOffset(460, 308),
-	-- 原Auth：250,125 → 改小为 200,100
-	Auth = UDim2.new(0.05, 200, 0.05, 100),
-	Max = UDim2.fromScale(1, 1),
-	Loading = UDim2.new(0, 70, 0, 70),
-	Close = UDim2.new(0.01, 25, 0.01, 25),
+    Default = UDim2.fromOffset(460, 308),
+    Auth    = UDim2.new(0.05, 200, 0.05, 100),
+    Max     = UDim2.fromScale(1, 1),
+    Loading = UDim2.new(0, 70, 0, 70),
+    Close   = UDim2.new(0.01, 25, 0.01, 25),
 }
 
 Library.Theme = {}
 
-Library.Colors = {
-	Hightlight = Color3.fromRGB(0, 255, 255),
-	Default = Color3.fromRGB(32, 33, 36),
-	Disable = Color3.fromRGB(167, 173, 188),
-	TextColor = Color3.fromRGB(220, 224, 234),
-}
-function Library.Theme:Default()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 255, 255),
-		Default = Color3.fromRGB(32, 33, 36),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(220, 224, 234),
-	}
+function Library:AddTheme(name, h, d, ds, t)
+    self.Theme[name] = function()
+        Library.Colors = {
+            Hightlight = Color3.fromRGB(h>>16, h>>8&0xFF, h&0xFF),
+            Default    = Color3.fromRGB(d>>16, d>>8&0xFF, d&0xFF),
+            Disable    = Color3.fromRGB(ds>>16,ds>>8&0xFF,ds&0xFF),
+            TextColor  = Color3.fromRGB(t>>16, t>>8&0xFF, t&0xFF),
+        }
+    end
 end
-function Library.Theme:Dark()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 255, 255),
-		Default = Color3.fromRGB(20, 20, 22),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(220, 224, 234),
-	}
-end
-function Library.Theme:Discord()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(114, 137, 218),
-		Default = Color3.fromRGB(35, 37, 40),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(234, 234, 234),
-	}
-end
-function Library.Theme:Discord1()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 115, 255),
-		Default = Color3.fromRGB(198, 211, 229),
-		Disable = Color3.fromRGB(74, 77, 83),
-		TextColor = Color3.fromRGB(0, 0, 0),
-	}
-end
-function Library.Theme:Catppuccin()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(201, 165, 245),
-		Default = Color3.fromRGB(30, 31, 47),
-		Disable = Color3.fromRGB(109, 123, 154, 255),
-		TextColor = Color3.fromRGB(204, 204, 204),
-	}
-end
-function Library.Theme:Discord2()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(90, 212, 176),
-		Default = Color3.fromRGB(22, 25, 29),
-		Disable = Color3.fromRGB(72, 72, 83),
-		TextColor = Color3.fromRGB(191, 193, 195),
-	}
-end
-function Library.Theme:Matcha()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(152, 132, 110),
-		Default = Color3.fromRGB(38, 49, 55),
-		Disable = Color3.fromRGB(62, 83, 82),
-		TextColor = Color3.fromRGB(165, 178, 175),
-	}
-end
-function Library.Theme:Neverlose()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 251, 255),
-		Default = Color3.fromRGB(0, 13, 26),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(255, 255, 255),
-	}
-end
-function Library.Theme:Custom(Hightlight, Default, Disable, TextColor)
-	Library.Colors = {
-		Hightlight = Hightlight,
-		Default = Default,
-		Disable = Disable,
-		TextColor = TextColor,
-	}
-end
-function Library.Theme:HightGreen()
-	-- 定义库（Library）的颜色配置表（Colors），用于"HightGreen"（高亮绿色）主题
-	Library.Colors = {
-		-- 高亮色：用于突出显示的元素（如选中状态、按钮 hover 效果等），RGB值对应亮绿色
-		Hightlight = Color3.fromRGB(0, 255, 140),
-		-- 默认色：界面基础背景色或普通元素底色，RGB值对应深暗色（接近黑色）
-		Default = Color3.fromRGB(8, 13, 12),
-		-- 禁用色：用于不可交互状态的元素（如禁用按钮、失效选项等），RGB值对应浅灰绿色
-		Disable = Color3.fromRGB(163, 188, 165),
-		-- 文本色：界面中文字的颜色，RGB值对应纯白色，确保在深色背景上清晰可见
-		TextColor = Color3.fromRGB(255, 255, 255),
-	}
-end
-function Library.Theme:Halloween()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 162, 0),
-		Default = Color3.fromRGB(13, 11, 10),
-		Disable = Color3.fromRGB(188, 156, 156),
-		TextColor = Color3.fromRGB(255, 0, 0),
-	}
-end
-function Library.Theme:Christmas()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(138, 220, 255),
-		Default = Color3.fromRGB(11, 13, 13),
-		Disable = Color3.fromRGB(81, 103, 104),
-		TextColor = Color3.fromRGB(249, 249, 249),
-	}
-end
-function Library.Theme:Valentine()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 0, 128), -- 粉红色
-		Default = Color3.fromRGB(200, 15, 100), -- 深粉红色
-		Disable = Color3.fromRGB(206, 162, 168), -- 浅灰色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Summer()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 255, 127), -- 酸橙色
-		Default = Color3.fromRGB(0, 128, 102), -- 深绿色
-		Disable = Color3.fromRGB(173, 216, 230), -- 天蓝色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Autumn()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 140, 0), -- 橙色
-		Default = Color3.fromRGB(139, 69, 19), -- 深棕色
-		Disable = Color3.fromRGB(188, 143, 143), -- 浅棕色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Winter()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(173, 216, 230), -- 天蓝色
-		Default = Color3.fromRGB(70, 130, 180), -- 深蓝色
-		Disable = Color3.fromRGB(199, 219, 249), -- 浅蓝色
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Ocean()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 150, 136), -- 青绿色
-		Default = Color3.fromRGB(0, 51, 51), -- 深蓝色
-		Disable = Color3.fromRGB(102, 153, 255), -- 亮蓝色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Nord()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(136, 192, 208), -- 北欧蓝
-		Default = Color3.fromRGB(46, 52, 64), -- 北欧深灰
-		Disable = Color3.fromRGB(88, 110, 117), -- 北欧浅灰
-		TextColor = Color3.fromRGB(216, 222, 227), -- 北欧亮灰
-	}
-end
-function Library.Theme:Mint()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(189, 252, 201), -- 薄荷绿
-		Default = Color3.fromRGB(39, 174, 96), -- 深薄荷绿
-		Disable = Color3.fromRGB(189, 220, 189), -- 浅薄荷绿
-		TextColor = Color3.fromRGB(41, 128, 185), -- 薄荷蓝
-	}
-end
-function Library.Theme:Sunset()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 69, 0), -- 夕阳橙
-		Default = Color3.fromRGB(139, 69, 19), -- 深棕色
-		Disable = Color3.fromRGB(207, 207, 207), -- 浅灰色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Rose()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 105, 180), -- 玫瑰粉
-		Default = Color3.fromRGB(96, 0, 77), -- 深玫瑰红
-		Disable = Color3.fromRGB(204, 192, 179), -- 玫瑰棕
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Cyberpunk()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 252, 255), -- 霓虹青
-		Default = Color3.fromRGB(0, 0, 0), -- 黑色
-		Disable = Color3.fromRGB(75, 75, 75), -- 深灰色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Lavender()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(230, 230, 250), -- 淡紫色
-		Default = Color3.fromRGB(150, 150, 170), -- 深紫色
-		Disable = Color3.fromRGB(200, 200, 220), -- 浅紫色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:AquaMarine()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(127, 255, 212), -- 水绿色
-		Default = Color3.fromRGB(0, 100, 100), -- 深水绿
-		Disable = Color3.fromRGB(143, 188, 143), -- 浅水绿
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Midnight()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(58, 69, 77), -- 午夜蓝
-		Default = Color3.fromRGB(10, 10, 10), -- 深午夜黑
-		Disable = Color3.fromRGB(58, 69, 77), -- 浅午夜灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Sakura()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 182, 193), -- 樱花粉
-		Default = Color3.fromRGB(160, 82, 45), -- 深棕色
-		Disable = Color3.fromRGB(233, 185, 170), -- 浅棕色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Desert()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 223, 129), -- 沙漠金
-		Default = Color3.fromRGB(139, 69, 19), -- 沙漠棕
-		Disable = Color3.fromRGB(210, 180, 140), -- 浅沙漠棕
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Forest()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(34, 139, 34), -- 森林绿
-		Default = Color3.fromRGB(0, 100, 0), -- 深森林绿
-		Disable = Color3.fromRGB(144, 238, 144), -- 浅森林绿
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Royal()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(102, 51, 153), -- 皇家紫
-		Default = Color3.fromRGB(0, 0, 0), -- 黑色
-		Disable = Color3.fromRGB(173, 127, 168), -- 浅紫色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Ruby()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(224, 17, 95), -- 红宝石红
-		Default = Color3.fromRGB(139, 0, 0), -- 深红色
-		Disable = Color3.fromRGB(233, 185, 170), -- 浅红色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Tropical()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 239, 213), -- 热带黄
-		Default = Color3.fromRGB(0, 95, 87), -- 热带绿
-		Disable = Color3.fromRGB(218, 232, 218), -- 热带浅绿
-		TextColor = Color3.fromRGB(10, 10, 10), -- 深灰色
-	}
-end
-function Library.Theme:Vintage()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(139, 69, 19), -- 复古棕
-		Default = Color3.fromRGB(112, 128, 144), -- 复古灰
-		Disable = Color3.fromRGB(191, 191, 191), -- 复古浅灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Cobalt()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 255, 255), -- 钴蓝色
-		Default = Color3.fromRGB(0, 0, 102), -- 深钴蓝
-		Disable = Color3.fromRGB(102, 153, 204), -- 浅钴蓝
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Sage()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(158, 251, 155), -- 鼠尾草绿
-		Default = Color3.fromRGB(75, 100, 70), -- 深鼠尾草绿
-		Disable = Color3.fromRGB(188, 226, 184), -- 浅鼠尾草绿
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Bronze()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(205, 127, 50), -- 青铜色
-		Default = Color3.fromRGB(139, 69, 19), -- 深青铜色
-		Disable = Color3.fromRGB(222, 184, 135), -- 浅青铜色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Lagoon()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 150, 136), -- 泻湖绿
-		Default = Color3.fromRGB(0, 51, 51), -- 深海绿
-		Disable = Color3.fromRGB(102, 153, 255), -- 浅泻湖绿
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Amber()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 191, 0), -- 琥珀色
-		Default = Color3.fromRGB(139, 69, 19), -- 深琥珀色
-		Disable = Color3.fromRGB(255, 204, 102), -- 浅琥珀色
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Aurora()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(138, 43, 226), -- 极光紫
-		Default = Color3.fromRGB(26, 26, 26), -- 深空黑
-		Disable = Color3.fromRGB(72, 72, 72), -- 星云灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 星光白
-	}
-end
-function Library.Theme:Neon()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 252, 255), -- 霓虹青
-		Default = Color3.fromRGB(25, 25, 25), -- 午夜黑
-		Disable = Color3.fromRGB(100, 100, 100), -- 深灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 亮白
-	}
-end
-function Library.Theme:Pastel()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 158, 181), -- 粉彩红
-		Default = Color3.fromRGB(207, 207, 207), -- 粉彩灰
-		Disable = Color3.fromRGB(238, 238, 238), -- 粉彩浅灰
-		TextColor = Color3.fromRGB(51, 51, 51), -- 深灰
-	}
-end
-function Library.Theme:Jungle()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 128, 0), -- 丛林绿
-		Default = Color3.fromRGB(34, 34, 34), -- 暗绿
-		Disable = Color3.fromRGB(102, 153, 102), -- 浅绿
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:OceanBreeze()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 173, 239), -- 海洋蓝
-		Default = Color3.fromRGB(41, 64, 90), -- 海洋深蓝
-		Disable = Color3.fromRGB(131, 175, 155), -- 海洋浅蓝
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Sunrise()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 159, 67), -- 日出色
-		Default = Color3.fromRGB(34, 34, 34), -- 深灰
-		Disable = Color3.fromRGB(204, 153, 102), -- 日出橙
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:StarryNight()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(70, 130, 180), -- 星空蓝
-		Default = Color3.fromRGB(12, 12, 12), -- 深夜黑
-		Disable = Color3.fromRGB(53, 53, 53), -- 暗夜灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 星光白
-	}
-end
-function Library.Theme:Twilight()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(75, 0, 130), -- 暮光紫
-		Default = Color3.fromRGB(45, 45, 60), -- 暮光深灰
-		Disable = Color3.fromRGB(100, 100, 120), -- 暮光浅灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Frost()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(185, 225, 255), -- 霜冻蓝
-		Default = Color3.fromRGB(240, 250, 255), -- 霜冻白
-		Disable = Color3.fromRGB(200, 215, 230), -- 霜冻浅蓝
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Floral()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 182, 193), -- 花园粉
-		Default = Color3.fromRGB(135, 206, 235), -- 花园蓝
-		Disable = Color3.fromRGB(225, 225, 225), -- 花园灰
-		TextColor = Color3.fromRGB(10, 10, 10), -- 深灰色
-	}
-end
-function Library.Theme:SunsetBeach()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 69, 0), -- 日落橙
-		Default = Color3.fromRGB(255, 140, 0), -- 沙滩金
-		Disable = Color3.fromRGB(255, 213, 102), -- 沙滩浅金
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Mystic()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(65, 105, 225), -- 神秘蓝
-		Default = Color3.fromRGB(40, 50, 60), -- 神秘深灰
-		Disable = Color3.fromRGB(130, 140, 170), -- 神秘浅灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Elegant()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 193, 7), -- 优雅金
-		Default = Color3.fromRGB(70, 30, 20), -- 优雅深棕
-		Disable = Color3.fromRGB(200, 160, 120), -- 优雅浅棕
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:ChineseNewYear()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 0, 0), -- 红色，代表喜庆和好运
-		Default = Color3.fromRGB(255, 165, 0), -- 橙色，代表活力和繁荣
-		Disable = Color3.fromRGB(255, 215, 205), -- 浅红色，代表温和和吉祥
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色，用于文本，保持清晰可读
-	}
-end
-function Library.Theme:Celebration()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(250, 1, 1), -- 喜庆红
-		Default = Color3.fromRGB(255, 0, 0), -- 金色
-		Disable = Color3.fromRGB(255, 192, 203), -- 浅粉色
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:RandomColor()
-	local randomColor = function()
-		return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
-	end
 
-	Library.Colors = {
-		Hightlight = randomColor(), -- 随机高亮色
-		Default = randomColor(), -- 随机默认色
-		Disable = randomColor(), -- 随机禁用色
-		TextColor = randomColor(), -- 随机文本色
-	}
+Library:AddTheme("Default"        ,0x00FFFF,0x202124,0xA7ADBC,0xDCE0EA)
+Library:AddTheme("Dark"           ,0xFFFFFF,0x141416,0xA7ADBC,0xDCE0EA)
+Library:AddTheme("Discord"        ,0x7289DA,0x232528,0xA7ADBC,0xEAEAEA)
+Library:AddTheme("Discord1"       ,0x0073FF,0xC6D3E5,0x4A4D53,0x000000)
+Library:AddTheme("Catppuccin"     ,0xC9A5F5,0x1E1F2F,0x6D7B9A,0xCCCCCC)
+Library:AddTheme("Discord2"       ,0x5AD4B0,0x16191D,0x484853,0xBFC1C3)
+Library:AddTheme("Matcha"         ,0x98846E,0x263137,0x3E5352,0xA5B2AF)
+Library:AddTheme("Neverlose"      ,0x00FBFF,0x000D1A,0xA7ADBC,0xFFFFFF)
+Library:AddTheme("HightGreen"     ,0x00FF8C,0x080D0C,0xA3BCA5,0xFFFFFF)
+Library:AddTheme("Halloween"      ,0xFFA200,0x0D0B0A,0xBC9C9C,0xFF0000)
+Library:AddTheme("Christmas"      ,0x8ADCFF,0x0B0D0D,0x516768,0xF9F9F9)
+Library:AddTheme("Valentine"      ,0xFF0080,0xC80F64,0xCEA2A8,0xFFFFFF)
+Library:AddTheme("Summer"         ,0x00FF7F,0x008066,0xADD8E6,0xFFFFFF)
+Library:AddTheme("Autumn"         ,0xFF8C00,0x8B4513,0xBC8F8F,0xFFFFFF)
+Library:AddTheme("Winter"         ,0xADD8E6,0x4682B4,0xC7DBF9,0x000000)
+Library:AddTheme("Ocean"          ,0x009688,0x003333,0x6699FF,0xFFFFFF)
+Library:AddTheme("Nord"           ,0x88C0D0,0x2E3440,0x586E75,0xD8DEE3)
+Library:AddTheme("Mint"           ,0xBDFCC9,0x27AE60,0xBDDCBD,0x2980B9)
+Library:AddTheme("Sunset"         ,0xFF4500,0x8B4513,0xCFCFCF,0xFFFFFF)
+Library:AddTheme("Rose"           ,0xFF69B4,0x60004D,0xCCC0B3,0xFFFFFF)
+Library:AddTheme("Cyberpunk"      ,0x00FCFF,0x000000,0x4B4B4B,0xFFFFFF)
+Library:AddTheme("Lavender"       ,0xE6E6FA,0x9696AA,0xC8C8DC,0xFFFFFF)
+Library:AddTheme("AquaMarine"     ,0x7FFFD4,0x006464,0x8FBC8F,0x000000)
+Library:AddTheme("Midnight"       ,0x3A454D,0x0A0A0A,0x3A454D,0xFFFFFF)
+Library:AddTheme("Sakura"         ,0xFFB6C1,0xA0522D,0xE9B9AA,0xFFFFFF)
+Library:AddTheme("Desert"         ,0xFFDF81,0x8B4513,0xD2B48C,0x000000)
+Library:AddTheme("Forest"         ,0x228B22,0x006400,0x90EE90,0xFFFFFF)
+Library:AddTheme("Royal"          ,0x663399,0x000000,0xAD7FA8,0xFFFFFF)
+Library:AddTheme("Ruby"           ,0xE0115F,0x8B0000,0xE9B9AA,0xFFFFFF)
+Library:AddTheme("Tropical"       ,0xFFEFFD,0x005F57,0xDAE8DA,0x0A0A0A)
+Library:AddTheme("Vintage"        ,0x8B4513,0x708090,0xBFBFBF,0xFFFFFF)
+Library:AddTheme("Cobalt"         ,0x00FFFF,0x000066,0x6699CC,0xFFFFFF)
+Library:AddTheme("Sage"           ,0x9EFB9B,0x4B6446,0xBCE2B8,0x000000)
+Library:AddTheme("Bronze"         ,0xCD7F32,0x8B4513,0xDEB887,0xFFFFFF)
+Library:AddTheme("Lagoon"         ,0x009688,0x003333,0x6699FF,0xFFFFFF)
+Library:AddTheme("Amber"          ,0xFFBF00,0x8B4513,0xFFCC66,0x000000)
+Library:AddTheme("Aurora"         ,0x8A2BE2,0x1A1A1A,0x484848,0xFFFFFF)
+Library:AddTheme("Neon"           ,0x00FCFF,0x191919,0x646464,0xFFFFFF)
+Library:AddTheme("Pastel"         ,0xFF9EB5,0xCFCFCF,0xEEEEEE,0x333333)
+Library:AddTheme("Jungle"         ,0x008000,0x222222,0x669966,0xFFFFFF)
+Library:AddTheme("OceanBreeze"    ,0x00ADEF,0x29405A,0x83AF9B,0xFFFFFF)
+Library:AddTheme("Sunrise"        ,0xFF9F43,0x222222,0xCC9966,0xFFFFFF)
+Library:AddTheme("StarryNight"    ,0x4682B4,0x0C0C0C,0x353535,0xFFFFFF)
+Library:AddTheme("Twilight"       ,0x4B0082,0x2D2D3C,0x646478,0xFFFFFF)
+Library:AddTheme("Frost"          ,0xB9E1FF,0xF0FAFF,0xC8D7E6,0x000000)
+Library:AddTheme("Floral"         ,0xFFB6C1,0x87CEEB,0xE1E1E1,0x0A0A0A)
+Library:AddTheme("SunsetBeach"    ,0xFF4500,0xFF8C00,0xFFD566,0x000000)
+Library:AddTheme("Mystic"         ,0x4169E1,0x28323C,0x828AA5,0xFFFFFF)
+Library:AddTheme("Elegant"        ,0xFFC107,0x461E14,0xC8A078,0xFFFFFF)
+Library:AddTheme("ChineseNewYear" ,0xFF0000,0xFFA500,0xFFD7CD,0x000000)
+Library:AddTheme("Celebration"    ,0xFA0101,0xFF0000,0xFFC0CB,0x000000)
+
+function Library.Theme:RandomColor()
+    local r = function() return math.random(0,255) end
+    Library.Colors = {
+        Hightlight = Color3.fromRGB(r(),r(),r()),
+        Default    = Color3.fromRGB(r(),r(),r()),
+        Disable    = Color3.fromRGB(r(),r(),r()),
+        TextColor  = Color3.fromRGB(r(),r(),r()),
+    }
 end
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 function Library.Theme:Random()
@@ -9340,7 +8970,7 @@ end
 		infoIco.BackgroundTransparency = 1
 		infoIco.Image = "rbxassetid://7733964719"
 		infoIco.ImageColor3 = Library.Colors.TextColor
-		infoIco.ImageTransparency = 0.3
+		infoIco.ImageTransparency = 0.5
 		infoIco.ZIndex = 20
 		WindowLibrary:AddToolTip(infoIco, "查看作者留言 / 更新日志")
 
