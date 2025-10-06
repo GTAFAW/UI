@@ -6814,261 +6814,666 @@ end
 			return RootSkid
 		end
 
-		------ // 切换按钮  ----------------------------------------------------------------------------------------
-Library = Library or {}
+		------ // 切换按钮[原ui]   ----------------------------------------------------------------------------------------
+		function Root:Toggle(setup)
+			setup = setup or {}
 
-function Library.ToggleCore(setup, skin)
-    setup.Title    = setup.Title   or "切换按钮"
-    setup.Content  = setup.Content or ""
-    setup.Default  = setup.Default or false
-    setup.Callback = setup.Callback or function() end
-    setup._Style   = setup._Style or "Norm"
+			setup.Title = setup.Title or "切换按钮"
+			setup.Content = setup.Content or ""
+			setup.Default = setup.Default or false
+			setup.Callback = setup.Callback or function() end
 
-    local block        = Instance.new("Frame")
-    block.Name         = setup._Style.."ToggleBlock"
-    block.Parent       = ScrollingFrame
-    block.BackgroundColor3 = Library.Colors.Default
-    block.BackgroundTransparency = 0.25
-    block.BorderSizePixel = 0
-    block.Size = UDim2.new(0.99, 0, 0, Library.ItemHeight)
-    block.ZIndex = 10
+			local ToggleBlock = Instance.new("Frame")
+			local DropShadow = Instance.new("ImageLabel")
+			local UIStroke = Instance.new("UIStroke")
+			local TextLabel = Instance.new("TextLabel")
+			local Content = Instance.new("TextLabel")
+			local Block = Instance.new("Frame")
+			local UIStroke_2 = Instance.new("UIStroke")
+			local UICorner = Instance.new("UICorner")
+			local ValueBlock = Instance.new("Frame")
+			local UICorner_2 = Instance.new("UICorner")
+			local Button = Instance.new("TextButton")
 
-    local drop = Instance.new("ImageLabel")
-    drop.Name = "DropShadow"
-    drop.Parent = block
-    drop.BackgroundTransparency = 1
-    drop.Image = "rbxassetid://297694300"
-    drop.ImageColor3 = Color3.new(0,0,0)
-    drop.ImageTransparency = 0.5
-    drop.ScaleType = Enum.ScaleType.Slice
-    drop.SliceCenter = Rect.new(95,103,894,902)
-    drop.SliceScale = 0.05
-    drop.Position = UDim2.new(0,-5,0,-5)
-    drop.Size = UDim2.new(1,10,1,10)
-    drop.ZIndex = 9
+			ToggleBlock.Name = "ToggleBlock"
+			ToggleBlock.Parent = ScrollingFrame
+			ToggleBlock.BackgroundColor3 = Library.Colors.Default
+			ToggleBlock.BackgroundTransparency = 0.250
+			ToggleBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ToggleBlock.BorderSizePixel = 0
+			ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+			ToggleBlock.ZIndex = 10
 
-    local stroke = Instance.new("UIStroke")
-    stroke.Transparency = 0.85
-    stroke.Color = Color3.fromRGB(156,156,156)
-    stroke.Parent = block
+			DropShadow.Name = "DropShadow"
+			DropShadow.Parent = ToggleBlock
+			DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			DropShadow.BackgroundTransparency = 1.000
+			DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+			DropShadow.Position = UDim2.new(0, -5, 0, -5)
+			DropShadow.Size = UDim2.new(1, 10, 1, 10)
+			DropShadow.ZIndex = 9
+			DropShadow.Image = "rbxassetid://297694300"
+			DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+			DropShadow.ImageTransparency = 0.500
+			DropShadow.ScaleType = Enum.ScaleType.Slice
+			DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+			DropShadow.SliceScale = 0.050
 
-    local title = Instance.new("TextLabel")
-    title.Name = "Title"
-    title.Parent = block
-    title.AnchorPoint = Vector2.new(0,0.5)
-    title.BackgroundTransparency = 1
-    title.Position = UDim2.new(0.02,0,0.5,0)
-    title.Size = UDim2.new(1,0,0.4,0)
-    title.Font = Enum.Font.Gotham
-    title.Text = setup.Title
-    title.TextColor3 = Library.Colors.TextColor
-    title.TextScaled = true
-    title.TextWrapped = true
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.RichText = true
-    title.ZIndex = 11
+			UIStroke.Transparency = 0.850
+			UIStroke.Color = Color3.fromRGB(156, 156, 156)
+			UIStroke.Parent = ToggleBlock
 
-    local content = Instance.new("TextLabel")
-    content.Name = "Content"
-    content.Parent = block
-    content.BackgroundTransparency = 1
-    content.Position = UDim2.new(0,5,0,18)
-    content.Size = UDim2.new(1,0,0,45)
-    content.Visible = false
-    content.Font = Enum.Font.Gotham
-    content.Text = setup.Content
-    content.TextColor3 = Library.Colors.TextColor
-    content.TextSize = 13
-    content.TextWrapped = true
-    content.TextXAlignment = Enum.TextXAlignment.Left
-    content.TextYAlignment = Enum.TextYAlignment.Top
-    content.RichText = true
-    content.ZIndex = 11
+			TextLabel.RichText = true
+			TextLabel.Parent = ToggleBlock
+			TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			TextLabel.BackgroundTransparency = 1.000
+			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TextLabel.BorderSizePixel = 0
+			TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+			TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+			TextLabel.ZIndex = 11
+			TextLabel.Font = Enum.Font.Gotham
+			TextLabel.Text = setup.Title
+			TextLabel.TextColor3 = Library.Colors.TextColor
+			TextLabel.TextScaled = true
+			TextLabel.TextSize = 14.000
+			TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+			TextLabel.TextStrokeTransparency = 0.950
+			TextLabel.TextWrapped = true
+			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-    local btn = Instance.new("TextButton")
-    btn.Name = "Button"
-    btn.Parent = block
-    btn.BackgroundTransparency = 1
-    btn.TextTransparency = 1
-    btn.Size = UDim2.new(1,0,1,0)
-    btn.ZIndex = 15
+			Content.Name = "Content"
+			Content.Parent = ToggleBlock
+			Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Content.BackgroundTransparency = 1.000
+			Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Content.BorderSizePixel = 0
+			Content.Position = UDim2.new(0, 5, 0, 18)
+			Content.Size = UDim2.new(1, 0, 0, 45)
+			Content.Visible = false
+			Content.ZIndex = 11
+			Content.Font = Enum.Font.Gotham
+			Content.Text = setup.Content
+			Content.TextColor3 = Library.Colors.TextColor
+			Content.TextSize = 13.000
+			Content.TextStrokeColor3 = Library.Colors.TextColor
+			Content.TextStrokeTransparency = 0.950
+			Content.TextTransparency = 0.500
+			Content.TextWrapped = true
+			Content.TextXAlignment = Enum.TextXAlignment.Left
+			Content.TextYAlignment = Enum.TextYAlignment.Top
+			Content.RichText = true
 
-    Library:MakeDrop(block, stroke, Library.Colors.Hightlight)
-    if setup.Tip then
-        WindowLibrary:AddToolTip(block, tostring(setup.Tip))
-    end
+			Block.Name = "Block"
+			Block.Parent = ToggleBlock
+			Block.AnchorPoint = Vector2.new(1, 0.5)
+			Block.BackgroundColor3 = Library.Colors.Default
+			Block.BackgroundTransparency = 0.500
+			Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Block.BorderSizePixel = 0
+			Block.Position = UDim2.new(0.980000019, 0, 0.5, 0)
+			Block.Size = UDim2.new(0, 35, 0.5, 0)
+			Block.ZIndex = 14
 
-    local skinTbl = skin.Build(block, setup.Default)
-    local Anim = skinTbl.Anim
+			UIStroke_2.Transparency = 0.850
+			UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+			UIStroke_2.Parent = Block
 
-    local function refresh(val)
-        Anim(val)
-        setup.Callback(val)
-    end
-    refresh(setup.Default)
+			UICorner.CornerRadius = UDim.new(5, 100)
+			UICorner.Parent = Block
 
-    btn.MouseButton1Click:Connect(function()
-        setup.Default = not setup.Default
-        refresh(setup.Default)
-    end)
+			ValueBlock.Name = "ValueBlock"
+			ValueBlock.Parent = Block
+			ValueBlock.AnchorPoint = Vector2.new(0.5, 0.5)
+			ValueBlock.BackgroundColor3 = Library.Colors.Hightlight
+			ValueBlock.BackgroundTransparency = 0.250
+			ValueBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ValueBlock.BorderSizePixel = 0
+			ValueBlock.Position = UDim2.new(0.75, 0, 0.5, 0)
+			ValueBlock.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
+			ValueBlock.SizeConstraint = Enum.SizeConstraint.RelativeYY
+			ValueBlock.ZIndex = 15
 
-    local function updateSize()
-        local ts = title.TextSize
-        local mainY = Library:GetTextSize(setup.Title, ts, title.Font).Y
-        local subY  = setup.Content:len()>0 and Library:GetTextSize(setup.Content,13,content.Font).Y or 0
-        local h = mainY + 10 + (subY>0 and subY+5 or 15)
-        block.Size = UDim2.new(0.99,0,0,h)
-        content.Visible = subY>0
-        if subY>0 then
-            title.Position = UDim2.new(0,5,0,12)
-            title.Size = UDim2.new(1,0,0,14)
-        else
-            title.Position = UDim2.new(0.02,0,0.5,0)
-            title.Size = UDim2.new(1,0,0.4,0)
-        end
-    end
-    updateSize()
+			UICorner_2.CornerRadius = UDim.new(1, 0)
+			UICorner_2.Parent = ValueBlock
 
-    return {
-        Content = function(_,txt) setup.Content=txt updateSize() end,
-        Value   = function(_,val) setup.Default=val refresh(val) end,
-        Visible = function(_,v) block.Visible=v end
-    }
-end
+			Button.Name = "Button"
+			Button.Parent = ToggleBlock
+			Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Button.BackgroundTransparency = 1.000
+			Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Button.BorderSizePixel = 0
+			Button.Size = UDim2.new(1, 0, 1, 0)
+			Button.ZIndex = 15
+			Button.Font = Enum.Font.SourceSans
+			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Button.TextSize = 14.000
+			Button.TextTransparency = 1.000
 
-function Root:Toggle(setup)
-    setup._Style = "Norm"
-    return Library.ToggleCore(setup, {
-        Build = function(block, first)
-            local box = Instance.new("Frame")
-            box.Name = "CheckBox"
-            box.Parent = block
-            box.AnchorPoint = Vector2.new(1,0.5)
-            box.Position = UDim2.new(0.98,0,0.5,0)
-            box.Size = UDim2.new(0,22,0,22)
-            box.BackgroundColor3 = first and Library.Colors.Hightlight or Library.Colors.Default
-            box.BackgroundTransparency = 0.5
-            box.ZIndex = 14
-            local s2 = Instance.new("UIStroke")
-            s2.Transparency = 0.85
-            s2.Color = Color3.fromRGB(156,156,156)
-            s2.Parent = box
-            local cr = Instance.new("UICorner")
-            cr.CornerRadius = UDim.new(0,3)
-            cr.Parent = box
+			Library:MakeDrop(ToggleBlock, UIStroke, Library.Colors.Hightlight)
 
-            local tick = Instance.new("TextLabel")
-            tick.Name = "CheckMark"
-            tick.Parent = box
-            tick.AnchorPoint = Vector2.new(0.5,0.5)
-            tick.Position = UDim2.new(0.5,0,0.5,0)
-            tick.Size = UDim2.new(0.8,0,0.8,0)
-            tick.BackgroundTransparency = 1
-            tick.Font = Enum.Font.GothamBold
-            tick.Text = "✓"
-            tick.TextColor3 = Color3.new(1,1,1)
-            tick.TextScaled = true
-            tick.ZIndex = 15
-            tick.Visible = first
+			if setup.Tip then
+				WindowLibrary:AddToolTip(ToggleBlock, tostring(setup.Tip))
+			end
 
-            local function anim(v)
-                tick.Visible = v
-                box.BackgroundColor3 = v and Library.Colors.Hightlight or Library.Colors.Default
-            end
-            return {ClickZone = block:FindFirstChild("Button"), Anim = anim}
-        end
-    })
-end
+			local UILib = function(value)
+				if value then
+					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
+						Position = UDim2.new(0.75, 0, 0.5, 0),
+						BackgroundColor3 = Library.Colors.Hightlight,
+					})
+				else
+					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
+						Position = UDim2.new(0.25, 0, 0.5, 0),
+						BackgroundColor3 = Library.Colors.Disable,
+					})
+				end
+			end
 
-function Root:A1Toggle(setup)
-    setup._Style = "A1"
-    return Library.ToggleCore(setup, {
-        Build = function(block, first)
-            local skin = makeSliderSkin(block,"A1")
-            local function anim(v)
-                sliderAnim(skin.ValueBlock, skin.Icon, v, "A1")
-            end
-            anim(first)
-            return {ClickZone = skin.Button, Anim = anim}
-        end
-    })
-end
+			UILib(setup.Default)
 
-function Root:A2Toggle(setup)
-    setup._Style = "A2"
-    return Library.ToggleCore(setup, {
-        Build = function(block, first)
-            local skin = makeSliderSkin(block,"A2")
-            local function anim(v)
-                sliderAnim(skin.ValueBlock, skin.Icon, v, "A2")
-            end
-            anim(first)
-            return {ClickZone = skin.Button, Anim = anim}
-        end
-    })
-end
+			Button.MouseButton1Click:Connect(function()
+				setup.Default = not setup.Default
 
-function makeSliderSkin(block,style)
-    local blk = Instance.new("Frame")
-    blk.Name = "Block"
-    blk.Parent = block
-    blk.AnchorPoint = Vector2.new(1,0.5)
-    blk.Position = UDim2.new(0.98,0,0.5,0)
-    blk.Size = UDim2.new(0,35,0.5,0)
-    blk.BackgroundColor3 = Library.Colors.Default
-    blk.BackgroundTransparency = 0.5
-    blk.ZIndex = 14
-    local s = Instance.new("UIStroke")
-    s.Transparency = 0.85
-    s.Color = Color3.fromRGB(156,156,156)
-    s.Parent = blk
-    local c1 = Instance.new("UICorner")
-    c1.CornerRadius = UDim.new(5,100)
-    c1.Parent = blk
+				UILib(setup.Default)
 
-    local vb = Instance.new("Frame")
-    vb.Name = "ValueBlock"
-    vb.Parent = blk
-    vb.AnchorPoint = Vector2.new(0.5,0.5)
-    vb.Position = UDim2.new(first and 0.75 or 0.25,0,0.5,0)
-    vb.Size = UDim2.new(0.99,0,0.99,0)
-    vb.SizeConstraint = Enum.SizeConstraint.RelativeYY
-    vb.BackgroundColor3 = first and Library.Colors.Hightlight or Library.Colors.Disable
-    vb.ZIndex = 16
-    local c2 = Instance.new("UICorner")
-    c2.CornerRadius = UDim.new(1,0)
-    c2.Parent = vb
+				setup.Callback(setup.Default)
+			end)
 
-    local img = Instance.new("ImageLabel")
-    img.Name = "Icon"
-    img.Parent = vb
-    img.AnchorPoint = Vector2.new(0.5,0.5)
-    img.Position = UDim2.new(0.5,0,0.5,0)
-    img.Size = UDim2.new(1,0,1,0)
-    img.BackgroundTransparency = 1
-    img.ScaleType = Enum.ScaleType.Fit
-    img.ZIndex = 17
-    if style=="A1" then
-        img.Image = "rbxassetid://102797584513959"
-        img.Rotation = first and 0 or 180
-    else
-        img.Image = first and "rbxassetid://88666635012556" or "rbxassetid://123698784885744"
-    end
+			local UpdateBlock = function()
+				local TitleSize = TextLabel.TextSize
+				local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
+				local ContentSize = setup.Content:len() > 0
+						and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font)
+					or Vector2.new(0, 0)
 
-    return {ValueBlock = vb, Icon = img, Button = block:FindFirstChild("Button")}
-end
+				local TotalHeight = MainSize.Y + 10
+				if setup.Content:len() > 0 then
+					Content.Visible = true
+					TotalHeight = TotalHeight + ContentSize.Y + 5
+					TextLabel.Position = UDim2.new(0, 5, 0, 12)
+					TextLabel.Size = UDim2.new(1, 0, 0, 14)
+				else
+					Content.Visible = false
+					TotalHeight = TotalHeight + 15.20000000000001
+					TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+					TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+				end
 
-function sliderAnim(vb,icon,v,style)
-    if style=="A1" then
-        Library:Tween(vb, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(v and 0.75 or 0.25,0,0.5,0)})
-        icon.Rotation = v and 0 or 180
-        vb.BackgroundColor3 = v and Library.Colors.Hightlight or Library.Colors.Disable
-    else
-        Library:Tween(vb, Library.TweenLibrary.SmallEffect, {Position = UDim2.new(v and 0.75 or 0.25,0,0.5,0)})
-        icon.Image = v and "rbxassetid://88666635012556" or "rbxassetid://123698784885744"
-        vb.BackgroundColor3 = v and Library.Colors.Hightlight or Library.Colors.Disable
-    end
-end
+				ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+			end
+			UpdateBlock()
+
+			local RootSkid = {}
+
+			function RootSkid:Content(Setup)
+				Content.Text = Setup
+				UpdateBlock()
+			end
+
+			function RootSkid:Value(Setup)
+				setup.Default = Setup
+				UILib(setup.Default)
+				setup.Callback(setup.Default)
+				UpdateBlock()
+			end
+
+			function RootSkid:Visible(value)
+				ToggleBlock.Visible = value
+			end
+
+			return RootSkid
+		end
+		------ // 切换按钮[1]   ----------------------------------------------------------------------------------------
+		function Root:A1Toggle(setup)
+			setup = setup or {}
+			setup.Title = setup.Title or "切换按钮[1]"
+			setup.Content = setup.Content or ""
+			setup.Default = setup.Default or false
+			setup.Callback = setup.Callback or function() end
+
+			local A1ToggleBlock = Instance.new("Frame")
+			local DropShadow = Instance.new("ImageLabel")
+			local UIStroke = Instance.new("UIStroke")
+			local TextLabel = Instance.new("TextLabel")
+			local Content = Instance.new("TextLabel")
+			local Block = Instance.new("Frame")
+			local UIStroke_2 = Instance.new("UIStroke")
+			local UICorner = Instance.new("UICorner")
+			local ValueBlock = Instance.new("Frame")
+			local UICorner_2 = Instance.new("UICorner")
+			local Button = Instance.new("TextButton")
+			local TriangleImage = Instance.new("ImageLabel")
+
+			A1ToggleBlock.Name = "A1ToggleBlock"
+			A1ToggleBlock.Parent = ScrollingFrame
+			A1ToggleBlock.BackgroundColor3 = Library.Colors.Default
+			A1ToggleBlock.BackgroundTransparency = 0.250
+			A1ToggleBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			A1ToggleBlock.BorderSizePixel = 0
+			A1ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+			A1ToggleBlock.ZIndex = 10
+
+			DropShadow.Name = "DropShadow"
+			DropShadow.Parent = A1ToggleBlock
+			DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			DropShadow.BackgroundTransparency = 1.000
+			DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+			DropShadow.Position = UDim2.new(0, -5, 0, -5)
+			DropShadow.Size = UDim2.new(1, 10, 1, 10)
+			DropShadow.ZIndex = 9
+			DropShadow.Image = "rbxassetid://297694300"
+			DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+			DropShadow.ImageTransparency = 0.500
+			DropShadow.ScaleType = Enum.ScaleType.Slice
+			DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+			DropShadow.SliceScale = 0.050
+
+			UIStroke.Transparency = 0.850
+			UIStroke.Color = Color3.fromRGB(156, 156, 156)
+			UIStroke.Parent = A1ToggleBlock
+
+			TextLabel.RichText = true
+			TextLabel.Parent = A1ToggleBlock
+			TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			TextLabel.BackgroundTransparency = 1.000
+			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TextLabel.BorderSizePixel = 0
+			TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+			TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+			TextLabel.ZIndex = 11
+			TextLabel.Font = Enum.Font.Gotham
+			TextLabel.Text = setup.Title
+			TextLabel.TextColor3 = Library.Colors.TextColor
+			TextLabel.TextScaled = true
+			TextLabel.TextSize = 14.000
+			TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+			TextLabel.TextStrokeTransparency = 0.950
+			TextLabel.TextWrapped = true
+			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+			Content.Name = "Content"
+			Content.Parent = A1ToggleBlock
+			Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Content.BackgroundTransparency = 1.000
+			Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Content.BorderSizePixel = 0
+			Content.Position = UDim2.new(0, 5, 0, 18)
+			Content.Size = UDim2.new(1, 0, 0, 45)
+			Content.Visible = false
+			Content.ZIndex = 11
+			Content.Font = Enum.Font.Gotham
+			Content.Text = setup.Content
+			Content.TextColor3 = Library.Colors.TextColor
+			Content.TextSize = 13.000
+			Content.TextStrokeColor3 = Library.Colors.TextColor
+			Content.TextStrokeTransparency = 0.950
+			Content.TextTransparency = 0.500
+			Content.TextWrapped = true
+			Content.TextXAlignment = Enum.TextXAlignment.Left
+			Content.TextYAlignment = Enum.TextYAlignment.Top
+			Content.RichText = true
+
+			Block.Name = "Block"
+			Block.Parent = A1ToggleBlock
+			Block.AnchorPoint = Vector2.new(1, 0.5)
+			Block.BackgroundColor3 = Library.Colors.Default
+			Block.BackgroundTransparency = 0.500
+			Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Block.BorderSizePixel = 0
+			Block.Position = UDim2.new(0.980000019, 0, 0.5, 0)
+			Block.Size = UDim2.new(0, 35, 0.5, 0)
+			Block.ZIndex = 14
+
+			UIStroke_2.Transparency = 0.850
+			UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+			UIStroke_2.Parent = Block
+
+			UICorner.CornerRadius = UDim.new(5, 100)
+			UICorner.Parent = Block
+
+			ValueBlock.Name = "ValueBlock"
+			ValueBlock.Parent = Block
+			ValueBlock.AnchorPoint = Vector2.new(0.5, 0.5)
+			ValueBlock.BackgroundColor3 = Library.Colors.Hightlight
+			ValueBlock.BackgroundTransparency = 1.000
+			ValueBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ValueBlock.BorderSizePixel = 0
+			ValueBlock.Position = UDim2.new(0.75, 0, 0.5, 0)
+			ValueBlock.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
+			ValueBlock.SizeConstraint = Enum.SizeConstraint.RelativeYY
+			ValueBlock.ZIndex = 16
+
+			TriangleImage.Name = "Triangle"
+			TriangleImage.Parent = ValueBlock
+			TriangleImage.AnchorPoint = Vector2.new(0.5, 0.5)
+			TriangleImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			TriangleImage.BackgroundTransparency = 1.000
+			TriangleImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+			TriangleImage.Size = UDim2.new(1, 0, 1, 0)
+			TriangleImage.Image = "rbxassetid://102797584513959"
+			TriangleImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			TriangleImage.ScaleType = Enum.ScaleType.Fit
+			TriangleImage.ZIndex = 17
+
+			UICorner_2.CornerRadius = UDim.new(1, 0)
+			UICorner_2.Parent = TriangleImage
+
+			Button.Name = "Button"
+			Button.Parent = A1ToggleBlock
+			Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Button.BackgroundTransparency = 1.000
+			Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Button.BorderSizePixel = 0
+			Button.Size = UDim2.new(1, 0, 1, 0)
+			Button.ZIndex = 15
+			Button.Font = Enum.Font.SourceSans
+			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Button.TextSize = 14.000
+			Button.TextTransparency = 1.000
+
+			Library:MakeDrop(A1ToggleBlock, UIStroke, Library.Colors.Hightlight)
+
+			if setup.Tip then
+				WindowLibrary:AddToolTip(A1ToggleBlock, tostring(setup.Tip))
+			end
+
+			local UILib = function(value)
+				if value then
+					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
+						Position = UDim2.new(0.75, 0, 0.5, 0),
+					})
+					TriangleImage.Rotation = 0
+				else
+					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
+						Position = UDim2.new(0.25, 0, 0.5, 0),
+					})
+					TriangleImage.Rotation = 180
+				end
+				ValueBlock.BackgroundColor3 = value and Library.Colors.Hightlight or Library.Colors.Disable
+			end
+
+			UILib(setup.Default)
+
+			Button.MouseButton1Click:Connect(function()
+				setup.Default = not setup.Default
+
+				UILib(setup.Default)
+
+				setup.Callback(setup.Default)
+			end)
+
+			local UpdateBlock = function()
+				local TitleSize = TextLabel.TextSize
+				local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
+				local ContentSize = setup.Content:len() > 0
+						and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font)
+					or Vector2.new(0, 0)
+
+				local TotalHeight = MainSize.Y + 10
+				if setup.Content:len() > 0 then
+					Content.Visible = true
+					TotalHeight = TotalHeight + ContentSize.Y + 5
+					TextLabel.Position = UDim2.new(0, 5, 0, 12)
+					TextLabel.Size = UDim2.new(1, 0, 0, 14)
+				else
+					Content.Visible = false
+					TotalHeight = TotalHeight + 15.20000000000001
+					TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+					TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+				end
+
+				A1ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+			end
+			UpdateBlock()
+
+			local RootSkid = {}
+
+			function RootSkid:Content(Setup)
+				Content.Text = Setup
+				UpdateBlock()
+			end
+
+			function RootSkid:Value(Setup)
+				setup.Default = Setup
+				UILib(setup.Default)
+				setup.Callback(setup.Default)
+				UpdateBlock()
+			end
+
+			function RootSkid:Visible(value)
+				A1ToggleBlock.Visible = value
+			end
+
+			return RootSkid
+		end
+		------ // 切换按钮[2]   ----------------------------------------------------------------------------------------
+		function Root:A2Toggle(setup)
+			setup = setup or {}
+
+			setup.Title = setup.Title or "切换按钮[2]"
+			setup.Content = setup.Content or ""
+			setup.Default = setup.Default or false
+			setup.Callback = setup.Callback or function() end
+
+			local A2ToggleBlock = Instance.new("Frame")
+			local DropShadow = Instance.new("ImageLabel")
+			local UIStroke = Instance.new("UIStroke")
+			local TextLabel = Instance.new("TextLabel")
+			local Content = Instance.new("TextLabel")
+			local Block = Instance.new("Frame")
+			local UIStroke_2 = Instance.new("UIStroke")
+			local UICorner = Instance.new("UICorner")
+			local ValueBlock = Instance.new("Frame")
+			local UICorner_2 = Instance.new("UICorner")
+			local Button = Instance.new("TextButton")
+			local StateImage = Instance.new("ImageLabel")
+
+			A2ToggleBlock.Name = "A2ToggleBlock"
+			A2ToggleBlock.Parent = ScrollingFrame
+			A2ToggleBlock.BackgroundColor3 = Library.Colors.Default
+			A2ToggleBlock.BackgroundTransparency = 0.250
+			A2ToggleBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			A2ToggleBlock.BorderSizePixel = 0
+			A2ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+			A2ToggleBlock.ZIndex = 10
+
+			DropShadow.Name = "DropShadow"
+			DropShadow.Parent = A2ToggleBlock
+			DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			DropShadow.BackgroundTransparency = 1.000
+			DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
+			DropShadow.Position = UDim2.new(0, -5, 0, -5)
+			DropShadow.Size = UDim2.new(1, 10, 1, 10)
+			DropShadow.ZIndex = 9
+			DropShadow.Image = "rbxassetid://297694300"
+			DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+			DropShadow.ImageTransparency = 0.500
+			DropShadow.ScaleType = Enum.ScaleType.Slice
+			DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+			DropShadow.SliceScale = 0.050
+
+			UIStroke.Transparency = 0.850
+			UIStroke.Color = Color3.fromRGB(156, 156, 156)
+			UIStroke.Parent = A2ToggleBlock
+
+			TextLabel.RichText = true
+			TextLabel.Parent = A2ToggleBlock
+			TextLabel.AnchorPoint = Vector2.new(0, 0.5)
+			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			TextLabel.BackgroundTransparency = 1.000
+			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TextLabel.BorderSizePixel = 0
+			TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+			TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+			TextLabel.ZIndex = 11
+			TextLabel.Font = Enum.Font.Gotham
+			TextLabel.Text = setup.Title
+			TextLabel.TextColor3 = Library.Colors.TextColor
+			TextLabel.TextScaled = true
+			TextLabel.TextSize = 14.000
+			TextLabel.TextStrokeColor3 = Library.Colors.TextColor
+			TextLabel.TextStrokeTransparency = 0.950
+			TextLabel.TextWrapped = true
+			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+			Content.Name = "Content"
+			Content.Parent = A2ToggleBlock
+			Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Content.BackgroundTransparency = 1.000
+			Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Content.BorderSizePixel = 0
+			Content.Position = UDim2.new(0, 5, 0, 18)
+			Content.Size = UDim2.new(1, 0, 0, 45)
+			Content.Visible = false
+			Content.ZIndex = 11
+			Content.Font = Enum.Font.Gotham
+			Content.Text = setup.Content
+			Content.TextColor3 = Library.Colors.TextColor
+			Content.TextSize = 13.000
+			Content.TextStrokeColor3 = Library.Colors.TextColor
+			Content.TextStrokeTransparency = 0.950
+			Content.TextTransparency = 0.500
+			Content.TextWrapped = true
+			Content.TextXAlignment = Enum.TextXAlignment.Left
+			Content.TextYAlignment = Enum.TextYAlignment.Top
+			Content.RichText = true
+
+			Block.Name = "Block"
+			Block.Parent = A2ToggleBlock
+			Block.AnchorPoint = Vector2.new(1, 0.5)
+			Block.BackgroundColor3 = Library.Colors.Default
+			Block.BackgroundTransparency = 0.500
+			Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Block.BorderSizePixel = 0
+			Block.Position = UDim2.new(0.980000019, 0, 0.5, 0)
+			Block.Size = UDim2.new(0, 35, 0.5, 0)
+			Block.ZIndex = 14
+
+			UIStroke_2.Transparency = 0.850
+			UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
+			UIStroke_2.Parent = Block
+
+			UICorner.CornerRadius = UDim.new(5, 100)
+			UICorner.Parent = Block
+
+			ValueBlock.Name = "ValueBlock"
+			ValueBlock.Parent = Block
+			ValueBlock.AnchorPoint = Vector2.new(0.5, 0.5)
+			ValueBlock.BackgroundColor3 = Library.Colors.Hightlight
+			ValueBlock.BackgroundTransparency = 1.000
+			ValueBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ValueBlock.BorderSizePixel = 0
+			ValueBlock.Position = UDim2.new(0.75, 0, 0.5, 0)
+			ValueBlock.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
+			ValueBlock.SizeConstraint = Enum.SizeConstraint.RelativeYY
+			ValueBlock.ZIndex = 16
+
+			StateImage.Name = "StateImage"
+			StateImage.Parent = ValueBlock
+			StateImage.AnchorPoint = Vector2.new(0.5, 0.5)
+			StateImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			StateImage.BackgroundTransparency = 1.000
+			StateImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+			StateImage.Size = UDim2.new(1, 0, 1, 0)
+			StateImage.Image = "rbxassetid://123698784885744"
+			StateImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			StateImage.ScaleType = Enum.ScaleType.Fit
+			StateImage.ZIndex = 17
+
+			UICorner_2.CornerRadius = UDim.new(1, 0)
+			UICorner_2.Parent = StateImage
+
+			Button.Name = "Button"
+			Button.Parent = A2ToggleBlock
+			Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Button.BackgroundTransparency = 1.000
+			Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Button.BorderSizePixel = 0
+			Button.Size = UDim2.new(1, 0, 1, 0)
+			Button.ZIndex = 15
+			Button.Font = Enum.Font.SourceSans
+			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Button.TextSize = 14.000
+			Button.TextTransparency = 1.000
+
+			Library:MakeDrop(A2ToggleBlock, UIStroke, Library.Colors.Hightlight)
+
+			if setup.Tip then
+				WindowLibrary:AddToolTip(A2ToggleBlock, tostring(setup.Tip))
+			end
+
+			local UILib = function(value)
+				if value then
+					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
+						Position = UDim2.new(0.75, 0, 0.5, 0),
+					})
+					StateImage.Image = "rbxassetid://88666635012556"
+				else
+					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
+						Position = UDim2.new(0.25, 0, 0.5, 0),
+					})
+					StateImage.Image = "rbxassetid://123698784885744"
+				end
+				ValueBlock.BackgroundColor3 = value and Library.Colors.Hightlight or Library.Colors.Disable
+			end
+
+			UILib(setup.Default)
+
+			Button.MouseButton1Click:Connect(function()
+				setup.Default = not setup.Default
+
+				UILib(setup.Default)
+
+				setup.Callback(setup.Default)
+			end)
+
+			local UpdateBlock = function()
+				local TitleSize = TextLabel.TextSize
+				local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
+				local ContentSize = setup.Content:len() > 0
+						and Library:GetTextSize(setup.Content, Content.TextSize, Content.Font)
+					or Vector2.new(0, 0)
+
+				local TotalHeight = MainSize.Y + 10
+				if setup.Content:len() > 0 then
+					Content.Visible = true
+					TotalHeight = TotalHeight + ContentSize.Y + 5
+					TextLabel.Position = UDim2.new(0, 5, 0, 12)
+					TextLabel.Size = UDim2.new(1, 0, 0, 14)
+				else
+					Content.Visible = false
+					TotalHeight = TotalHeight + 15.20000000000001
+					TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
+					TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+				end
+
+				A2ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+			end
+			UpdateBlock()
+
+			local RootSkid = {}
+
+			function RootSkid:Content(Setup)
+				Content.Text = Setup
+				UpdateBlock()
+			end
+
+			function RootSkid:Value(Setup)
+				setup.Default = Setup
+				UILib(setup.Default)
+				setup.Callback(setup.Default)
+				UpdateBlock()
+			end
+
+			function RootSkid:Visible(value)
+				A2ToggleBlock.Visible = value
+			end
+
+			return RootSkid
+		end
 		------ // 输入框   ----------------------------------------------------------------------------------------
 		function Root:Textbox(setup)
 			setup = setup or {}
