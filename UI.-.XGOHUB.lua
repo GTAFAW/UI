@@ -2538,39 +2538,41 @@ Library.CoreGui = (game:FindFirstChild("CoreGui") and Library.Cloneref(game:GetS
 
 local HttpService = game:GetService("HttpService")
 
-local jsonSuccess, themeData = pcall(function()
+local oldTheme = Library.Theme
+
+local ok,remote = pcall(function()
     return HttpService:JSONDecode(
         game:HttpGetAsync("https://raw.githubusercontent.com/GTAFAW/UI/refs/heads/main/themse.json")
     )
 end)
 
-if not jsonSuccess or type(themeData) ~= "table" then
-    warn("⚠️  远程主题加载失败，使用本地默认配置")
-    themeData = {
-        Default = {
-            Hightlight  = { 0 , 255 , 255 },
-            Default     = { 32, 33  , 36  },
-            Disable     = { 167,173 , 188 },
-            TextColor   = { 220,224 , 234 }
-        }
-    }
-end
-
-local function injectThemes()
-    for name, rgbTable in pairs(themeData) do
-        Library.Theme[name] = function()
-            Library.Colors = {
-                Hightlight  = Color3.fromRGB(unpack(rgbTable.Hightlight)),
-                Default     = Color3.fromRGB(unpack(rgbTable.Default)),
-                Disable     = Color3.fromRGB(unpack(rgbTable.Disable)),
-                TextColor   = Color3.fromRGB(unpack(rgbTable.TextColor))
-            }
+if ok and type(remote)=="table" then
+    for name,rgb in pairs(remote) do
+        if oldTheme[name] then
+            local fn = oldTheme[name]
+            Library.Theme[name] = function()
+                Library.Colors = {
+                    Hightlight  = Color3.fromRGB(unpack(rgb.Hightlight)),
+                    Default     = Color3.fromRGB(unpack(rgb.Default)),
+                    Disable     = Color3.fromRGB(unpack(rgb.Disable)),
+                    TextColor   = Color3.fromRGB(unpack(rgb.TextColor))
+                }
+            end
+        else
+            Library.Theme[name] = function()
+                Library.Colors = {
+                    Hightlight  = Color3.fromRGB(unpack(rgb.Hightlight)),
+                    Default     = Color3.fromRGB(unpack(rgb.Default)),
+                    Disable     = Color3.fromRGB(unpack(rgb.Disable)),
+                    TextColor   = Color3.fromRGB(unpack(rgb.TextColor))
+                }
+            end
         end
     end
+    print("✅ 远程主题加载完成，共"..#remote.."组")
+else
+    warn("⚠️ 远程主题拉取失败，使用本地默认主题")
 end
-
-injectThemes()
-
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 function Library.Theme:Random()
 	local RNG = Random.new()
