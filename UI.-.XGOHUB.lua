@@ -11,15 +11,12 @@ local b = a.Value or 0
 b = b + 1
 a.Value = b
 local function c(d)
-	game.StarterGui:SetCore(
-		"SendNotification",
-		{
-			Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
-			Text = d,
-			Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
-			Duration = 1.5,
-		}
-	)
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "\232\132\154\230\156\172\233\128\154\231\159\165",
+		Text = d,
+		Icon = "rbxthumb://type=Asset&id=120611289434746&w=150&h=150",
+		Duration = 1.5,
+	})
 end
 local function e(f)
 	local g = Instance.new("Sound")
@@ -595,8 +592,13 @@ if b == 1 then
 		end)
 	end
 	_G.ThunderIntro_Stop = aD
-	local aL =
-		{ rStroke = a3.Color, gStroke = a6.Color, titleGradient = a9.Color, sub = ad.TextColor3, orb = al.BackgroundColor3 }
+	local aL = {
+		rStroke = a3.Color,
+		gStroke = a6.Color,
+		titleGradient = a9.Color,
+		sub = ad.TextColor3,
+		orb = al.BackgroundColor3,
+	}
 	local function aM(C, D, E)
 		return Color3.fromHSV(C % 1, D, E)
 	end
@@ -2536,16 +2538,12 @@ Library.CoreGui = (game:FindFirstChild("CoreGui") and Library.Cloneref(game:GetS
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 
 Library.SizeLibrary = {
-	-- 原Default：580,385 → 改小为 460,308（缩小80%）
 	Default = UDim2.fromOffset(460, 308),
-	-- 原Auth：250,125 → 改小为 200,100
 	Auth = UDim2.new(0.05, 200, 0.05, 100),
 	Max = UDim2.fromScale(1, 1),
 	Loading = UDim2.new(0, 70, 0, 70),
 	Close = UDim2.new(0.01, 25, 0.01, 25),
 }
-
-Library.Theme = {}
 
 Library.Colors = {
 	Hightlight = Color3.fromRGB(0, 255, 255),
@@ -2553,6 +2551,63 @@ Library.Colors = {
 	Disable = Color3.fromRGB(167, 173, 188),
 	TextColor = Color3.fromRGB(220, 224, 234),
 }
+
+local ThemeMap = {
+	Default = { 0, 255, 255, 32, 33, 36, 167, 173, 188, 220, 224, 234 },
+	Dark = { 255, 255, 255, 20, 20, 22, 167, 173, 188, 220, 224, 234 },
+	Discord = { 114, 137, 218, 35, 37, 40, 167, 173, 188, 234, 234, 234 },
+	Discord1 = { 0, 115, 255, 198, 211, 229, 74, 77, 83, 0, 0, 0 },
+	Catppuccin = { 201, 165, 245, 30, 31, 47, 109, 123, 154, 204, 204, 204 },
+	Discord2 = { 90, 212, 176, 22, 25, 29, 72, 72, 83, 191, 193, 195 },
+	Matcha = { 152, 132, 110, 38, 49, 55, 62, 83, 82, 165, 178, 175 },
+	Neverlose = { 0, 251, 255, 0, 13, 26, 167, 173, 188, 255, 255, 255 },
+	HightGreen = { 0, 255, 140, 8, 13, 12, 163, 188, 165, 255, 255, 255 },
+	Halloween = { 255, 162, 0, 13, 11, 10, 188, 156, 156, 255, 0, 0 },
+	Christmas = { 138, 220, 255, 11, 13, 13, 81, 103, 104, 249, 249, 249 },
+	Valentine = { 255, 0, 128, 200, 15, 100, 206, 162, 168, 255, 255, 255 },
+	Summer = { 0, 255, 127, 0, 128, 102, 173, 216, 230, 255, 255, 255 },
+	Autumn = { 255, 140, 0, 139, 69, 19, 188, 143, 143, 255, 255, 255 },
+	Winter = { 173, 216, 230, 70, 130, 180, 199, 219, 249, 0, 0, 0 },
+	Ocean = { 0, 150, 136, 0, 51, 51, 102, 153, 255, 255, 255, 255 },
+	Nord = { 136, 192, 208, 46, 52, 64, 88, 110, 117, 216, 222, 227 },
+	Mint = { 189, 252, 201, 39, 174, 96, 189, 220, 189, 41, 128, 185 },
+	Sunset = { 255, 69, 0, 139, 69, 19, 207, 207, 207, 255, 255, 255 },
+	Rose = { 255, 105, 180, 96, 0, 77, 204, 192, 179, 255, 255, 255 },
+	Cyberpunk = { 0, 252, 255, 0, 0, 0, 75, 75, 75, 255, 255, 255 },
+	Lavender = { 230, 230, 250, 150, 150, 170, 200, 200, 220, 255, 255, 255 },
+	AquaMarine = { 127, 255, 212, 0, 100, 100, 143, 188, 143, 0, 0, 0 },
+	Midnight = { 58, 69, 77, 10, 10, 10, 58, 69, 77, 255, 255, 255 },
+	Sakura = { 255, 182, 193, 160, 82, 45, 233, 185, 170, 255, 255, 255 },
+	Desert = { 255, 223, 129, 139, 69, 19, 210, 180, 140, 0, 0, 0 },
+	Forest = { 34, 139, 34, 0, 100, 0, 144, 238, 144, 255, 255, 255 },
+	Royal = { 102, 51, 153, 0, 0, 0, 173, 127, 168, 255, 255, 255 },
+	Ruby = { 224, 17, 95, 139, 0, 0, 233, 185, 170, 255, 255, 255 },
+	Tropical = { 255, 239, 213, 0, 95, 87, 218, 232, 218, 10, 10, 10 },
+	Vintage = { 139, 69, 19, 112, 128, 144, 191, 191, 191, 255, 255, 255 },
+	Cobalt = { 0, 255, 255, 0, 0, 102, 102, 153, 204, 255, 255, 255 },
+	Sage = { 158, 251, 155, 75, 100, 70, 188, 226, 184, 0, 0, 0 },
+	Bronze = { 205, 127, 50, 139, 69, 19, 222, 184, 135, 255, 255, 255 },
+	Lagoon = { 0, 150, 136, 0, 51, 51, 102, 153, 255, 255, 255, 255 },
+	Amber = { 255, 191, 0, 139, 69, 19, 255, 204, 102, 0, 0, 0 },
+	Aurora = { 138, 43, 226, 26, 26, 26, 72, 72, 72, 255, 255, 255 },
+	Neon = { 0, 252, 255, 25, 25, 25, 100, 100, 100, 255, 255, 255 },
+	Pastel = { 255, 158, 181, 207, 207, 207, 238, 238, 238, 51, 51, 51 },
+	Jungle = { 0, 128, 0, 34, 34, 34, 102, 153, 102, 255, 255, 255 },
+	OceanBreeze = { 0, 173, 239, 41, 64, 90, 131, 175, 155, 255, 255, 255 },
+	Sunrise = { 255, 159, 67, 34, 34, 34, 204, 153, 102, 255, 255, 255 },
+	StarryNight = { 70, 130, 180, 12, 12, 12, 53, 53, 53, 255, 255, 255 },
+	Twilight = { 75, 0, 130, 45, 45, 60, 100, 100, 120, 255, 255, 255 },
+	Frost = { 185, 225, 255, 240, 250, 255, 200, 215, 230, 0, 0, 0 },
+	Floral = { 255, 182, 193, 135, 206, 235, 225, 225, 225, 10, 10, 10 },
+	SunsetBeach = { 255, 69, 0, 255, 140, 0, 255, 213, 102, 0, 0, 0 },
+	Mystic = { 65, 105, 225, 40, 50, 60, 130, 140, 170, 255, 255, 255 },
+	Elegant = { 255, 193, 7, 70, 30, 20, 200, 160, 120, 255, 255, 255 },
+	ChineseNewYear = { 255, 0, 0, 255, 165, 0, 255, 215, 205, 0, 0, 0 },
+	Celebration = { 250, 1, 1, 255, 0, 0, 255, 192, 203, 0, 0, 0 },
+}
+
+Library.Theme = {}
+
 function Library.Theme:Default()
 	Library.Colors = {
 		Hightlight = Color3.fromRGB(0, 255, 255),
@@ -2561,431 +2616,40 @@ function Library.Theme:Default()
 		TextColor = Color3.fromRGB(220, 224, 234),
 	}
 end
-function Library.Theme:Dark()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 255, 255),
-		Default = Color3.fromRGB(20, 20, 22),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(220, 224, 234),
-	}
-end
-function Library.Theme:Discord()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(114, 137, 218),
-		Default = Color3.fromRGB(35, 37, 40),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(234, 234, 234),
-	}
-end
-function Library.Theme:Discord1()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 115, 255),
-		Default = Color3.fromRGB(198, 211, 229),
-		Disable = Color3.fromRGB(74, 77, 83),
-		TextColor = Color3.fromRGB(0, 0, 0),
-	}
-end
-function Library.Theme:Catppuccin()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(201, 165, 245),
-		Default = Color3.fromRGB(30, 31, 47),
-		Disable = Color3.fromRGB(109, 123, 154, 255),
-		TextColor = Color3.fromRGB(204, 204, 204),
-	}
-end
-function Library.Theme:Discord2()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(90, 212, 176),
-		Default = Color3.fromRGB(22, 25, 29),
-		Disable = Color3.fromRGB(72, 72, 83),
-		TextColor = Color3.fromRGB(191, 193, 195),
-	}
-end
-function Library.Theme:Matcha()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(152, 132, 110),
-		Default = Color3.fromRGB(38, 49, 55),
-		Disable = Color3.fromRGB(62, 83, 82),
-		TextColor = Color3.fromRGB(165, 178, 175),
-	}
-end
-function Library.Theme:Neverlose()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 251, 255),
-		Default = Color3.fromRGB(0, 13, 26),
-		Disable = Color3.fromRGB(167, 173, 188),
-		TextColor = Color3.fromRGB(255, 255, 255),
-	}
-end
-function Library.Theme:Custom(Hightlight, Default, Disable, TextColor)
-	Library.Colors = {
-		Hightlight = Hightlight,
-		Default = Default,
-		Disable = Disable,
-		TextColor = TextColor,
-	}
-end
-function Library.Theme:HightGreen()
-	-- 定义库（Library）的颜色配置表（Colors），用于"HightGreen"（高亮绿色）主题
-	Library.Colors = {
-		-- 高亮色：用于突出显示的元素（如选中状态、按钮 hover 效果等），RGB值对应亮绿色
-		Hightlight = Color3.fromRGB(0, 255, 140),
-		-- 默认色：界面基础背景色或普通元素底色，RGB值对应深暗色（接近黑色）
-		Default = Color3.fromRGB(8, 13, 12),
-		-- 禁用色：用于不可交互状态的元素（如禁用按钮、失效选项等），RGB值对应浅灰绿色
-		Disable = Color3.fromRGB(163, 188, 165),
-		-- 文本色：界面中文字的颜色，RGB值对应纯白色，确保在深色背景上清晰可见
-		TextColor = Color3.fromRGB(255, 255, 255),
-	}
-end
-function Library.Theme:Halloween()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 162, 0),
-		Default = Color3.fromRGB(13, 11, 10),
-		Disable = Color3.fromRGB(188, 156, 156),
-		TextColor = Color3.fromRGB(255, 0, 0),
-	}
-end
-function Library.Theme:Christmas()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(138, 220, 255),
-		Default = Color3.fromRGB(11, 13, 13),
-		Disable = Color3.fromRGB(81, 103, 104),
-		TextColor = Color3.fromRGB(249, 249, 249),
-	}
-end
-function Library.Theme:Valentine()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 0, 128), -- 粉红色
-		Default = Color3.fromRGB(200, 15, 100), -- 深粉红色
-		Disable = Color3.fromRGB(206, 162, 168), -- 浅灰色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Summer()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 255, 127), -- 酸橙色
-		Default = Color3.fromRGB(0, 128, 102), -- 深绿色
-		Disable = Color3.fromRGB(173, 216, 230), -- 天蓝色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Autumn()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 140, 0), -- 橙色
-		Default = Color3.fromRGB(139, 69, 19), -- 深棕色
-		Disable = Color3.fromRGB(188, 143, 143), -- 浅棕色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Winter()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(173, 216, 230), -- 天蓝色
-		Default = Color3.fromRGB(70, 130, 180), -- 深蓝色
-		Disable = Color3.fromRGB(199, 219, 249), -- 浅蓝色
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Ocean()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 150, 136), -- 青绿色
-		Default = Color3.fromRGB(0, 51, 51), -- 深蓝色
-		Disable = Color3.fromRGB(102, 153, 255), -- 亮蓝色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Nord()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(136, 192, 208), -- 北欧蓝
-		Default = Color3.fromRGB(46, 52, 64), -- 北欧深灰
-		Disable = Color3.fromRGB(88, 110, 117), -- 北欧浅灰
-		TextColor = Color3.fromRGB(216, 222, 227), -- 北欧亮灰
-	}
-end
-function Library.Theme:Mint()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(189, 252, 201), -- 薄荷绿
-		Default = Color3.fromRGB(39, 174, 96), -- 深薄荷绿
-		Disable = Color3.fromRGB(189, 220, 189), -- 浅薄荷绿
-		TextColor = Color3.fromRGB(41, 128, 185), -- 薄荷蓝
-	}
-end
-function Library.Theme:Sunset()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 69, 0), -- 夕阳橙
-		Default = Color3.fromRGB(139, 69, 19), -- 深棕色
-		Disable = Color3.fromRGB(207, 207, 207), -- 浅灰色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Rose()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 105, 180), -- 玫瑰粉
-		Default = Color3.fromRGB(96, 0, 77), -- 深玫瑰红
-		Disable = Color3.fromRGB(204, 192, 179), -- 玫瑰棕
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Cyberpunk()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 252, 255), -- 霓虹青
-		Default = Color3.fromRGB(0, 0, 0), -- 黑色
-		Disable = Color3.fromRGB(75, 75, 75), -- 深灰色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Lavender()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(230, 230, 250), -- 淡紫色
-		Default = Color3.fromRGB(150, 150, 170), -- 深紫色
-		Disable = Color3.fromRGB(200, 200, 220), -- 浅紫色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:AquaMarine()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(127, 255, 212), -- 水绿色
-		Default = Color3.fromRGB(0, 100, 100), -- 深水绿
-		Disable = Color3.fromRGB(143, 188, 143), -- 浅水绿
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Midnight()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(58, 69, 77), -- 午夜蓝
-		Default = Color3.fromRGB(10, 10, 10), -- 深午夜黑
-		Disable = Color3.fromRGB(58, 69, 77), -- 浅午夜灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Sakura()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 182, 193), -- 樱花粉
-		Default = Color3.fromRGB(160, 82, 45), -- 深棕色
-		Disable = Color3.fromRGB(233, 185, 170), -- 浅棕色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Desert()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 223, 129), -- 沙漠金
-		Default = Color3.fromRGB(139, 69, 19), -- 沙漠棕
-		Disable = Color3.fromRGB(210, 180, 140), -- 浅沙漠棕
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Forest()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(34, 139, 34), -- 森林绿
-		Default = Color3.fromRGB(0, 100, 0), -- 深森林绿
-		Disable = Color3.fromRGB(144, 238, 144), -- 浅森林绿
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Royal()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(102, 51, 153), -- 皇家紫
-		Default = Color3.fromRGB(0, 0, 0), -- 黑色
-		Disable = Color3.fromRGB(173, 127, 168), -- 浅紫色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Ruby()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(224, 17, 95), -- 红宝石红
-		Default = Color3.fromRGB(139, 0, 0), -- 深红色
-		Disable = Color3.fromRGB(233, 185, 170), -- 浅红色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Tropical()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 239, 213), -- 热带黄
-		Default = Color3.fromRGB(0, 95, 87), -- 热带绿
-		Disable = Color3.fromRGB(218, 232, 218), -- 热带浅绿
-		TextColor = Color3.fromRGB(10, 10, 10), -- 深灰色
-	}
-end
-function Library.Theme:Vintage()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(139, 69, 19), -- 复古棕
-		Default = Color3.fromRGB(112, 128, 144), -- 复古灰
-		Disable = Color3.fromRGB(191, 191, 191), -- 复古浅灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Cobalt()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 255, 255), -- 钴蓝色
-		Default = Color3.fromRGB(0, 0, 102), -- 深钴蓝
-		Disable = Color3.fromRGB(102, 153, 204), -- 浅钴蓝
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Sage()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(158, 251, 155), -- 鼠尾草绿
-		Default = Color3.fromRGB(75, 100, 70), -- 深鼠尾草绿
-		Disable = Color3.fromRGB(188, 226, 184), -- 浅鼠尾草绿
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Bronze()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(205, 127, 50), -- 青铜色
-		Default = Color3.fromRGB(139, 69, 19), -- 深青铜色
-		Disable = Color3.fromRGB(222, 184, 135), -- 浅青铜色
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Lagoon()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 150, 136), -- 泻湖绿
-		Default = Color3.fromRGB(0, 51, 51), -- 深海绿
-		Disable = Color3.fromRGB(102, 153, 255), -- 浅泻湖绿
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Amber()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 191, 0), -- 琥珀色
-		Default = Color3.fromRGB(139, 69, 19), -- 深琥珀色
-		Disable = Color3.fromRGB(255, 204, 102), -- 浅琥珀色
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Aurora()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(138, 43, 226), -- 极光紫
-		Default = Color3.fromRGB(26, 26, 26), -- 深空黑
-		Disable = Color3.fromRGB(72, 72, 72), -- 星云灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 星光白
-	}
-end
-function Library.Theme:Neon()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 252, 255), -- 霓虹青
-		Default = Color3.fromRGB(25, 25, 25), -- 午夜黑
-		Disable = Color3.fromRGB(100, 100, 100), -- 深灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 亮白
-	}
-end
-function Library.Theme:Pastel()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 158, 181), -- 粉彩红
-		Default = Color3.fromRGB(207, 207, 207), -- 粉彩灰
-		Disable = Color3.fromRGB(238, 238, 238), -- 粉彩浅灰
-		TextColor = Color3.fromRGB(51, 51, 51), -- 深灰
-	}
-end
-function Library.Theme:Jungle()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 128, 0), -- 丛林绿
-		Default = Color3.fromRGB(34, 34, 34), -- 暗绿
-		Disable = Color3.fromRGB(102, 153, 102), -- 浅绿
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:OceanBreeze()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(0, 173, 239), -- 海洋蓝
-		Default = Color3.fromRGB(41, 64, 90), -- 海洋深蓝
-		Disable = Color3.fromRGB(131, 175, 155), -- 海洋浅蓝
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Sunrise()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 159, 67), -- 日出色
-		Default = Color3.fromRGB(34, 34, 34), -- 深灰
-		Disable = Color3.fromRGB(204, 153, 102), -- 日出橙
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:StarryNight()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(70, 130, 180), -- 星空蓝
-		Default = Color3.fromRGB(12, 12, 12), -- 深夜黑
-		Disable = Color3.fromRGB(53, 53, 53), -- 暗夜灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 星光白
-	}
-end
-function Library.Theme:Twilight()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(75, 0, 130), -- 暮光紫
-		Default = Color3.fromRGB(45, 45, 60), -- 暮光深灰
-		Disable = Color3.fromRGB(100, 100, 120), -- 暮光浅灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Frost()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(185, 225, 255), -- 霜冻蓝
-		Default = Color3.fromRGB(240, 250, 255), -- 霜冻白
-		Disable = Color3.fromRGB(200, 215, 230), -- 霜冻浅蓝
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Floral()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 182, 193), -- 花园粉
-		Default = Color3.fromRGB(135, 206, 235), -- 花园蓝
-		Disable = Color3.fromRGB(225, 225, 225), -- 花园灰
-		TextColor = Color3.fromRGB(10, 10, 10), -- 深灰色
-	}
-end
-function Library.Theme:SunsetBeach()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 69, 0), -- 日落橙
-		Default = Color3.fromRGB(255, 140, 0), -- 沙滩金
-		Disable = Color3.fromRGB(255, 213, 102), -- 沙滩浅金
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:Mystic()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(65, 105, 225), -- 神秘蓝
-		Default = Color3.fromRGB(40, 50, 60), -- 神秘深灰
-		Disable = Color3.fromRGB(130, 140, 170), -- 神秘浅灰
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:Elegant()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 193, 7), -- 优雅金
-		Default = Color3.fromRGB(70, 30, 20), -- 优雅深棕
-		Disable = Color3.fromRGB(200, 160, 120), -- 优雅浅棕
-		TextColor = Color3.fromRGB(255, 255, 255), -- 白色
-	}
-end
-function Library.Theme:ChineseNewYear()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(255, 0, 0), -- 红色，代表喜庆和好运
-		Default = Color3.fromRGB(255, 165, 0), -- 橙色，代表活力和繁荣
-		Disable = Color3.fromRGB(255, 215, 205), -- 浅红色，代表温和和吉祥
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色，用于文本，保持清晰可读
-	}
-end
-function Library.Theme:Celebration()
-	Library.Colors = {
-		Hightlight = Color3.fromRGB(250, 1, 1), -- 喜庆红
-		Default = Color3.fromRGB(255, 0, 0), -- 金色
-		Disable = Color3.fromRGB(255, 192, 203), -- 浅粉色
-		TextColor = Color3.fromRGB(0, 0, 0), -- 黑色
-	}
-end
-function Library.Theme:RandomColor()
-	local randomColor = function()
-		return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
-	end
 
+function Library.Theme:Custom(h, d, dis, t)
 	Library.Colors = {
-		Hightlight = randomColor(), -- 随机高亮色
-		Default = randomColor(), -- 随机默认色
-		Disable = randomColor(), -- 随机禁用色
-		TextColor = randomColor(), -- 随机文本色
+		Hightlight = h,
+		Default = d,
+		Disable = dis,
+		TextColor = t,
 	}
 end
+
+setmetatable(Library.Theme, {
+	__index = function(_, theme)
+		local c = ThemeMap[theme]
+
+		if not c then
+			return nil
+		end
+		return function()
+			if theme == "RandomColor" then
+				local r = function()
+					return Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255))
+				end
+				Library.Colors = { Hightlight = r(), Default = r(), Disable = r(), TextColor = r() }
+			else
+				Library.Colors = {
+					Hightlight = Color3.fromRGB(c[1], c[2], c[3]),
+					Default = Color3.fromRGB(c[4], c[5], c[6]),
+					Disable = Color3.fromRGB(c[7], c[8], c[9]),
+					TextColor = Color3.fromRGB(c[10], c[11], c[12]),
+				}
+			end
+		end
+	end,
+})
 ------------------------------------UI.主题颜色------------------------------------------------------------------------------------------------------------
 function Library.Theme:Random()
 	local RNG = Random.new()
@@ -3976,8 +3640,8 @@ function Library:Windowxgo(setup)
 		"rbxassetid://74636237060419",
 		"rbxassetid://110959984143843",
 	}
---      "rbxassetid://",
---		"rbxassetid://",
+	--      "rbxassetid://",
+	--		"rbxassetid://",
 	math.randomseed(tick())
 	local function shuffle(t)
 		for i = #t, 2, -1 do
@@ -4069,382 +3733,457 @@ function Library:Windowxgo(setup)
 	MainFrame.ClipsDescendants = true
 	MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 	MainFrame.Size = UDim2.fromScale(0, 0)
-	
-do
-	----------------------------------------------------------------
-	local particleFolder = Instance.new("Frame")
-	particleFolder.Name  = "PlayableStars"
-	particleFolder.Parent = MainFrame
-	particleFolder.AnchorPoint = Vector2.new(0.5, 0.5)
-	particleFolder.Position = UDim2.fromScale(0.5, 0.5)
-	particleFolder.Size = UDim2.fromScale(1, 1)
-	particleFolder.BackgroundTransparency = 1
-	particleFolder.ZIndex = 5
-	particleFolder.ClipsDescendants = true
 
-	local isParticleActive = true
-	local heartbeatConnection = nil
-	local rng = Random.new()
-	local run = game:GetService("RunService")
-	local uis = game:GetService("UserInputService")
-	local guiServ = game:GetService("GuiService")
+	do
+		----------------------------------------------------------------
+		local particleFolder = Instance.new("Frame")
+		particleFolder.Name = "PlayableStars"
+		particleFolder.Parent = MainFrame
+		particleFolder.AnchorPoint = Vector2.new(0.5, 0.5)
+		particleFolder.Position = UDim2.fromScale(0.5, 0.5)
+		particleFolder.Size = UDim2.fromScale(1, 1)
+		particleFolder.BackgroundTransparency = 1
+		particleFolder.ZIndex = 5
+		particleFolder.ClipsDescendants = true
 
-	---------------- 参数 ----------------
-	local TOTAL_COUNT = 20
-	local FIRST_BATCH = 8
-	local FADE_DELAY  = 16
-	local SPAWN_GAP   = 3
-	local FALL_SPEED  = 0.2
-	local HORIZONTAL_RANGE = 0.6
-	local MIN_SIZE, MAX_SIZE = 8, 14
-	local MIN_ROT_SPEED, MAX_ROT_SPEED = -0.5, 0.5
-	local STAR_ELASTICITY = 0.75
-	local COLLAPSED_THRESHOLD = 50
+		local isParticleActive = true
+		local heartbeatConnection = nil
+		local rng = Random.new()
+		local run = game:GetService("RunService")
+		local uis = game:GetService("UserInputService")
+		local guiServ = game:GetService("GuiService")
 
-	-- 波纹
-	local WAVE_MAX_RADIUS = 200
-	local WAVE_DURATION   = 0.4
-	local WAVE_PUSH_SPEED = 0.6
-	local WAVE_DECAY      = 0.88
+		---------------- 参数 ----------------
+		local TOTAL_COUNT = 20
+		local FIRST_BATCH = 8
+		local FADE_DELAY = 16
+		local SPAWN_GAP = 3
+		local FALL_SPEED = 0.2
+		local HORIZONTAL_RANGE = 0.6
+		local MIN_SIZE, MAX_SIZE = 8, 14
+		local MIN_ROT_SPEED, MAX_ROT_SPEED = -0.5, 0.5
+		local STAR_ELASTICITY = 0.75
+		local COLLAPSED_THRESHOLD = 50
 
-	-- 公转
-	local ORBIT_SPEED   = 1.2         -- 弧度/秒
-	local ORBIT_RADIUS  = 0.25        -- 比例半径
-	local LONG_PRESS_TIME = 0.35      -- 长按判定时间
-	------------------------------------------
+		-- 波纹
+		local WAVE_MAX_RADIUS = 200
+		local WAVE_DURATION = 0.4
+		local WAVE_PUSH_SPEED = 0.6
+		local WAVE_DECAY = 0.88
 
-	local particles   = {}
-	local dragging    = nil
-	local secondSpawned = false
-	local starImageIds = {
-		"rbxassetid://112950808406477",
-		"rbxassetid://126585145865309",
-		"rbxassetid://140049610411995",
-		"rbxassetid://127810956322486"
-	}
+		-- 公转
+		local ORBIT_SPEED = 1.2 -- 弧度/秒
+		local ORBIT_RADIUS = 0.25 -- 比例半径
+		local LONG_PRESS_TIME = 0.35 -- 长按判定时间
+		------------------------------------------
 
-	-- 冲击波
-	local waveActive = false
-	local waveCenter = Vector2.zero
-	local waveRadius = 0
-	local waveSpeed  = WAVE_MAX_RADIUS / WAVE_DURATION
-
-	-- 长按状态
-	local pressStart  = 0
-	local longPressing = false
-	local pressConn   = nil
-	local releaseConn = nil
-
-	----------------------------------------------------------------函数
-	local function getFallInitParams()
-		local initX = rng:NextNumber(0, 1)
-		local initY = rng:NextNumber(-0.1, 0)
-		local horizontalOffset = rng:NextNumber(-HORIZONTAL_RANGE, HORIZONTAL_RANGE) * FALL_SPEED
-		local verticalSpeed = FALL_SPEED
-		return initX, initY, horizontalOffset, verticalSpeed
-	end
-
-	local function spawnStar()
-		if not isParticleActive then return end
-		local star = Instance.new("ImageLabel")
-		star.Name = "Star"
-		star.Parent = particleFolder
-		star.AnchorPoint = Vector2.new(0.5, 0.5)
-		star.BackgroundTransparency = 1
-		star.Image = starImageIds[rng:NextInteger(1, #starImageIds)]
-		star.ScaleType = Enum.ScaleType.Fit
-		star.ZIndex = 5
-
-		local s = rng:NextInteger(MIN_SIZE, MAX_SIZE)
-		star.Size = UDim2.fromOffset(s, s)
-		local r = s * 0.5
-		local initRot = rng:NextNumber(0, 360)
-		star.Rotation = initRot
-		local rotSpeed = rng:NextNumber(MIN_ROT_SPEED, MAX_ROT_SPEED)
-
-		local initX, initY, vx, vy = getFallInitParams()
-		star.Position = UDim2.new(initX, 0, initY, 0)
-		star.ImageTransparency = rng:NextNumber(0.2, 0.5)
-		star.ImageColor3 = Color3.fromHSV(rng:NextNumber(), 1, 1)
-
-		local data = {
-			obj = star, vx = vx, vy = vy, life = 0,
-			rot = initRot, rotSpeed = rotSpeed, r = r,
-			waveVx = 0, waveVy = 0,
-			-- 公转
-			orbitAngle = rng:NextNumber(0, 2*math.pi),
-			orbitRadius = rng:NextNumber(ORBIT_RADIUS*0.7, ORBIT_RADIUS),
-			orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
+		local particles = {}
+		local dragging = nil
+		local secondSpawned = false
+		local starImageIds = {
+			"rbxassetid://112950808406477",
+			"rbxassetid://126585145865309",
+			"rbxassetid://140049610411995",
+			"rbxassetid://127810956322486",
 		}
 
-		-- 拖拽
-		local function onPress(input)
-			if not isParticleActive then return end
-			if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-				dragging = data
-				data.vx, data.vy = 0, 0
-			end
+		-- 冲击波
+		local waveActive = false
+		local waveCenter = Vector2.zero
+		local waveRadius = 0
+		local waveSpeed = WAVE_MAX_RADIUS / WAVE_DURATION
+
+		-- 长按状态
+		local pressStart = 0
+		local longPressing = false
+		local pressConn = nil
+		local releaseConn = nil
+
+		----------------------------------------------------------------函数
+		local function getFallInitParams()
+			local initX = rng:NextNumber(0, 1)
+			local initY = rng:NextNumber(-0.1, 0)
+			local horizontalOffset = rng:NextNumber(-HORIZONTAL_RANGE, HORIZONTAL_RANGE) * FALL_SPEED
+			local verticalSpeed = FALL_SPEED
+			return initX, initY, horizontalOffset, verticalSpeed
 		end
-		local function onMove(input)
-			if not isParticleActive then return end
-			if dragging == data then
-				local pos = uis:GetMouseLocation()
-				local rel = MainFrame.AbsoluteSize
-				local x = math.clamp(pos.X - MainFrame.AbsolutePosition.X, 0, rel.X) / rel.X
-				local y = math.clamp(pos.Y - MainFrame.AbsolutePosition.Y, 0, rel.Y) / rel.Y
-				data.obj.Position = UDim2.new(x, 0, y, 0)
+
+		local function spawnStar()
+			if not isParticleActive then
+				return
 			end
-		end
-		local function onRelease()
-			if not isParticleActive then return end
-			if dragging == data then
-				dragging = nil
-				local _, _, newVx, newVy = getFallInitParams()
-				data.vx = newVx
-				data.vy = newVy
+			local star = Instance.new("ImageLabel")
+			star.Name = "Star"
+			star.Parent = particleFolder
+			star.AnchorPoint = Vector2.new(0.5, 0.5)
+			star.BackgroundTransparency = 1
+			star.Image = starImageIds[rng:NextInteger(1, #starImageIds)]
+			star.ScaleType = Enum.ScaleType.Fit
+			star.ZIndex = 5
+
+			local s = rng:NextInteger(MIN_SIZE, MAX_SIZE)
+			star.Size = UDim2.fromOffset(s, s)
+			local r = s * 0.5
+			local initRot = rng:NextNumber(0, 360)
+			star.Rotation = initRot
+			local rotSpeed = rng:NextNumber(MIN_ROT_SPEED, MAX_ROT_SPEED)
+
+			local initX, initY, vx, vy = getFallInitParams()
+			star.Position = UDim2.new(initX, 0, initY, 0)
+			star.ImageTransparency = rng:NextNumber(0.2, 0.5)
+			star.ImageColor3 = Color3.fromHSV(rng:NextNumber(), 1, 1)
+
+			local data = {
+				obj = star,
+				vx = vx,
+				vy = vy,
+				life = 0,
+				rot = initRot,
+				rotSpeed = rotSpeed,
+				r = r,
+				waveVx = 0,
+				waveVy = 0,
+				-- 公转
+				orbitAngle = rng:NextNumber(0, 2 * math.pi),
+				orbitRadius = rng:NextNumber(ORBIT_RADIUS * 0.7, ORBIT_RADIUS),
+				orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1),
+			}
+
+			-- 拖拽
+			local function onPress(input)
+				if not isParticleActive then
+					return
+				end
+				if
+					input.UserInputType == Enum.UserInputType.Touch
+					or input.UserInputType == Enum.UserInputType.MouseButton1
+				then
+					dragging = data
+					data.vx, data.vy = 0, 0
+				end
 			end
+			local function onMove(input)
+				if not isParticleActive then
+					return
+				end
+				if dragging == data then
+					local pos = uis:GetMouseLocation()
+					local rel = MainFrame.AbsoluteSize
+					local x = math.clamp(pos.X - MainFrame.AbsolutePosition.X, 0, rel.X) / rel.X
+					local y = math.clamp(pos.Y - MainFrame.AbsolutePosition.Y, 0, rel.Y) / rel.Y
+					data.obj.Position = UDim2.new(x, 0, y, 0)
+				end
+			end
+			local function onRelease()
+				if not isParticleActive then
+					return
+				end
+				if dragging == data then
+					dragging = nil
+					local _, _, newVx, newVy = getFallInitParams()
+					data.vx = newVx
+					data.vy = newVy
+				end
+			end
+			star.InputBegan:Connect(onPress)
+			uis.InputChanged:Connect(onMove)
+			uis.InputEnded:Connect(function(input)
+				if not isParticleActive then
+					return
+				end
+				if
+					input.UserInputType == Enum.UserInputType.Touch
+					or input.UserInputType == Enum.UserInputType.MouseButton1
+				then
+					onRelease()
+				end
+			end)
+
+			table.insert(particles, data)
+			return data
 		end
-		star.InputBegan:Connect(onPress)
-		uis.InputChanged:Connect(onMove)
-		uis.InputEnded:Connect(function(input)
-			if not isParticleActive then return end
-			if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-				onRelease()
+
+		for _ = 1, FIRST_BATCH do
+			spawnStar()
+		end
+
+		----------------------------------------------------------------
+		local function startWave(screenPos)
+			local mainPos = MainFrame.AbsolutePosition
+			local mainSize = MainFrame.AbsoluteSize
+			local x = math.clamp((screenPos.X - mainPos.X) / mainSize.X, 0, 1)
+			local y = math.clamp((screenPos.Y - mainPos.Y) / mainSize.Y, 0, 1)
+			waveCenter = Vector2.new(x, y)
+			waveRadius = 0
+			waveActive = true
+		end
+
+		local clickLayer = Instance.new("TextButton")
+		clickLayer.Name = "WaveClickLayer"
+		clickLayer.Parent = MainFrame
+		clickLayer.Size = UDim2.fromScale(1, 1)
+		clickLayer.BackgroundTransparency = 1
+		clickLayer.Text = ""
+		clickLayer.ZIndex = 1
+		clickLayer.Active = true
+
+		clickLayer.InputBegan:Connect(function(input, gpe)
+			if gpe then
+				return
+			end
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+			then
+				local objs = game:GetService("GuiService"):GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)
+				for _, obj in ipairs(objs) do
+					if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Active and obj ~= clickLayer then
+						return
+					end
+				end
+				startWave(input.Position)
+			end
+		end)
+		uis.InputBegan:Connect(function(input, gpe)
+			if gpe then
+				return
+			end
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+			then
+				local mainPos = MainFrame.AbsolutePosition
+				local mainSize = MainFrame.AbsoluteSize
+				local x = input.Position.X - mainPos.X
+				local y = input.Position.Y - mainPos.Y
+				if x < 0 or x > mainSize.X or y < 0 or y > mainSize.Y then
+					startWave(input.Position)
+				end
 			end
 		end)
 
-		table.insert(particles, data)
-		return data
-	end
-
-	for _ = 1, FIRST_BATCH do
-		spawnStar()
-	end
-
-	----------------------------------------------------------------
-	local function startWave(screenPos)
-		local mainPos = MainFrame.AbsolutePosition
-		local mainSize = MainFrame.AbsoluteSize
-		local x = math.clamp((screenPos.X - mainPos.X) / mainSize.X, 0, 1)
-		local y = math.clamp((screenPos.Y - mainPos.Y) / mainSize.Y, 0, 1)
-		waveCenter = Vector2.new(x, y)
-		waveRadius = 0
-		waveActive = true
-	end
-
-	local clickLayer = Instance.new("TextButton")
-	clickLayer.Name = "WaveClickLayer"
-	clickLayer.Parent = MainFrame
-	clickLayer.Size = UDim2.fromScale(1, 1)
-	clickLayer.BackgroundTransparency = 1
-	clickLayer.Text = ""
-	clickLayer.ZIndex = 1
-	clickLayer.Active = true
-
-	clickLayer.InputBegan:Connect(function(input, gpe)
-		if gpe then return end
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			local objs = game:GetService("GuiService"):GetGuiObjectsAtPosition(input.Position.X, input.Position.Y)
-			for _, obj in ipairs(objs) do
-				if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Active and obj ~= clickLayer then
-					return
+		----------------------------------------------------------------
+		local function tryLongPress(input)
+			if
+				input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+			then
+				pressStart = tick()
+				longPressing = false
+				if pressConn then
+					pressConn:Disconnect()
 				end
-			end
-			startWave(input.Position)
-		end
-	end)
-	uis.InputBegan:Connect(function(input, gpe)
-		if gpe then return end
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			local mainPos = MainFrame.AbsolutePosition
-			local mainSize = MainFrame.AbsoluteSize
-			local x = input.Position.X - mainPos.X
-			local y = input.Position.Y - mainPos.Y
-			if x < 0 or x > mainSize.X or y < 0 or y > mainSize.Y then
-				startWave(input.Position)
+				if releaseConn then
+					releaseConn:Disconnect()
+				end
+				pressConn = run.Heartbeat:Connect(function()
+					if tick() - pressStart >= LONG_PRESS_TIME and not longPressing then
+						longPressing = true
+					end
+				end)
+				releaseConn = uis.InputEnded:Connect(function(endInput)
+					if endInput == input then
+						longPressing = false
+						if pressConn then
+							pressConn:Disconnect()
+							pressConn = nil
+						end
+						if releaseConn then
+							releaseConn:Disconnect()
+							releaseConn = nil
+						end
+					end
+				end)
 			end
 		end
-	end)
+		uis.InputBegan:Connect(tryLongPress)
 
-	----------------------------------------------------------------
-	local function tryLongPress(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			pressStart = tick()
-			longPressing = false
-			if pressConn then pressConn:Disconnect() end
-			if releaseConn then releaseConn:Disconnect() end
-			pressConn = run.Heartbeat:Connect(function()
-				if tick() - pressStart >= LONG_PRESS_TIME and not longPressing then
-					longPressing = true
-				end
-			end)
-			releaseConn = uis.InputEnded:Connect(function(endInput)
-				if endInput == input then
-					longPressing = false
-					if pressConn then pressConn:Disconnect(); pressConn = nil end
-					if releaseConn then releaseConn:Disconnect(); releaseConn = nil end
-				end
-			end)
-		end
-	end
-	uis.InputBegan:Connect(tryLongPress)
+		----------------------------------------------------------------
+		local function particleMainLoop(dt)
+			isParticleActive = MainFrame.AbsoluteSize.Y > COLLAPSED_THRESHOLD
+			particleFolder.Visible = isParticleActive
+			if not isParticleActive then
+				return
+			end
 
-	----------------------------------------------------------------
-	local function particleMainLoop(dt)
-		isParticleActive = MainFrame.AbsoluteSize.Y > COLLAPSED_THRESHOLD
-		particleFolder.Visible = isParticleActive
-		if not isParticleActive then return end
-
-		-- 冲击波
-		if waveActive then
-			waveRadius = waveRadius + waveSpeed * dt
-			if waveRadius >= WAVE_MAX_RADIUS then waveActive = false end
-		end
-
-		local cx, cy = 0.5, 0.5
-
-		for _, p in ipairs(particles) do
+			-- 冲击波
 			if waveActive then
-				local px = p.obj.Position.X.Scale
-				local py = p.obj.Position.Y.Scale
-				local dx = px - waveCenter.X
-				local dy = py - waveCenter.Y
-				local dist = math.sqrt(dx*dx + dy*dy) * MainFrame.AbsoluteSize.X
-				if dist < waveRadius and dist > 0 then
-					local nx, ny = dx / (dist / MainFrame.AbsoluteSize.X), dy / (dist / MainFrame.AbsoluteSize.X)
-					local push = (1 - dist / waveRadius) * WAVE_PUSH_SPEED
-					p.waveVx = p.waveVx + nx * push
-					p.waveVy = p.waveVy + ny * push
+				waveRadius = waveRadius + waveSpeed * dt
+				if waveRadius >= WAVE_MAX_RADIUS then
+					waveActive = false
 				end
 			end
-			p.waveVx = p.waveVx * WAVE_DECAY
-			p.waveVy = p.waveVy * WAVE_DECAY
 
-			-- 长按公转模式
-			if longPressing then
-				p.orbitAngle = p.orbitAngle + p.orbitSpeed * dt
-				local ox = cx + math.cos(p.orbitAngle) * p.orbitRadius
-				local oy = cy + math.sin(p.orbitAngle) * p.orbitRadius
-				p.obj.Position = UDim2.new(ox, 0, oy, 0)
-				p.vx, p.vy = 0, 0
-				p.waveVx, p.waveVy = 0, 0
-			else
-				-- 正常运动
-				local totalVx = p.vx + p.waveVx
-				local totalVy = p.vy + p.waveVy
-				if dragging ~= p then
-					local x = p.obj.Position.X.Scale + totalVx * dt
-					local y = p.obj.Position.Y.Scale + totalVy * dt
-					-- 边缘反弹
-					if x < 0 then x = 0; totalVx = -totalVx * STAR_ELASTICITY; p.waveVx = -p.waveVx * STAR_ELASTICITY end
-					if x > 1 then x = 1; totalVx = -totalVx * STAR_ELASTICITY; p.waveVx = -p.waveVx * STAR_ELASTICITY end
-					if y < 0 then y = 0; totalVy = -totalVy * STAR_ELASTICITY; p.waveVy = -p.waveVy * STAR_ELASTICITY end
-					if y > 1 then y = 1; totalVy = -totalVy * STAR_ELASTICITY; p.waveVy = -p.waveVy * STAR_ELASTICITY end
-					p.obj.Position = UDim2.new(x, 0, y, 0)
+			local cx, cy = 0.5, 0.5
+
+			for _, p in ipairs(particles) do
+				if waveActive then
+					local px = p.obj.Position.X.Scale
+					local py = p.obj.Position.Y.Scale
+					local dx = px - waveCenter.X
+					local dy = py - waveCenter.Y
+					local dist = math.sqrt(dx * dx + dy * dy) * MainFrame.AbsoluteSize.X
+					if dist < waveRadius and dist > 0 then
+						local nx, ny = dx / (dist / MainFrame.AbsoluteSize.X), dy / (dist / MainFrame.AbsoluteSize.X)
+						local push = (1 - dist / waveRadius) * WAVE_PUSH_SPEED
+						p.waveVx = p.waveVx + nx * push
+						p.waveVy = p.waveVy + ny * push
+					end
 				end
-				p.vx = totalVx - p.waveVx
-				p.vy = totalVy - p.waveVy
-			end
+				p.waveVx = p.waveVx * WAVE_DECAY
+				p.waveVy = p.waveVy * WAVE_DECAY
 
-			p.rot = p.rot + p.rotSpeed * dt
-			p.obj.Rotation = p.rot
-
-			p.life = p.life + dt
-			if p.life > FADE_DELAY then
-				local t = p.obj.ImageTransparency + dt * 0.8
-				p.obj.ImageTransparency = math.min(1, t)
-				if t >= 1 then
-					local initX, initY, newVx, newVy = getFallInitParams()
-					p.obj.Position = UDim2.new(initX, 0, initY, 0)
-					p.obj.ImageTransparency = rng:NextNumber(0.2, 0.5)
-					p.life = 0
-					p.rot = rng:NextNumber(0, 360)
-					p.obj.Rotation = p.rot
-					p.vx = newVx
-					p.vy = newVy
+				-- 长按公转模式
+				if longPressing then
+					p.orbitAngle = p.orbitAngle + p.orbitSpeed * dt
+					local ox = cx + math.cos(p.orbitAngle) * p.orbitRadius
+					local oy = cy + math.sin(p.orbitAngle) * p.orbitRadius
+					p.obj.Position = UDim2.new(ox, 0, oy, 0)
+					p.vx, p.vy = 0, 0
 					p.waveVx, p.waveVy = 0, 0
-					-- 公转参数重新随机
-					p.orbitAngle = rng:NextNumber(0, 2*math.pi)
-					p.orbitRadius = rng:NextNumber(ORBIT_RADIUS*0.7, ORBIT_RADIUS)
-					p.orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
+				else
+					-- 正常运动
+					local totalVx = p.vx + p.waveVx
+					local totalVy = p.vy + p.waveVy
+					if dragging ~= p then
+						local x = p.obj.Position.X.Scale + totalVx * dt
+						local y = p.obj.Position.Y.Scale + totalVy * dt
+						-- 边缘反弹
+						if x < 0 then
+							x = 0
+							totalVx = -totalVx * STAR_ELASTICITY
+							p.waveVx = -p.waveVx * STAR_ELASTICITY
+						end
+						if x > 1 then
+							x = 1
+							totalVx = -totalVx * STAR_ELASTICITY
+							p.waveVx = -p.waveVx * STAR_ELASTICITY
+						end
+						if y < 0 then
+							y = 0
+							totalVy = -totalVy * STAR_ELASTICITY
+							p.waveVy = -p.waveVy * STAR_ELASTICITY
+						end
+						if y > 1 then
+							y = 1
+							totalVy = -totalVy * STAR_ELASTICITY
+							p.waveVy = -p.waveVy * STAR_ELASTICITY
+						end
+						p.obj.Position = UDim2.new(x, 0, y, 0)
+					end
+					p.vx = totalVx - p.waveVx
+					p.vy = totalVy - p.waveVy
+				end
+
+				p.rot = p.rot + p.rotSpeed * dt
+				p.obj.Rotation = p.rot
+
+				p.life = p.life + dt
+				if p.life > FADE_DELAY then
+					local t = p.obj.ImageTransparency + dt * 0.8
+					p.obj.ImageTransparency = math.min(1, t)
+					if t >= 1 then
+						local initX, initY, newVx, newVy = getFallInitParams()
+						p.obj.Position = UDim2.new(initX, 0, initY, 0)
+						p.obj.ImageTransparency = rng:NextNumber(0.2, 0.5)
+						p.life = 0
+						p.rot = rng:NextNumber(0, 360)
+						p.obj.Rotation = p.rot
+						p.vx = newVx
+						p.vy = newVy
+						p.waveVx, p.waveVy = 0, 0
+						-- 公转参数重新随机
+						p.orbitAngle = rng:NextNumber(0, 2 * math.pi)
+						p.orbitRadius = rng:NextNumber(ORBIT_RADIUS * 0.7, ORBIT_RADIUS)
+						p.orbitSpeed = ORBIT_SPEED * (rng:NextNumber() < 0.5 and 1 or -1)
+					end
+				end
+			end
+
+			-- 第二段生成
+			if not secondSpawned then
+				local oldest = 0
+				for i = 1, FIRST_BATCH do
+					oldest = math.max(oldest, particles[i] and particles[i].life or 0)
+				end
+				if oldest >= FADE_DELAY - SPAWN_GAP then
+					secondSpawned = true
+					for i = 1, TOTAL_COUNT - FIRST_BATCH do
+						task.wait(0.15)
+						spawnStar()
+					end
+				end
+			end
+
+			-- 碰撞
+			for i = 1, #particles do
+				local a = particles[i]
+				if dragging == a or longPressing then
+					continue
+				end
+				local ax = a.obj.Position.X.Scale
+				local ay = a.obj.Position.Y.Scale
+				local ar = a.r / MainFrame.AbsoluteSize.X
+				for j = i + 1, #particles do
+					local b = particles[j]
+					if dragging == b or longPressing then
+						continue
+					end
+					local bx = b.obj.Position.X.Scale
+					local by = b.obj.Position.Y.Scale
+					local br = b.r / MainFrame.AbsoluteSize.X
+					local dx, dy = bx - ax, by - ay
+					local dist2 = dx * dx + dy * dy
+					local rad = ar + br
+					if dist2 < rad * rad and dist2 > 0 then
+						local dist = math.sqrt(dist2)
+						local nx, ny = dx / dist, dy / dist
+						local overlap = rad - dist
+						local ax_new = ax - nx * overlap * 0.5
+						local ay_new = ay - ny * overlap * 0.5
+						local bx_new = bx + nx * overlap * 0.5
+						local by_new = by + ny * overlap * 0.5
+						a.obj.Position = UDim2.new(ax_new, 0, ay_new, 0)
+						b.obj.Position = UDim2.new(bx_new, 0, by_new, 0)
+						local dvx = b.vx - a.vx
+						local dvy = b.vy - a.vy
+						local dvn = dvx * nx + dvy * ny
+						if dvn > 0 then
+							continue
+						end
+						local impulse = 2 * dvn / 2 * STAR_ELASTICITY
+						local ix, iy = impulse * nx, impulse * ny
+						a.vx = a.vx + ix
+						a.vy = a.vy + iy
+						b.vx = b.vx - ix
+						b.vy = b.vy - iy
+					end
 				end
 			end
 		end
 
-		-- 第二段生成
-		if not secondSpawned then
-			local oldest = 0
-			for i = 1, FIRST_BATCH do
-				oldest = math.max(oldest, particles[i] and particles[i].life or 0)
+		----------------------------------------------------------------
+		local function onClose()
+			if heartbeatConnection then
+				heartbeatConnection:Disconnect()
 			end
-			if oldest >= FADE_DELAY - SPAWN_GAP then
-				secondSpawned = true
-				for i = 1, TOTAL_COUNT - FIRST_BATCH do
-					task.wait(0.15)
-					spawnStar()
-				end
+			particleFolder:Destroy()
+			if clickLayer then
+				clickLayer:Destroy()
 			end
 		end
 
-		-- 碰撞
-		for i = 1, #particles do
-			local a = particles[i]
-			if dragging == a or longPressing then continue end
-			local ax = a.obj.Position.X.Scale
-			local ay = a.obj.Position.Y.Scale
-			local ar = a.r / MainFrame.AbsoluteSize.X
-			for j = i + 1, #particles do
-				local b = particles[j]
-				if dragging == b or longPressing then continue end
-				local bx = b.obj.Position.X.Scale
-				local by = b.obj.Position.Y.Scale
-				local br = b.r / MainFrame.AbsoluteSize.X
-				local dx, dy = bx - ax, by - ay
-				local dist2 = dx*dx + dy*dy
-				local rad = ar + br
-				if dist2 < rad*rad and dist2 > 0 then
-					local dist = math.sqrt(dist2)
-					local nx, ny = dx / dist, dy / dist
-					local overlap = rad - dist
-					local ax_new = ax - nx * overlap * 0.5
-					local ay_new = ay - ny * overlap * 0.5
-					local bx_new = bx + nx * overlap * 0.5
-					local by_new = by + ny * overlap * 0.5
-					a.obj.Position = UDim2.new(ax_new, 0, ay_new, 0)
-					b.obj.Position = UDim2.new(bx_new, 0, by_new, 0)
-					local dvx = b.vx - a.vx
-					local dvy = b.vy - a.vy
-					local dvn = dvx*nx + dvy*ny
-					if dvn > 0 then continue end
-					local impulse = 2 * dvn / 2 * STAR_ELASTICITY
-					local ix, iy = impulse * nx, impulse * ny
-					a.vx = a.vx + ix
-					a.vy = a.vy + iy
-					b.vx = b.vx - ix
-					b.vy = b.vy - iy
-				end
-			end
+		local oldStop = _G.ThunderIntro_Stop or function() end
+		_G.ThunderIntro_Stop = function()
+			oldStop()
+			onClose()
 		end
-	end
 
-	----------------------------------------------------------------
-	local function onClose()
-		if heartbeatConnection then heartbeatConnection:Disconnect() end
-		particleFolder:Destroy()
-		if clickLayer then clickLayer:Destroy() end
+		----------------------------------------------------------------
+		task.defer(function()
+			heartbeatConnection = run.Heartbeat:Connect(particleMainLoop)
+		end)
 	end
-
-	local oldStop = _G.ThunderIntro_Stop or function() end
-	_G.ThunderIntro_Stop = function()
-		oldStop()
-		onClose()
-	end
-
-	----------------------------------------------------------------
-	task.defer(function()
-		heartbeatConnection = run.Heartbeat:Connect(particleMainLoop)
-	end)
-end
 
 	initBackgrounds()
 
@@ -6817,7 +6556,6 @@ end
 		------ // 切换按钮[原ui]   ----------------------------------------------------------------------------------------
 		function Root:Toggle(setup)
 			setup = setup or {}
-
 			setup.Title = setup.Title or "切换按钮"
 			setup.Content = setup.Content or ""
 			setup.Default = setup.Default or false
@@ -6828,38 +6566,37 @@ end
 			local UIStroke = Instance.new("UIStroke")
 			local TextLabel = Instance.new("TextLabel")
 			local Content = Instance.new("TextLabel")
-			local Block = Instance.new("Frame")
+			local Block = Instance.new("TextButton")
 			local UIStroke_2 = Instance.new("UIStroke")
 			local UICorner = Instance.new("UICorner")
-			local ValueBlock = Instance.new("Frame")
-			local UICorner_2 = Instance.new("UICorner")
+			local Check = Instance.new("TextLabel")
 			local Button = Instance.new("TextButton")
 
 			ToggleBlock.Name = "ToggleBlock"
 			ToggleBlock.Parent = ScrollingFrame
 			ToggleBlock.BackgroundColor3 = Library.Colors.Default
-			ToggleBlock.BackgroundTransparency = 0.250
+			ToggleBlock.BackgroundTransparency = 0.25
 			ToggleBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			ToggleBlock.BorderSizePixel = 0
-			ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, Library.ItemHeight)
+			ToggleBlock.Size = UDim2.new(0.99, 0, 0, Library.ItemHeight)
 			ToggleBlock.ZIndex = 10
 
 			DropShadow.Name = "DropShadow"
 			DropShadow.Parent = ToggleBlock
 			DropShadow.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			DropShadow.BackgroundTransparency = 1.000
+			DropShadow.BackgroundTransparency = 1
 			DropShadow.BorderColor3 = Color3.fromRGB(27, 42, 53)
 			DropShadow.Position = UDim2.new(0, -5, 0, -5)
 			DropShadow.Size = UDim2.new(1, 10, 1, 10)
 			DropShadow.ZIndex = 9
 			DropShadow.Image = "rbxassetid://297694300"
 			DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-			DropShadow.ImageTransparency = 0.500
+			DropShadow.ImageTransparency = 0.5
 			DropShadow.ScaleType = Enum.ScaleType.Slice
 			DropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
-			DropShadow.SliceScale = 0.050
+			DropShadow.SliceScale = 0.05
 
-			UIStroke.Transparency = 0.850
+			UIStroke.Transparency = 0.85
 			UIStroke.Color = Color3.fromRGB(156, 156, 156)
 			UIStroke.Parent = ToggleBlock
 
@@ -6867,26 +6604,26 @@ end
 			TextLabel.Parent = ToggleBlock
 			TextLabel.AnchorPoint = Vector2.new(0, 0.5)
 			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			TextLabel.BackgroundTransparency = 1.000
+			TextLabel.BackgroundTransparency = 1
 			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			TextLabel.BorderSizePixel = 0
-			TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
-			TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+			TextLabel.Position = UDim2.new(0.02, 0, 0.5, 0)
+			TextLabel.Size = UDim2.new(1, 0, 0.4, 0)
 			TextLabel.ZIndex = 11
 			TextLabel.Font = Enum.Font.Gotham
 			TextLabel.Text = setup.Title
 			TextLabel.TextColor3 = Library.Colors.TextColor
 			TextLabel.TextScaled = true
-			TextLabel.TextSize = 14.000
+			TextLabel.TextSize = 14
 			TextLabel.TextStrokeColor3 = Library.Colors.TextColor
-			TextLabel.TextStrokeTransparency = 0.950
+			TextLabel.TextStrokeTransparency = 0.95
 			TextLabel.TextWrapped = true
 			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 			Content.Name = "Content"
 			Content.Parent = ToggleBlock
 			Content.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Content.BackgroundTransparency = 1.000
+			Content.BackgroundTransparency = 1
 			Content.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Content.BorderSizePixel = 0
 			Content.Position = UDim2.new(0, 5, 0, 18)
@@ -6896,10 +6633,10 @@ end
 			Content.Font = Enum.Font.Gotham
 			Content.Text = setup.Content
 			Content.TextColor3 = Library.Colors.TextColor
-			Content.TextSize = 13.000
+			Content.TextSize = 13
 			Content.TextStrokeColor3 = Library.Colors.TextColor
-			Content.TextStrokeTransparency = 0.950
-			Content.TextTransparency = 0.500
+			Content.TextStrokeTransparency = 0.95
+			Content.TextTransparency = 0.5
 			Content.TextWrapped = true
 			Content.TextXAlignment = Enum.TextXAlignment.Left
 			Content.TextYAlignment = Enum.TextYAlignment.Top
@@ -6909,47 +6646,46 @@ end
 			Block.Parent = ToggleBlock
 			Block.AnchorPoint = Vector2.new(1, 0.5)
 			Block.BackgroundColor3 = Library.Colors.Default
-			Block.BackgroundTransparency = 0.500
+			Block.BackgroundTransparency = 0.5
 			Block.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Block.BorderSizePixel = 0
-			Block.Position = UDim2.new(0.980000019, 0, 0.5, 0)
-			Block.Size = UDim2.new(0, 35, 0.5, 0)
+			Block.Position = UDim2.new(0.98, 0, 0.5, 0)
+			Block.Size = UDim2.new(0, 22, 0, 22)
 			Block.ZIndex = 14
+			Block.AutoButtonColor = false
+			Block.Text = ""
 
-			UIStroke_2.Transparency = 0.850
+			UIStroke_2.Transparency = 0.85
 			UIStroke_2.Color = Color3.fromRGB(156, 156, 156)
 			UIStroke_2.Parent = Block
 
-			UICorner.CornerRadius = UDim.new(5, 100)
+			UICorner.CornerRadius = UDim.new(0, 4)
 			UICorner.Parent = Block
 
-			ValueBlock.Name = "ValueBlock"
-			ValueBlock.Parent = Block
-			ValueBlock.AnchorPoint = Vector2.new(0.5, 0.5)
-			ValueBlock.BackgroundColor3 = Library.Colors.Hightlight
-			ValueBlock.BackgroundTransparency = 0.250
-			ValueBlock.BorderColor3 = Color3.fromRGB(0, 0, 0)
-			ValueBlock.BorderSizePixel = 0
-			ValueBlock.Position = UDim2.new(0.75, 0, 0.5, 0)
-			ValueBlock.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
-			ValueBlock.SizeConstraint = Enum.SizeConstraint.RelativeYY
-			ValueBlock.ZIndex = 15
-
-			UICorner_2.CornerRadius = UDim.new(1, 0)
-			UICorner_2.Parent = ValueBlock
+			Check.Name = "Check"
+			Check.Parent = Block
+			Check.BackgroundTransparency = 1
+			Check.BorderSizePixel = 0
+			Check.Size = UDim2.new(1, 0, 1, 0)
+			Check.ZIndex = 15
+			Check.Font = Enum.Font.GothamBold
+			Check.Text = "✓"
+			Check.TextColor3 = Library.Colors.Hightlight
+			Check.TextScaled = true
+			Check.TextTransparency = 1
 
 			Button.Name = "Button"
 			Button.Parent = ToggleBlock
 			Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Button.BackgroundTransparency = 1.000
+			Button.BackgroundTransparency = 1
 			Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Button.BorderSizePixel = 0
 			Button.Size = UDim2.new(1, 0, 1, 0)
 			Button.ZIndex = 15
 			Button.Font = Enum.Font.SourceSans
 			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-			Button.TextSize = 14.000
-			Button.TextTransparency = 1.000
+			Button.TextSize = 14
+			Button.TextTransparency = 1
 
 			Library:MakeDrop(ToggleBlock, UIStroke, Library.Colors.Hightlight)
 
@@ -6957,31 +6693,29 @@ end
 				WindowLibrary:AddToolTip(ToggleBlock, tostring(setup.Tip))
 			end
 
-			local UILib = function(value)
+			local function UpdateVisual(value)
 				if value then
-					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
-						Position = UDim2.new(0.75, 0, 0.5, 0),
-						BackgroundColor3 = Library.Colors.Hightlight,
-					})
+					Library:Tween(Check, Library.TweenLibrary.SmallEffect, { TextTransparency = 0 })
+					Library:Tween(UIStroke_2, Library.TweenLibrary.SmallEffect, { Color = Library.Colors.Hightlight })
 				else
-					Library:Tween(ValueBlock, Library.TweenLibrary.SmallEffect, {
-						Position = UDim2.new(0.25, 0, 0.5, 0),
-						BackgroundColor3 = Library.Colors.Disable,
-					})
+					Library:Tween(Check, Library.TweenLibrary.SmallEffect, { TextTransparency = 1 })
+					Library:Tween(
+						UIStroke_2,
+						Library.TweenLibrary.SmallEffect,
+						{ Color = Color3.fromRGB(156, 156, 156) }
+					)
 				end
 			end
 
-			UILib(setup.Default)
+			UpdateVisual(setup.Default)
 
 			Button.MouseButton1Click:Connect(function()
 				setup.Default = not setup.Default
-
-				UILib(setup.Default)
-
+				UpdateVisual(setup.Default)
 				setup.Callback(setup.Default)
 			end)
 
-			local UpdateBlock = function()
+			local function UpdateBlock()
 				local TitleSize = TextLabel.TextSize
 				local MainSize = Library:GetTextSize(setup.Title, TitleSize, TextLabel.Font)
 				local ContentSize = setup.Content:len() > 0
@@ -6996,33 +6730,28 @@ end
 					TextLabel.Size = UDim2.new(1, 0, 0, 14)
 				else
 					Content.Visible = false
-					TotalHeight = TotalHeight + 15.20000000000001
-					TextLabel.Position = UDim2.new(0.0199999996, 0, 0.5, 0)
-					TextLabel.Size = UDim2.new(1, 0, 0.400000006, 0)
+					TotalHeight = TotalHeight + 15.2
+					TextLabel.Position = UDim2.new(0.02, 0, 0.5, 0)
+					TextLabel.Size = UDim2.new(1, 0, 0.4, 0)
 				end
-
-				ToggleBlock.Size = UDim2.new(0.99000001, 0, 0, TotalHeight)
+				ToggleBlock.Size = UDim2.new(0.99, 0, 0, TotalHeight)
 			end
 			UpdateBlock()
 
 			local RootSkid = {}
-
 			function RootSkid:Content(Setup)
 				Content.Text = Setup
 				UpdateBlock()
 			end
-
 			function RootSkid:Value(Setup)
 				setup.Default = Setup
-				UILib(setup.Default)
+				UpdateVisual(setup.Default)
 				setup.Callback(setup.Default)
 				UpdateBlock()
 			end
-
 			function RootSkid:Visible(value)
 				ToggleBlock.Visible = value
 			end
-
 			return RootSkid
 		end
 		------ // 切换按钮[1]   ----------------------------------------------------------------------------------------
@@ -9698,13 +9427,373 @@ end
 			end
 		end
 	end)
+	local quickBtn = Instance.new("ImageButton")
+	quickBtn.Name = "QuickBarBtn"
+	quickBtn.Parent = Headers
+	quickBtn.AnchorPoint = Vector2.new(1, 0.5)
+	quickBtn.Position = UDim2.new(0.99, -40, 0.5, 0)
+	quickBtn.Size = UDim2.new(0, 18, 0, 18)
+	quickBtn.BackgroundTransparency = 1
+	quickBtn.Image = "rbxassetid://7733993211"
+	quickBtn.ImageColor3 = Library.Colors.TextColor
+	quickBtn.ImageTransparency = 0
+	quickBtn.ZIndex = 20
+	WindowLibrary:AddToolTip(quickBtn, "快捷功能栏")
+
+	local quickFrame
+
+	local function buildQuickFrame()
+		if quickFrame then
+			return
+		end
+		quickFrame = Instance.new("Frame")
+		quickFrame.Name = "QuickBarFrame"
+		quickFrame.Parent = ScreenGui
+		quickFrame.AnchorPoint = Vector2.new(1, 0)
+		quickFrame.Position = UDim2.new(0.99, 0, 0, 60)
+		quickFrame.Size = UDim2.new(0, 180, 0, 0)
+		quickFrame.BackgroundColor3 = Library.Colors.Default
+		quickFrame.BackgroundTransparency = 0.25
+		quickFrame.BorderSizePixel = 0
+		quickFrame.ClipsDescendants = true
+		quickFrame.ZIndex = 300
+		quickFrame.Visible = false
+
+		local ds = Instance.new("ImageLabel")
+		ds.Name = "DropShadow"
+		ds.Parent = quickFrame
+		ds.BackgroundTransparency = 1
+		ds.Position = UDim2.new(0, -5, 0, -5)
+		ds.Size = UDim2.new(1, 10, 1, 10)
+		ds.Image = "rbxassetid://297694300"
+		ds.ImageColor3 = Color3.new(0, 0, 0)
+		ds.ImageTransparency = 0.5
+		ds.ScaleType = Enum.ScaleType.Slice
+		ds.SliceCenter = Rect.new(95, 103, 894, 902)
+		ds.SliceScale = 0.05
+		ds.ZIndex = 299
+
+		local sc = Instance.new("ScrollingFrame")
+		sc.Parent = quickFrame
+		sc.AnchorPoint = Vector2.new(0.5, 0.5)
+		sc.Position = UDim2.new(0.5, 0, 0.5, 0)
+		sc.Size = UDim2.new(1, -10, 1, -10)
+		sc.BackgroundTransparency = 1
+		sc.BorderSizePixel = 0
+		sc.ScrollBarThickness = 3
+		sc.ScrollBarImageColor3 = Library.Colors.Hightlight
+		sc.ZIndex = 301
+		sc.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+		local uil = Instance.new("UIListLayout")
+		uil.Parent = sc
+		uil.Padding = UDim.new(0, 6)
+		uil.SortOrder = Enum.SortOrder.LayoutOrder
+		uil:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			sc.CanvasSize = UDim2.new(0, 0, 0, uil.AbsoluteContentSize.Y + 10)
+		end)
+
+		WindowLibrary.AddQuickButton = function(_, title, callback)
+			local btn = Instance.new("TextButton")
+			btn.Parent = sc
+			btn.Size = UDim2.new(1, 0, 0, 28)
+			btn.BackgroundColor3 = Library.Colors.Default
+			btn.BackgroundTransparency = 0.3
+			btn.BorderSizePixel = 0
+			btn.Font = Enum.Font.Gotham
+			btn.Text = title
+			btn.TextColor3 = Library.Colors.TextColor
+			btn.TextSize = 14
+			btn.ZIndex = 302
+			btn.ClipsDescendants = true
+			local corner = Instance.new("UICorner")
+			corner.CornerRadius = UDim.new(0, 4)
+			corner.Parent = btn
+			local stroke = Instance.new("UIStroke")
+			stroke.Transparency = 0.85
+			stroke.Color = Color3.fromRGB(156, 156, 156)
+			stroke.Parent = btn
+			Library:MakeDrop(btn, stroke, Library.Colors.Hightlight)
+
+			btn.MouseButton1Click:Connect(function()
+				if callback then
+					callback()
+				end
+			end)
+			return btn
+		end
+
+		WindowLibrary:AddQuickButton("穿墙 ON", function()
+			print("穿墙已开启")
+		end)
+
+		WindowLibrary:AddQuickButton("无敌 ON", function()
+			print("无敌已开启")
+		end)
+
+		WindowLibrary:AddQuickButton("高跳 ON", function()
+			print("高跳已开启")
+		end)
+	end
+
+	local quickVisible = false
+	quickBtn.MouseButton1Click:Connect(function()
+		buildQuickFrame()
+		quickVisible = not quickVisible
+		if quickVisible then
+			quickFrame.Visible = true
+			Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 180, 0, 220) })
+		else
+			Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 180, 0, 0) })
+			task.wait(0.35)
+			quickFrame.Visible = false
+		end
+	end)
+
+	do
+		local chatLogBtn = Instance.new("ImageButton")
+		local chatPanel, mainUIBackup, chatScreenGui
+		local MAX_MESSAGES = 100000
+		local messageBuffer = {}
+
+		chatLogBtn.Name = "ChatLogButton"
+		chatLogBtn.Parent = Headers
+		chatLogBtn.AnchorPoint = Vector2.new(1, 0.5)
+		chatLogBtn.Position = UDim2.new(0.96, -7, 0.5, 0)
+		chatLogBtn.Size = UDim2.new(0, 18, 0, 18)
+		chatLogBtn.BackgroundTransparency = 1
+		chatLogBtn.Image = Library.Icons["联系人"] or "rbxassetid://7743866666"
+		chatLogBtn.ImageColor3 = Library.Colors.TextColor
+		chatLogBtn.ImageTransparency = 0
+		chatLogBtn.ZIndex = 20
+		WindowLibrary:AddToolTip(chatLogBtn, "查看玩家聊天记录")
+
+		local function createChatPanel()
+			if chatPanel then
+				return
+			end
+
+			mainUIBackup = {
+				Visible = MainFrame.Visible,
+				Size = MainFrame.Size,
+				Position = MainFrame.Position,
+			}
+			MainFrame.Visible = false
+
+			chatScreenGui = Instance.new("ScreenGui")
+			chatScreenGui.Name = "ChatLogPanel"
+			chatScreenGui.ResetOnSpawn = false
+			chatScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+			chatScreenGui.Parent = game.CoreGui
+
+			local mainFrame = Instance.new("Frame")
+			mainFrame.Name = "MainFrame"
+			mainFrame.Parent = chatScreenGui
+			mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+			mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+			mainFrame.Size = Library.SizeLibrary.Default
+			mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			mainFrame.BackgroundTransparency = 0.8
+			mainFrame.BorderSizePixel = 0
+			mainFrame.ClipsDescendants = true
+			chatPanel = mainFrame
+
+			local dropShadow = Instance.new("ImageLabel")
+			dropShadow.Name = "DropShadow"
+			dropShadow.Parent = mainFrame
+			dropShadow.BackgroundTransparency = 1
+			dropShadow.Position = UDim2.new(0, -5, 0, -5)
+			dropShadow.Size = UDim2.new(1, 10, 1, 10)
+			dropShadow.ZIndex = -1
+			dropShadow.Image = "rbxassetid://297694300"
+			dropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+			dropShadow.ImageTransparency = 0.5
+			dropShadow.ScaleType = Enum.ScaleType.Slice
+			dropShadow.SliceCenter = Rect.new(95, 103, 894, 902)
+			dropShadow.SliceScale = 0.05
+
+			local header = Instance.new("Frame")
+			header.Name = "Header"
+			header.Parent = mainFrame
+			header.Size = UDim2.new(1, 0, 0, 25.8)
+			header.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			header.BackgroundTransparency = 0.8
+
+			local title = Instance.new("TextLabel")
+			title.Name = "Title"
+			title.Parent = header
+			title.AnchorPoint = Vector2.new(0.5, 0.5)
+			title.Position = UDim2.new(0.5, 0, 0.5, 0)
+			title.Size = UDim2.new(0.8, 0, 0.8, 0)
+			title.BackgroundTransparency = 1
+			title.Font = Enum.Font.Gotham
+			title.Text = "玩家聊天记录"
+			title.TextColor3 = Library.Colors.TextColor
+			title.TextScaled = true
+			title.TextSize = 14
+			title.TextStrokeColor3 = Library.Colors.TextColor
+			title.TextStrokeTransparency = 0.95
+
+			local closeBtn = Instance.new("ImageButton")
+			closeBtn.Name = "CloseButton"
+			closeBtn.Parent = header
+			closeBtn.AnchorPoint = Vector2.new(1, 0.5)
+			closeBtn.Position = UDim2.new(0.98, 0, 0.5, 0)
+			closeBtn.Size = UDim2.new(0, 18, 0, 18)
+			closeBtn.BackgroundTransparency = 1
+			closeBtn.Image = "rbxassetid://7733765224"
+			closeBtn.ImageColor3 = Color3.fromRGB(255, 88, 91)
+			closeBtn.ScaleType = Enum.ScaleType.Fit
+
+			local scrollingFrame = Instance.new("ScrollingFrame")
+			scrollingFrame.Name = "MessageContainer"
+			scrollingFrame.Parent = mainFrame
+			scrollingFrame.Position = UDim2.new(0, 5, 0, 30)
+			scrollingFrame.Size = UDim2.new(1, -10, 1, -40)
+			scrollingFrame.BackgroundTransparency = 1
+			scrollingFrame.BorderSizePixel = 0
+			scrollingFrame.ScrollBarThickness = 4
+			scrollingFrame.ScrollBarImageColor3 = Library.Colors.Hightlight
+			scrollingFrame.ScrollBarImageTransparency = 0.6
+
+			local listLayout = Instance.new("UIListLayout")
+			listLayout.Name = "Layout"
+			listLayout.Parent = scrollingFrame
+			listLayout.FillDirection = Enum.FillDirection.Vertical
+			listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			listLayout.Padding = UDim.new(0, 3)
+
+			listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+				scrollingFrame.CanvasSize = UDim2.fromOffset(0, listLayout.AbsoluteContentSize.Y)
+			end)
+
+			local function addMessage(player, message)
+				message = message:gsub("<", "&lt;"):gsub(">", "&gt;")
+				local now = os.date("*t")
+				local timeStr = string.format("%02d:%02d:%02d", now.hour, now.min, now.sec)
+
+				local textLabel = Instance.new("TextLabel")
+				textLabel.Name = "Message"
+				textLabel.Parent = scrollingFrame
+				textLabel.BackgroundTransparency = 1
+				textLabel.Size = UDim2.new(1, 0, 0, 16)
+				textLabel.Font = Enum.Font.Gotham
+				textLabel.TextSize = 14
+				textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+				textLabel.TextXAlignment = Enum.TextXAlignment.Left
+				textLabel.TextWrapped = true
+				textLabel.RichText = true
+				textLabel.AutomaticSize = Enum.AutomaticSize.Y
+				textLabel.LayoutOrder = os.time()
+
+				local highlight = Library.Colors.Hightlight
+				textLabel.Text = string.format(
+					'<font color="rgb(%d,%d,%d)">%s</font> <font color="rgb(200,200,200)">[%s]</font>: %s',
+					math.round(highlight.R * 255),
+					math.round(highlight.G * 255),
+					math.round(highlight.B * 255),
+					player.Name,
+					timeStr,
+					message
+				)
+
+				table.insert(messageBuffer, { player = player, message = message, time = timeStr })
+
+				local msgCount = 0
+				for _, child in ipairs(scrollingFrame:GetChildren()) do
+					if child:IsA("TextLabel") then
+						msgCount = msgCount + 1
+					end
+				end
+				if msgCount > MAX_MESSAGES then
+					for _, child in ipairs(scrollingFrame:GetChildren()) do
+						if child:IsA("TextLabel") then
+							child:Destroy()
+							break
+						end
+					end
+					table.remove(messageBuffer, 1)
+				end
+
+				task.wait()
+				scrollingFrame.CanvasPosition = Vector2.new(0, scrollingFrame.CanvasSize.Y)
+			end
+
+			for _, data in ipairs(messageBuffer) do
+				local textLabel = Instance.new("TextLabel")
+				textLabel.Name = "Message"
+				textLabel.Parent = scrollingFrame
+				textLabel.BackgroundTransparency = 1
+				textLabel.Size = UDim2.new(1, 0, 0, 16)
+				textLabel.Font = Enum.Font.Gotham
+				textLabel.TextSize = 14
+				textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+				textLabel.TextXAlignment = Enum.TextXAlignment.Left
+				textLabel.TextWrapped = true
+				textLabel.RichText = true
+				textLabel.AutomaticSize = Enum.AutomaticSize.Y
+				textLabel.LayoutOrder = os.time()
+
+				local highlight = Library.Colors.Hightlight
+				textLabel.Text = string.format(
+					'<font color="rgb(%d,%d,%d)">%s</font> <font color="rgb(200,200,200)">[%s]</font>: %s',
+					math.round(highlight.R * 255),
+					math.round(highlight.G * 255),
+					math.round(highlight.B * 255),
+					data.player.Name,
+					data.time,
+					data.message
+				)
+			end
+
+			local function onPlayerAdded(player)
+				player.Chatted:Connect(function(message)
+					addMessage(player, message)
+				end)
+			end
+
+			for _, player in ipairs(game.Players:GetPlayers()) do
+				onPlayerAdded(player)
+			end
+			game.Players.PlayerAdded:Connect(onPlayerAdded)
+
+			closeBtn.MouseButton1Click:Connect(function()
+				chatScreenGui.Enabled = false
+				MainFrame.Visible = mainUIBackup.Visible
+				MainFrame.Size = mainUIBackup.Size
+				MainFrame.Position = mainUIBackup.Position
+			end)
+
+			Library:Tween(mainFrame, Library.TweenLibrary.WindowChanged, { Size = Library.SizeLibrary.Default })
+		end
+
+		chatLogBtn.MouseButton1Click:Connect(function()
+			if chatPanel then
+				chatScreenGui.Enabled = true
+				MainFrame.Visible = false
+			else
+				createChatPanel()
+			end
+		end)
+
+		chatLogBtn.MouseEnter:Connect(function()
+			Library:Tween(chatLogBtn, Library.TweenLibrary.FastEffect, { ImageTransparency = 0.3 })
+		end)
+
+		chatLogBtn.MouseLeave:Connect(function()
+			Library:Tween(chatLogBtn, Library.TweenLibrary.FastEffect, { ImageTransparency = 0 })
+		end)
+	end
+
 	do
 		local infoIco = Instance.new("ImageButton")
 		local card = Instance.new("Frame")
-		local closeBtn = Instance.new("ImageButton")
+		local closeBtn = Instance.new("TextButton")
 		local img = Instance.new("ImageLabel")
 		local scroll = Instance.new("ScrollingFrame")
 		local msgLb = Instance.new("TextLabel")
+		local blocker, isOpen = nil, false
 
 		infoIco.Name = "InfoButton"
 		infoIco.Parent = Headers
@@ -9714,7 +9803,7 @@ end
 		infoIco.BackgroundTransparency = 1
 		infoIco.Image = "rbxassetid://7733964719"
 		infoIco.ImageColor3 = Library.Colors.TextColor
-		infoIco.ImageTransparency = 0.5
+		infoIco.ImageTransparency = 0
 		infoIco.ZIndex = 20
 		WindowLibrary:AddToolTip(infoIco, "查看作者留言 / 更新日志")
 
@@ -9727,9 +9816,6 @@ end
 				self._infoScroll.CanvasSize = UDim2.new(0, 0, 0, h)
 			end
 		end
-
-		local blocker
-		local isOpen = false
 
 		local function buildDialog()
 			if blocker then
@@ -9752,40 +9838,28 @@ end
 			card.Parent = blocker
 			card.Size = UDim2.new(1, 0, 1, 0)
 			card.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			card.BackgroundTransparency = 0.5
+			card.BackgroundTransparency = 0.8
 			card.BorderSizePixel = 1
 			card.BorderColor3 = Color3.fromRGB(255, 0, 0)
 			card.ClipsDescendants = true
 			card.ZIndex = 500
 
-			closeBtn = Instance.new("TextButton")
 			closeBtn.Name = "CloseBtn"
 			closeBtn.Parent = card
 			closeBtn.AnchorPoint = Vector2.new(1, 0)
-			closeBtn.Position = UDim2.new(1, -8, 0, 8)
+			closeBtn.Position = UDim2.new(1, -8, 0, -1)
 			closeBtn.Size = UDim2.new(0, 24, 0, 24)
 			closeBtn.BackgroundTransparency = 1
-			closeBtn.Text = "「关闭」"      
+			closeBtn.Text = "「关闭」"
 			closeBtn.Font = Enum.Font.GothamBold
 			closeBtn.TextSize = 18
 			closeBtn.TextColor3 = Color3.fromRGB(255, 0, 0)
 			closeBtn.ZIndex = 501
 
-			closeBtn.MouseButton1Click:Connect(function()
-                    blocker.Visible = false
-                    isOpen = false
-            			end)
-			closeBtn.MouseEnter:Connect(function()
-                    closeBtn.TextTransparency = 0
-        			end)
-			closeBtn.MouseLeave:Connect(function()
-                    closeBtn.TextTransparency = 0.3
-			end)
-
 			img.Name = "BgImage"
 			img.Parent = card
 			img.Size = UDim2.new(1, 0, 1, 0)
-			img.BackgroundTransparency = 0
+			img.BackgroundTransparency = 1
 			img.Image = "rbxassetid://81428127111090"
 			img.ScaleType = Enum.ScaleType.Slice
 			img.SliceCenter = Rect.new(128, 128, 128, 128)
@@ -9816,8 +9890,8 @@ end
 			msgLb.ZIndex = 502
 			msgLb.TextXAlignment = Enum.TextXAlignment.Center
 			msgLb.TextYAlignment = Enum.TextYAlignment.Top
-			msgLb.Text = 
-[[
+
+			msgLb.Text = [[
 
 <b>v1.2.0 更新摘要</b>
 • 新增粒子星空背景
@@ -9834,24 +9908,23 @@ end
 - 后续会重新做Ui粒子特效
 - 可能会重做悬浮窗 | 添加快捷栏
 
-
 感谢各位使用，如有 BUG 请反馈至 QQ群：259461151  -- XGOHUB 作者.星果XG
 
- /$$   /$$        /$$$$$$         /$$$$$$        /$$   /$$       /$$   /$$       /$$$$$$$ 
+ /$$   /$$        /$$$$$$         /$$$$$$        /$$   /$$       /$$   /$$       /$$$$$$$
 | $$  / $$       /$$__  $$       /$$__  $$      | $$  | $$      | $$  | $$      | $$__  $$
 |  $$/ $$/      | $$  \__/      | $$  \ $$      | $$  | $$      | $$  | $$      | $$  \ $$
- \  $$$$/       | $$ /$$$$      | $$  | $$      | $$$$$$$$      | $$  | $$      | $$$$$$$ 
+ \  $$$$/       | $$ /$$$$      | $$  | $$      | $$$$$$$$      | $$  | $$      | $$$$$$$
   >$$  $$       | $$|_  $$      | $$  | $$      | $$__  $$      | $$  | $$      | $$__  $$
  /$$/\  $$      | $$  \ $$      | $$  | $$      | $$  | $$      | $$  | $$      | $$  \ $$
 | $$  \ $$      |  $$$$$$/      |  $$$$$$/      | $$  | $$      |  $$$$$$/      | $$$$$$$/
-|__/  |__/       \______/        \______/       |__/  |__/       \______/       |_______/ 
-                                                                                          
+|__/  |__/       \______/        \______/       |__/  |__/       \______/       |_______/
+
 ╔═╗╔═╦═══╦═══╦╗─╔╦╗─╔╦══╗
 ╚╗╚╝╔╣╔═╗║╔═╗║║─║║║─║║╔╗║
 ─╚╗╔╝║║─╚╣║─║║╚═╝║║─║║╚╝╚╗
 ─╔╝╚╗║║╔═╣║─║║╔═╗║║─║║╔═╗║
 ╔╝╔╗╚╣╚╩═║╚═╝║║─║║╚═╝║╚═╝║
-╚═╝╚═╩═══╩═══╩╝─╚╩═══╩═══╝   
+╚═╝╚═╩═══╩═══╩╝─╚╩═══╩═══╝
 
 ]]
 
@@ -9872,12 +9945,30 @@ end
 					isOpen = false
 				end
 			end)
+			closeBtn.MouseButton1Click:Connect(function()
+				blocker.Visible = false
+				isOpen = false
+			end)
+			closeBtn.MouseEnter:Connect(function()
+				closeBtn.TextTransparency = 0
+			end)
+			closeBtn.MouseLeave:Connect(function()
+				closeBtn.TextTransparency = 0.3
+			end)
 		end
 
 		infoIco.MouseButton1Click:Connect(function()
 			buildDialog()
 			isOpen = not isOpen
 			blocker.Visible = isOpen
+		end)
+
+		infoIco.MouseEnter:Connect(function()
+			Library:Tween(infoIco, Library.TweenLibrary.FastEffect, { ImageTransparency = 0.3 })
+		end)
+
+		infoIco.MouseLeave:Connect(function()
+			Library:Tween(infoIco, Library.TweenLibrary.FastEffect, { ImageTransparency = 0 })
 		end)
 	end
 
