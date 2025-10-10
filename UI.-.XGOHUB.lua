@@ -9427,6 +9427,7 @@ function Library:Windowxgo(setup)
 			end
 		end
 	end)
+	-------------------// 无聊做的小玩意，从这到 return WindowLibrary之前删除即可 如果不需要 //----------------
 	local quickBtn = Instance.new("ImageButton")
 	quickBtn.Name = "QuickBarBtn"
 	quickBtn.Parent = Headers
@@ -9440,7 +9441,20 @@ function Library:Windowxgo(setup)
 	quickBtn.ZIndex = 20
 	WindowLibrary:AddToolTip(quickBtn, "快捷功能栏")
 
+	local quickOrigSize = quickBtn.Size
+	quickBtn.MouseButton1Down:Connect(function()
+		quickBtn.Size = quickOrigSize - UDim2.new(0, 4, 0, 4)
+	end)
+	quickBtn.MouseButton1Up:Connect(function()
+		quickBtn.Size = quickOrigSize
+	end)
+	quickBtn.MouseLeave:Connect(function()
+		quickBtn.Size = quickOrigSize
+	end)
+
 	local quickFrame
+	local selectedFont = nil
+	local appliedObjects = {}
 
 	local function buildQuickFrame()
 		if quickFrame then
@@ -9473,11 +9487,34 @@ function Library:Windowxgo(setup)
 		ds.SliceScale = 0.05
 		ds.ZIndex = 299
 
+		local searchBox = Instance.new("TextBox")
+		searchBox.Name = "SearchBox"
+		searchBox.Parent = quickFrame
+		searchBox.Size = UDim2.new(1, -10, 0, 28)
+		searchBox.Position = UDim2.new(0.5, 0, 0, 5)
+		searchBox.AnchorPoint = Vector2.new(0.5, 0)
+		searchBox.BackgroundColor3 = Library.Colors.Default
+		searchBox.BackgroundTransparency = 0.3
+		searchBox.BorderSizePixel = 0
+		searchBox.PlaceholderText = "搜索功能…"
+		searchBox.Text = ""
+		searchBox.Font = Enum.Font.Gotham
+		searchBox.TextColor3 = Library.Colors.TextColor
+		searchBox.TextSize = 14
+		searchBox.ZIndex = 302
+		searchBox.ClipsDescendants = true
+		local sCorner = Instance.new("UICorner", searchBox)
+		sCorner.CornerRadius = UDim.new(0, 4)
+		local sStroke = Instance.new("UIStroke", searchBox)
+		sStroke.Transparency = 0.85
+		sStroke.Color = Color3.fromRGB(156, 156, 156)
+
 		local sc = Instance.new("ScrollingFrame")
+		sc.Name = "Scroll"
 		sc.Parent = quickFrame
-		sc.AnchorPoint = Vector2.new(0.5, 0.5)
-		sc.Position = UDim2.new(0.5, 0, 0.5, 0)
-		sc.Size = UDim2.new(1, -10, 1, -10)
+		sc.AnchorPoint = Vector2.new(0.5, 0)
+		sc.Position = UDim2.new(0.5, 0, 0, 38)
+		sc.Size = UDim2.new(1, -10, 1, -43)
 		sc.BackgroundTransparency = 1
 		sc.BorderSizePixel = 0
 		sc.ScrollBarThickness = 3
@@ -9485,17 +9522,36 @@ function Library:Windowxgo(setup)
 		sc.ZIndex = 301
 		sc.CanvasSize = UDim2.new(0, 0, 0, 0)
 
-		local uil = Instance.new("UIListLayout")
-		uil.Parent = sc
+		local uil = Instance.new("UIListLayout", sc)
 		uil.Padding = UDim.new(0, 6)
 		uil.SortOrder = Enum.SortOrder.LayoutOrder
 		uil:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 			sc.CanvasSize = UDim2.new(0, 0, 0, uil.AbsoluteContentSize.Y + 10)
 		end)
 
+		local buttonHolder = Instance.new("Frame")
+		buttonHolder.Name = "ButtonHolder"
+		buttonHolder.Parent = sc
+		buttonHolder.Size = UDim2.new(1, 0, 1, 0)
+		buttonHolder.BackgroundTransparency = 1
+		buttonHolder.ZIndex = 302
+
+		local innerList = Instance.new("UIListLayout", buttonHolder)
+		innerList.Padding = UDim.new(0, 6)
+		innerList.SortOrder = Enum.SortOrder.LayoutOrder
+
+		local allButtons = {}
+		local function filterButtons()
+			local key = searchBox.Text:lower()
+			for _, btn in ipairs(allButtons) do
+				btn.Visible = key == "" or btn.Text:lower():find(key, 1, true) ~= nil
+			end
+		end
+		searchBox:GetPropertyChangedSignal("Text"):Connect(filterButtons)
+
 		WindowLibrary.AddQuickButton = function(_, title, callback)
 			local btn = Instance.new("TextButton")
-			btn.Parent = sc
+			btn.Parent = buttonHolder
 			btn.Size = UDim2.new(1, 0, 0, 28)
 			btn.BackgroundColor3 = Library.Colors.Default
 			btn.BackgroundTransparency = 0.3
@@ -9506,13 +9562,17 @@ function Library:Windowxgo(setup)
 			btn.TextSize = 14
 			btn.ZIndex = 302
 			btn.ClipsDescendants = true
+			btn.LayoutOrder = #allButtons
+
 			local corner = Instance.new("UICorner")
 			corner.CornerRadius = UDim.new(0, 4)
 			corner.Parent = btn
+
 			local stroke = Instance.new("UIStroke")
 			stroke.Transparency = 0.85
 			stroke.Color = Color3.fromRGB(156, 156, 156)
 			stroke.Parent = btn
+
 			Library:MakeDrop(btn, stroke, Library.Colors.Hightlight)
 
 			btn.MouseButton1Click:Connect(function()
@@ -9520,21 +9580,633 @@ function Library:Windowxgo(setup)
 					callback()
 				end
 			end)
+
+			table.insert(allButtons, btn)
+			filterButtons()
 			return btn
 		end
 
+        WindowLibrary:AddQuickButton("测试尚未完成", function()
+			print("已开启")
+		end)
+        
 		WindowLibrary:AddQuickButton("穿墙 ON", function()
 			print("穿墙已开启")
 		end)
-
 		WindowLibrary:AddQuickButton("无敌 ON", function()
 			print("无敌已开启")
 		end)
-
 		WindowLibrary:AddQuickButton("高跳 ON", function()
 			print("高跳已开启")
 		end)
+		--  WindowLibrary:AddQuickButton(" ", function() print(" ") end)
+		WindowLibrary:AddQuickButton("切换字体", function()
+			if not WindowLibrary.FontFrame then
+				local a = game:GetService("Players")
+				local b = game:GetService("CoreGui")
+				local c = a.LocalPlayer
+				local d = {}
+				for e, f in ipairs(Enum.Font:GetEnumItems()) do
+					table.insert(d, f.Name)
+				end
+				local g = Instance.new("ScreenGui")
+				g.Name = "FontChanger"
+				g.Parent = b
+				WindowLibrary.FontGui = g
+				local h = Instance.new("Frame")
+				h.Size = UDim2.new(0, 260, 0, 0)
+				h.Position = UDim2.new(0.5, -130, 0.5, -150)
+				h.BackgroundTransparency = 1
+				h.BorderSizePixel = 0
+				h.Active = true
+				h.Parent = g
+				h.Visible = false
+				WindowLibrary.FontFrame = h
+				local i = Instance.new("Frame")
+				i.Size = UDim2.new(1, 0, 1, 0)
+				i.BackgroundTransparency = 1
+				i.ClipsDescendants = true
+				i.Parent = h
+				Instance.new("UICorner", i).CornerRadius = UDim.new(0, 8)
+				local j = Instance.new("ImageLabel")
+				j.Name = "BgImage"
+				j.Size = UDim2.new(1, 0, 1, 0)
+				j.Position = UDim2.new(0, 0, 0, 0)
+				j.BackgroundTransparency = 1
+				j.Image = "rbxassetid://132111462046017"
+				j.ScaleType = Enum.ScaleType.Stretch
+				j.ImageTransparency = 0.3
+				j.Parent = i
+				local k = Instance.new("ImageLabel")
+				k.Name = "DropShadow"
+				k.BackgroundTransparency = 1
+				k.Position = UDim2.new(0, -5, 0, -5)
+				k.Size = UDim2.new(1, 10, 1, 10)
+				k.Image = "rbxassetid://132111462046017"
+				k.ImageColor3 = Color3.new(0, 0, 0)
+				k.ImageTransparency = 1
+				k.ScaleType = Enum.ScaleType.Slice
+				k.SliceCenter = Rect.new(95, 103, 894, 902)
+				k.SliceScale = 0.05
+				k.Parent = h
+				local l = Instance.new("TextLabel")
+				l.Size = UDim2.new(1, 0, 0, 30)
+				l.BackgroundTransparency = 1
+				l.Text = "切换字体"
+				l.TextColor3 = Library.Colors.TextColor
+				l.Font = Enum.Font.GothamSemibold
+				l.TextSize = 14
+				l.Parent = h
+				local m = Instance.new("ScrollingFrame")
+				m.Size = UDim2.new(1, -10, 1, -40)
+				m.Position = UDim2.new(0, 5, 0, 35)
+				m.ScrollBarThickness = 3
+				m.ScrollBarImageColor3 = Library.Colors.Hightlight
+				m.BackgroundTransparency = 1
+				m.AutomaticCanvasSize = Enum.AutomaticSize.Y
+				m.Parent = h
+				local n = Instance.new("UIListLayout", m)
+				n.Padding = UDim.new(0, 4)
+				n.SortOrder = Enum.SortOrder.LayoutOrder
+				local o = {}
+				local p
+				local function q(r, s)
+					if r:IsA("TextLabel") or r:IsA("TextButton") or r:IsA("TextBox") then
+						if not o[r] and not g:IsAncestorOf(r) then
+							pcall(function()
+								r.Font = Enum.Font[s]
+							end)
+							o[r] = true
+						end
+					end
+					for e, t in ipairs(r:GetChildren()) do
+						q(t, s)
+					end
+				end
+				local function u(s)
+					o = {}
+					for e, r in ipairs(workspace:GetDescendants()) do
+						q(r, s)
+					end
+					for e, r in ipairs(c:WaitForChild("PlayerGui"):GetDescendants()) do
+						q(r, s)
+					end
+					for e, r in ipairs(b:GetDescendants()) do
+						q(r, s)
+					end
+				end
+				local function v(w)
+					w.DescendantAdded:Connect(function(r)
+						if p then
+							q(r, p)
+						end
+					end)
+				end
+				v(workspace)
+				v(c:WaitForChild("PlayerGui"))
+				v(b)
+				for e, x in ipairs(d) do
+					local y = Instance.new("TextButton")
+					y.Size = UDim2.new(1, -5, 0, 26)
+					y.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+					y.TextColor3 = Color3.fromRGB(255, 255, 255)
+					y.Font = Enum.Font[x]
+					y.Text = x .. ": 字体"
+					y.TextSize = 14
+					y.AutoButtonColor = false
+					y.Parent = m
+					y.BackgroundTransparency = 0.2
+					y.TextTransparency = 0.2
+					Instance.new("UICorner", y).CornerRadius = UDim.new(0, 6)
+					y.MouseEnter:Connect(function()
+						y.BackgroundColor3 = Color3.fromRGB(65, 65, 75)
+					end)
+					y.MouseLeave:Connect(function()
+						y.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+					end)
+					y.MouseButton1Click:Connect(function()
+						p = x
+						u(p)
+					end)
+				end
+			end
+			if WindowLibrary.isBusy then
+				return
+			end
+			WindowLibrary.isBusy = true
+			local h = WindowLibrary.FontFrame
+			local z = h:FindFirstChild("ScrollingFrame", true)
+			WindowLibrary.FontVisible = not WindowLibrary.FontVisible
+			if WindowLibrary.FontVisible then
+				for e, A in ipairs(z:GetChildren()) do
+					if A:IsA("TextButton") then
+						A.BackgroundTransparency = 0.2
+						A.TextTransparency = 0.2
+					end
+				end
+				h.Visible = true
+				local B = Library:Tween(h, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 260, 0, 300) })
+				B.Completed:Wait()
+			else
+				local B = Library:Tween(h, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 260, 0, 0) })
+				B.Completed:Wait()
+				h.Visible = false
+				for e, r in ipairs(z:GetChildren()) do
+					if r:IsA("TextButton") then
+						r.BackgroundTransparency = 0.2
+						r.TextTransparency = 0.2
+					end
+				end
+			end
+			WindowLibrary.isBusy = false
+		end)
+		WindowLibrary:AddQuickButton("注入器", function()
+			if _G.injectorGui and _G.injectorGui.Parent then
+				local a = game:GetService("TweenService")
+				a:Create(
+					_G.injectorGui.MainFrame,
+					TweenInfo.new(0.25),
+					{ Size = UDim2.fromOffset(420, 0), BackgroundTransparency = 1 }
+				):Play()
+				a:Create(_G.injectorGui.ShadowFrame, TweenInfo.new(0.25), { BackgroundTransparency = 1 }):Play()
+				a:Create(_G.injectorGui.ImgBg, TweenInfo.new(0.25), { ImageTransparency = 1 }):Play()
+				task.wait(0.25)
+				_G.injectorGui:Destroy()
+				_G.injectorGui = nil
+				return
+			end
+			local a = game:GetService("TweenService")
+			local b = game:GetService("UserInputService")
+			local c = game:GetService("RunService")
+			local d = game:GetService("Players")
+			local e = d.LocalPlayer
+			local f = e:WaitForChild("PlayerGui")
+			local g = Instance.new("ScreenGui")
+			g.Name = "AcrylicInjector"
+			g.ResetOnSpawn = false
+			g.Parent = f
+			_G.injectorGui = g
+			local h = Instance.new("ImageLabel")
+			h.Name = "ImgBg"
+			h.Size = UDim2.fromOffset(420, 280)
+			h.Position = UDim2.fromScale(0.5, 0.5)
+			h.AnchorPoint = Vector2.new(0.5, 0.5)
+			h.BackgroundTransparency = 1
+			h.Image = "rbxassetid://140492333414033"
+			h.ImageTransparency = 1
+			h.BorderSizePixel = 0
+			h.Parent = g
+			Instance.new("UICorner", h).CornerRadius = UDim.new(0, 12)
+			local i = Instance.new("Frame")
+			i.Name = "ShadowFrame"
+			i.Size = UDim2.fromOffset(440, 300)
+			i.Position = UDim2.fromScale(0.5, 0.5)
+			i.AnchorPoint = Vector2.new(0.5, 0.5)
+			i.BackgroundColor3 = Color3.new(0, 0, 0)
+			i.BackgroundTransparency = 1
+			i.BorderSizePixel = 0
+			i.Visible = true
+			i.Parent = g
+			Instance.new("UICorner", i).CornerRadius = UDim.new(0, 16)
+			local j = Instance.new("Frame")
+			j.Name = "MainFrame"
+			j.Size = UDim2.fromOffset(420, 280)
+			j.Position = UDim2.fromScale(0.5, 0.5)
+			j.AnchorPoint = Vector2.new(0.5, 0.5)
+			j.BackgroundColor3 = Color3.fromRGB(32, 32, 32)
+			j.BackgroundTransparency = 1
+			j.BorderSizePixel = 0
+			j.ClipsDescendants = true
+			j.Parent = g
+			Instance.new("UICorner", j).CornerRadius = UDim.new(0, 12)
+			local k = Instance.new("Camera")
+			k.FieldOfView = 70
+			local l = Instance.new("ViewportFrame")
+			l.Size = UDim2.fromScale(1, 1)
+			l.BackgroundTransparency = 1
+			l.BorderSizePixel = 0
+			l.ImageTransparency = 0.4
+			l.CurrentCamera = k
+			l.Parent = j
+			c.RenderStepped:Connect(function()
+				if not l.Parent then
+					return
+				end
+				l:ClearAllChildren()
+				for m, n in ipairs(workspace:GetChildren()) do
+					if n:IsA("BasePart") then
+						local o = n:Clone()
+						o.Parent = l
+					end
+				end
+				k.CFrame = workspace.CurrentCamera.CFrame
+			end)
+			local p = Instance.new("Frame")
+			p.Size = UDim2.new(1, 0, 0, 40)
+			p.Position = UDim2.fromScale(0, 0)
+			p.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
+			p.BackgroundTransparency = 0.4
+			p.BorderSizePixel = 0
+			p.Parent = j
+			Instance.new("UICorner", p).CornerRadius = UDim.new(0, 12)
+			local q = Instance.new("TextLabel")
+			q.Size = UDim2.new(1, -100, 1, 0)
+			q.Position = UDim2.fromScale(0, 0)
+			q.BackgroundTransparency = 1
+			q.Text = "XGOHUB 注入器"
+			q.Font = Enum.Font.GothamMedium
+			q.TextColor3 = Color3.fromRGB(240, 240, 240)
+			q.TextSize = 16
+			q.TextXAlignment = Enum.TextXAlignment.Left
+			q.Parent = p
+			local r = Instance.new("UIPadding")
+			r.PaddingLeft = UDim.new(0, 16)
+			r.Parent = q
+			local s = Instance.new("TextButton")
+			s.Size = UDim2.fromOffset(24, 24)
+			s.Position = UDim2.new(1, -28, 0.5, 0)
+			s.AnchorPoint = Vector2.new(0.5, 0.5)
+			s.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+			s.BackgroundTransparency = 0.3
+			s.BorderSizePixel = 0
+			s.Text = "X"
+			s.Font = Enum.Font.GothamBold
+			s.TextSize = 14
+			s.TextColor3 = Color3.new(1, 1, 1)
+			s.Parent = p
+			Instance.new("UICorner", s).CornerRadius = UDim.new(0, 6)
+			local t = Instance.new("ScrollingFrame")
+			t.Size = UDim2.new(1, -24, 1, -130)
+			t.Position = UDim2.new(0, 12, 0, 50)
+			t.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
+			t.BackgroundTransparency = 0.3
+			t.BorderSizePixel = 0
+			t.ScrollBarThickness = 6
+			t.ScrollBarImageColor3 = Color3.fromRGB(120, 120, 120)
+			t.CanvasSize = UDim2.new(0, 0, 0, 0)
+			t.AutomaticCanvasSize = Enum.AutomaticSize.Y
+			t.Parent = j
+			Instance.new("UICorner", t).CornerRadius = UDim.new(0, 8)
+			local u = Instance.new("UIPadding")
+			u.PaddingLeft = UDim.new(0, 8)
+			u.PaddingRight = UDim.new(0, 8)
+			u.PaddingTop = UDim.new(0, 8)
+			u.PaddingBottom = UDim.new(0, 8)
+			u.Parent = t
+			local v = Instance.new("TextBox")
+			v.Size = UDim2.new(1, 0, 0, 200)
+			v.BackgroundTransparency = 1
+			v.ClearTextOnFocus = false
+			v.MultiLine = true
+			v.Font = Enum.Font.Code
+			v.PlaceholderText = "-- 在此处编写 Lua 代码"
+			v.Text = ""
+			v.TextColor3 = Color3.fromRGB(230, 230, 230)
+			v.TextSize = 13
+			v.TextXAlignment = Enum.TextXAlignment.Left
+			v.TextYAlignment = Enum.TextYAlignment.Top
+			v.Parent = t
+			local w = Instance.new("Frame")
+			w.Size = UDim2.new(1, -24, 0, 34)
+			w.Position = UDim2.new(0, 12, 1, -74)
+			w.BackgroundTransparency = 1
+			w.Parent = j
+			local x = Instance.new("ScrollingFrame")
+			x.Size = UDim2.new(1, -24, 0, 60)
+			x.Position = UDim2.new(0, 12, 1, -140)
+			x.BackgroundColor3 = Color3.fromRGB(36, 36, 36)
+			x.BackgroundTransparency = 0.3
+			x.BorderSizePixel = 0
+			x.ScrollBarThickness = 4
+			x.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+			x.CanvasSize = UDim2.new(0, 0, 0, 0)
+			x.AutomaticCanvasSize = Enum.AutomaticSize.X
+			x.Parent = j
+			Instance.new("UICorner", x).CornerRadius = UDim.new(0, 6)
+			local y = Instance.new("UIPadding")
+			y.PaddingLeft = UDim.new(0, 6)
+			y.PaddingTop = UDim.new(0, 6)
+			y.PaddingBottom = UDim.new(0, 6)
+			y.Parent = x
+			local z = { "执行", "清空", "粘贴", "复制", "保存" }
+			local A = {
+				function()
+					local B = v.Text
+					if B:gsub("%s+", "") == "" then
+						return
+					end
+					local C, D = pcall(function()
+						loadstring(B)()
+					end)
+				end,
+				function()
+					v.Text = ""
+				end,
+				function()
+					v.Text = game:GetService("HttpService"):GetAsync("https://pastebin.com/raw/" .. "YOUR_PASTE_ID")
+				end,
+				function()
+					writefile("clipboard.txt", v.Text)
+					setclipboard(v.Text)
+				end,
+				function()
+					local E = Instance.new("Frame")
+					E.Size = UDim2.fromOffset(300, 140)
+					E.Position = UDim2.fromScale(0.5, 0.5)
+					E.AnchorPoint = Vector2.new(0.5, 0.5)
+					E.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
+					E.BackgroundTransparency = 0.3
+					E.BorderSizePixel = 0
+					E.Parent = j
+					Instance.new("UICorner", E).CornerRadius = UDim.new(0, 10)
+					local F = Instance.new("TextLabel")
+					F.Size = UDim2.new(1, 0, 0, 30)
+					F.Position = UDim2.fromScale(0, 0)
+					F.BackgroundTransparency = 1
+					F.Text = "请输入保存后的名称"
+					F.Font = Enum.Font.GothamMedium
+					F.TextColor3 = Color3.new(1, 1, 1)
+					F.TextSize = 15
+					F.Parent = E
+					local G = Instance.new("TextBox")
+					G.Size = UDim2.new(1, -20, 0, 32)
+					G.Position = UDim2.new(0, 10, 0, 40)
+					G.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+					G.BackgroundTransparency = 0.2
+					G.Font = Enum.Font.Gotham
+					G.PlaceholderText = "文件名（无需后缀）"
+					G.Text = ""
+					G.TextColor3 = Color3.new(1, 1, 1)
+					G.TextSize = 14
+					G.Parent = E
+					Instance.new("UICorner", G).CornerRadius = UDim.new(0, 6)
+					local H = Instance.new("Frame")
+					H.Size = UDim2.new(1, 0, 0, 32)
+					H.Position = UDim2.new(0, 0, 1, -42)
+					H.BackgroundTransparency = 1
+					H.Parent = E
+					local C = Instance.new("TextButton")
+					C.Size = UDim2.new(0.45, 0, 1, 0)
+					C.Position = UDim2.new(0.03, 0, 0, 0)
+					C.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+					C.BackgroundTransparency = 0.3
+					C.Font = Enum.Font.GothamSemibold
+					C.Text = "确认保存"
+					C.TextColor3 = Color3.new(1, 1, 1)
+					C.TextSize = 14
+					C.Parent = H
+					Instance.new("UICorner", C).CornerRadius = UDim.new(0, 6)
+					local I = Instance.new("TextButton")
+					I.Size = UDim2.new(0.45, 0, 1, 0)
+					I.Position = UDim2.new(0.52, 0, 0, 0)
+					I.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+					I.BackgroundTransparency = 0.3
+					I.Font = Enum.Font.GothamSemibold
+					I.Text = "取消"
+					I.TextColor3 = Color3.new(1, 1, 1)
+					I.TextSize = 14
+					I.Parent = H
+					Instance.new("UICorner", I).CornerRadius = UDim.new(0, 6)
+					local function J()
+						if not isfolder("XGOHUB") then
+							makefolder("XGOHUB")
+						end
+						if not isfolder("XGOHUB/saves") then
+							makefolder("XGOHUB/saves")
+						end
+					end
+					C.MouseButton1Click:Connect(function()
+						local K = G.Text:gsub('[%\\/%:%*%?"<>|]', "")
+						if K == "" then
+							return
+						end
+						J()
+						writefile("XGOHUB/saves/" .. K .. ".lua", v.Text)
+						E:Destroy()
+						refreshScripts()
+					end)
+					I.MouseButton1Click:Connect(function()
+						E:Destroy()
+					end)
+				end,
+			}
+			for L, M in ipairs(z) do
+				local N = Instance.new("TextButton")
+				N.Size = UDim2.new(0.19, 0, 1, 0)
+				N.Position = UDim2.new(0.01 + (L - 1) * 0.198, 0, 0, 0)
+				N.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+				N.BackgroundTransparency = 0.3
+				N.BorderSizePixel = 0
+				N.Font = Enum.Font.GothamSemibold
+				N.Text = M
+				N.TextColor3 = Color3.new(1, 1, 1)
+				N.TextSize = 14
+				N.Parent = w
+				Instance.new("UICorner", N).CornerRadius = UDim.new(0, 6)
+				N.MouseButton1Click:Connect(A[L])
+			end
+			local function refreshScripts()
+				for m, o in ipairs(x:GetChildren()) do
+					if o:IsA("TextButton") then
+						o:Destroy()
+					end
+				end
+				local O = listfiles("XGOHUB/saves")
+				local P = 100
+				local Q = 6
+				x.CanvasSize = UDim2.new(0, #O * (P + Q), 0, 0)
+				for R, S in ipairs(O) do
+					local T = S:match("([^\\/]+)%.lua$")
+					if T then
+						local U = Instance.new("TextButton")
+						U.Size = UDim2.new(0, P, 0, 24)
+						U.Position = UDim2.new(0, (R - 1) * (P + Q), 0, 0)
+						U.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+						U.BackgroundTransparency = 0.3
+						U.BorderSizePixel = 0
+						U.Font = Enum.Font.Gotham
+						U.Text = T
+						U.TextColor3 = Color3.new(1, 1, 1)
+						U.TextSize = 12
+						U.Parent = x
+						Instance.new("UICorner", U).CornerRadius = UDim.new(0, 4)
+						local V = false
+						local W
+						U.MouseButton1Down:Connect(function()
+							V = true
+							W = task.delay(1, function()
+								if not V then
+									return
+								end
+								local E = Instance.new("Frame")
+								E.Size = UDim2.fromOffset(260, 120)
+								E.Position = UDim2.fromScale(0.5, 0.5)
+								E.AnchorPoint = Vector2.new(0.5, 0.5)
+								E.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+								E.BackgroundTransparency = 0.2
+								E.BorderSizePixel = 0
+								E.Parent = j
+								Instance.new("UICorner", E).CornerRadius = UDim.new(0, 10)
+								local F = Instance.new("TextLabel")
+								F.Size = UDim2.new(1, 0, 0, 40)
+								F.Position = UDim2.fromScale(0, 0)
+								F.BackgroundTransparency = 1
+								F.Text = "是否删除该文件？"
+								F.Font = Enum.Font.GothamMedium
+								F.TextColor3 = Color3.new(1, 1, 1)
+								F.TextSize = 15
+								F.Parent = E
+								local H = Instance.new("Frame")
+								H.Size = UDim2.new(1, 0, 0, 32)
+								H.Position = UDim2.new(0, 0, 1, -42)
+								H.BackgroundTransparency = 1
+								H.Parent = E
+								local X = Instance.new("TextButton")
+								X.Size = UDim2.new(0.45, 0, 1, 0)
+								X.Position = UDim2.new(0.03, 0, 0, 0)
+								X.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+								X.BackgroundTransparency = 0.3
+								X.Font = Enum.Font.GothamSemibold
+								X.Text = "删除"
+								X.TextColor3 = Color3.new(1, 1, 1)
+								X.TextSize = 14
+								X.Parent = H
+								Instance.new("UICorner", X).CornerRadius = UDim.new(0, 6)
+								local I = Instance.new("TextButton")
+								I.Size = UDim2.new(0.45, 0, 1, 0)
+								I.Position = UDim2.new(0.52, 0, 0, 0)
+								I.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+								I.BackgroundTransparency = 0.3
+								I.Font = Enum.Font.GothamSemibold
+								I.Text = "取消"
+								I.TextColor3 = Color3.new(1, 1, 1)
+								I.TextSize = 14
+								I.Parent = H
+								Instance.new("UICorner", I).CornerRadius = UDim.new(0, 6)
+								X.MouseButton1Click:Connect(function()
+									delfile(S)
+									E:Destroy()
+									refreshScripts()
+								end)
+								I.MouseButton1Click:Connect(function()
+									E:Destroy()
+								end)
+							end)
+						end)
+						U.MouseButton1Up:Connect(function()
+							V = false
+							if W then
+								pcall(function()
+									W:Cancel()
+								end)
+								W = nil
+							end
+						end)
+						U.MouseLeave:Connect(function()
+							V = false
+							if W then
+								pcall(function()
+									W:Cancel()
+								end)
+								W = nil
+							end
+						end)
+					end
+				end
+			end
+			refreshScripts()
+			if _G.codeCache then
+				v.Text = _G.codeCache
+			end
+			v:GetPropertyChangedSignal("Text"):Connect(function()
+				_G.codeCache = v.Text
+			end)
+			local Y, Z, _, a0
+			p.InputBegan:Connect(function(G)
+				if G.UserInputType == Enum.UserInputType.MouseButton1 then
+					Y = true
+					_ = G.Position
+					a0 = j.Position
+					G.Changed:Connect(function()
+						if G.UserInputState == Enum.UserInputState.End then
+							Y = false
+						end
+					end)
+				end
+			end)
+			p.InputChanged:Connect(function(G)
+				if G.UserInputType == Enum.UserInputType.MouseMovement then
+					Z = G
+				end
+			end)
+			b.InputChanged:Connect(function(G)
+				if G == Z and Y then
+					local a1 = G.Position - _
+					j.Position = UDim2.new(a0.X.Scale, a0.X.Offset + a1.X, a0.Y.Scale, a0.Y.Offset + a1.Y)
+				end
+			end)
+			s.MouseButton1Click:Connect(function()
+				a:Create(j, TweenInfo.new(0.25), { Size = UDim2.fromOffset(420, 0), BackgroundTransparency = 1 }):Play()
+				a:Create(i, TweenInfo.new(0.25), { BackgroundTransparency = 1 }):Play()
+				a:Create(h, TweenInfo.new(0.25), { ImageTransparency = 1 }):Play()
+				task.wait(0.25)
+				g:Destroy()
+				_G.injectorGui = nil
+			end)
+			j.Size = UDim2.fromOffset(0, 0)
+			j.BackgroundTransparency = 1
+			i.BackgroundTransparency = 1
+			a:Create(i, TweenInfo.new(0.4), { BackgroundTransparency = 0.6 }):Play()
+			a:Create(
+				j,
+				TweenInfo.new(0.5, Enum.EasingStyle.Back),
+				{ Size = UDim2.fromOffset(420, 280), BackgroundTransparency = 0.3 }
+			):Play()
+			a:Create(h, TweenInfo.new(0.5), { ImageTransparency = 0.2 }):Play()
+		end)
 	end
+
+	buildQuickFrame()
 
 	local quickVisible = false
 	quickBtn.MouseButton1Click:Connect(function()
