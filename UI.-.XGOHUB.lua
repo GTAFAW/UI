@@ -9441,15 +9441,15 @@ function Library:Windowxgo(setup)
 	quickBtn.ZIndex = 20
 	WindowLibrary:AddToolTip(quickBtn, "快捷功能栏")
 
-	local quickOrigSize = quickBtn.Size
+	local quickOrigBtnSize = quickBtn.Size
 	quickBtn.MouseButton1Down:Connect(function()
-		quickBtn.Size = quickOrigSize - UDim2.new(0, 4, 0, 4)
+		quickBtn.Size = quickOrigBtnSize - UDim2.new(0, 4, 0, 4)
 	end)
 	quickBtn.MouseButton1Up:Connect(function()
-		quickBtn.Size = quickOrigSize
+		quickBtn.Size = quickOrigBtnSize
 	end)
 	quickBtn.MouseLeave:Connect(function()
-		quickBtn.Size = quickOrigSize
+		quickBtn.Size = quickOrigBtnSize
 	end)
 
 	local quickFrame
@@ -9495,6 +9495,19 @@ function Library:Windowxgo(setup)
 		bg.SliceScale = 1
 		bg.ZIndex = 0
 
+		local miniBg = Instance.new("ImageLabel")
+		miniBg.Name = "MiniBg"
+		miniBg.Parent = mask
+		miniBg.Size = UDim2.new(1, 0, 1, 0)
+		miniBg.Position = UDim2.fromOffset(0, 0)
+		miniBg.BackgroundTransparency = 1
+		miniBg.Image = "rbxassetid://107863110521291"
+		miniBg.ScaleType = Enum.ScaleType.Fit
+		miniBg.SliceCenter = Rect.new(0, 0, 0, 0)
+		miniBg.SliceScale = 1
+		miniBg.ZIndex = 0
+		miniBg.Visible = false
+
 		local qCorner = Instance.new("UICorner", bg)
 		qCorner.CornerRadius = UDim.new(0, 8)
 
@@ -9512,12 +9525,20 @@ function Library:Windowxgo(setup)
 		ds.SliceScale = 1
 		ds.ZIndex = 299
 
+		local topBar = Instance.new("Frame")
+		topBar.Name = "TopBar"
+		topBar.Parent = quickFrame
+		topBar.Size = UDim2.new(1, 0, 0, 32)
+		topBar.Position = UDim2.new(0, 0, 0, 0)
+		topBar.BackgroundTransparency = 1
+		topBar.ZIndex = 302
+
 		local searchBox = Instance.new("TextBox")
 		searchBox.Name = "SearchBox"
-		searchBox.Parent = quickFrame
-		searchBox.Size = UDim2.new(1, -12, 0, 32)
-		searchBox.Position = UDim2.new(0.5, 0, 0, 8)
-		searchBox.AnchorPoint = Vector2.new(0.5, 0)
+		searchBox.Parent = topBar
+		searchBox.Size = UDim2.new(1, -44, 0, 26)
+		searchBox.Position = UDim2.new(0, 8, 0.5, 0)
+		searchBox.AnchorPoint = Vector2.new(0, 0.5)
 		searchBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		searchBox.BackgroundTransparency = 0.9
 		searchBox.BorderSizePixel = 0
@@ -9536,12 +9557,23 @@ function Library:Windowxgo(setup)
 		sStroke.Thickness = 1
 		sStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
+		local minBtn = Instance.new("ImageButton")
+		minBtn.Name = "MinBtn"
+		minBtn.Parent = topBar
+		minBtn.AnchorPoint = Vector2.new(1, 0.5)
+		minBtn.Position = UDim2.new(1, -8, 0.5, 0)
+		minBtn.Size = UDim2.new(0, 16, 0, 16)
+		minBtn.BackgroundTransparency = 1
+		minBtn.Image = "rbxassetid://7733997941"
+		minBtn.ImageColor3 = Library.Colors.TextColor
+		minBtn.ZIndex = 302
+
 		local sc = Instance.new("ScrollingFrame")
 		sc.Name = "Scroll"
 		sc.Parent = quickFrame
 		sc.AnchorPoint = Vector2.new(0.5, 0)
-		sc.Position = UDim2.new(0.5, 0, 0, 48)
-		sc.Size = UDim2.new(1, -12, 1, -56)
+		sc.Position = UDim2.new(0.5, 0, 0, 40)
+		sc.Size = UDim2.new(1, -12, 1, -48)
 		sc.BackgroundTransparency = 1
 		sc.BorderSizePixel = 0
 		sc.ScrollBarThickness = 4
@@ -9586,6 +9618,126 @@ function Library:Windowxgo(setup)
 
 		searchBox:GetPropertyChangedSignal("Text"):Connect(filterButtons)
 		uil:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(refreshCanvas)
+
+		local dialog
+		local function createConfirmDialog(url, title)
+			if dialog and dialog.Parent then
+				return
+			end
+			dialog = Instance.new("ImageLabel")
+			dialog.Name = "ConfirmDialog"
+			dialog.Parent = ScreenGui
+			dialog.AnchorPoint = Vector2.new(0.5, 0.5)
+			dialog.Position = UDim2.new(0.5, 0.3, 0.5, 0)
+			dialog.Size = UDim2.new(0, 220, 0, 110)
+			dialog.BackgroundTransparency = 1
+			dialog.Image = "rbxassetid://97441066642687"
+			dialog.ImageTransparency = 0.8
+			dialog.ScaleType = Enum.ScaleType.Stretch
+			dialog.ZIndex = 400
+
+			local corner = Instance.new("UICorner", dialog)
+			corner.CornerRadius = UDim.new(0, 12)
+
+			local shadow = Instance.new("ImageLabel")
+			shadow.Name = "Shadow"
+			shadow.Parent = dialog
+			shadow.Position = UDim2.new(0, -10, 0, -10)
+			shadow.Size = UDim2.new(1, 20, 1, 20)
+			shadow.Image = "rbxassetid://13151082138"
+			shadow.ImageColor3 = Color3.new(0, 0, 0)
+			shadow.ImageTransparency = 0.9
+			shadow.ScaleType = Enum.ScaleType.Slice
+			shadow.SliceCenter = Rect.new(64, 64, 192, 192)
+			shadow.BackgroundTransparency = 1
+			shadow.ZIndex = 399
+
+			local titleLbl = Instance.new("TextLabel")
+			titleLbl.Parent = dialog
+			titleLbl.Size = UDim2.new(1, -20, 0, 40)
+			titleLbl.Position = UDim2.new(0, 10, 0, 10)
+			titleLbl.BackgroundTransparency = 1
+			titleLbl.Font = Enum.Font.GothamBold
+			titleLbl.Text = "是否执行脚本？"
+			titleLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+			titleLbl.TextSize = 16
+			titleLbl.TextTransparency = 1
+			titleLbl.TextWrapped = true
+			titleLbl.ZIndex = 401
+
+			local subTitle = Instance.new("TextLabel")
+			subTitle.Parent = dialog
+			subTitle.Size = UDim2.new(1, -20, 0, 40)
+			subTitle.Position = UDim2.new(0, 10, 0, 50)
+			subTitle.BackgroundTransparency = 1
+			subTitle.Font = Enum.Font.Gotham
+			subTitle.Text = "来源：" .. title
+			subTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+			subTitle.TextSize = 14
+			subTitle.TextTransparency = 1
+			subTitle.TextWrapped = true
+			subTitle.ZIndex = 401
+
+			local confirm = Instance.new("TextButton")
+			confirm.Name = "Confirm"
+			confirm.Parent = dialog
+			confirm.Size = UDim2.new(0, 80, 0, 32)
+			confirm.Position = UDim2.new(0.5, -85, 1, -42)
+			confirm.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+			confirm.BackgroundTransparency = 0.9
+			confirm.Font = Enum.Font.GothamBold
+			confirm.Text = "确认"
+			confirm.TextColor3 = Color3.new(1, 1, 1)
+			confirm.TextSize = 14
+			confirm.ZIndex = 401
+			local cCorner = Instance.new("UICorner", confirm)
+
+			local cancel = Instance.new("TextButton")
+			cancel.Name = "Cancel"
+			cancel.Parent = dialog
+			cancel.Size = UDim2.new(0, 80, 0, 32)
+			cancel.Position = UDim2.new(0.5, 5, 1, -42)
+			cancel.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+			cancel.BackgroundTransparency = 0.9
+			cancel.Font = Enum.Font.GothamBold
+			cancel.Text = "取消"
+			cancel.TextColor3 = Color3.new(1, 1, 1)
+			cancel.TextSize = 14
+			cancel.ZIndex = 401
+			local caCorner = Instance.new("UICorner", cancel)
+
+			confirm.MouseButton1Click:Connect(function()
+				dialog:Destroy()
+				dialog = nil
+				loadstring(game:HttpGet(url))()
+			end)
+
+			cancel.MouseButton1Click:Connect(function()
+				dialog:Destroy()
+				dialog = nil
+			end)
+
+			local enterTweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			Library:Tween(dialog, enterTweenInfo, {
+				Size = UDim2.new(0, 280, 0, 140),
+				ImageTransparency = 0,
+			})
+			Library:Tween(shadow, enterTweenInfo, {
+				ImageTransparency = 0.6,
+			})
+			Library:Tween(titleLbl, enterTweenInfo, {
+				TextTransparency = 0,
+			})
+			Library:Tween(subTitle, enterTweenInfo, {
+				TextTransparency = 0,
+			})
+			Library:Tween(confirm, enterTweenInfo, {
+				BackgroundTransparency = 0.5,
+			})
+			Library:Tween(cancel, enterTweenInfo, {
+				BackgroundTransparency = 0.5,
+			})
+		end
 
 		WindowLibrary.AddQuickButton = function(_, title, callback)
 			local btn = Instance.new("TextButton")
@@ -9671,7 +9823,9 @@ function Library:Windowxgo(setup)
 			end)
 
 			btn.MouseButton1Click:Connect(function()
-				if callback then
+				if type(callback) == "string" and (callback:match("^https?://") or callback:match("^http://")) then
+					createConfirmDialog(callback, title)
+				elseif type(callback) == "function" then
 					callback()
 				end
 			end)
@@ -9681,20 +9835,10 @@ function Library:Windowxgo(setup)
 			return btn
 		end
 
+		WindowLibrary:AddQuickButton("XGOHUB备用链接", "https://github.com/GTAFAW/XGOHUB/raw/main/备用链接.lua")
 		WindowLibrary:AddQuickButton("测试尚未完成", function()
 			print("已开启")
 		end)
-
-		WindowLibrary:AddQuickButton("穿墙 ON", function()
-			print("穿墙已开启")
-		end)
-		WindowLibrary:AddQuickButton("无敌 ON", function()
-			print("无敌已开启")
-		end)
-		WindowLibrary:AddQuickButton("高跳 ON", function()
-			print("高跳已开启")
-		end)
-		--  WindowLibrary:AddQuickButton(" ", function() print(" ") end)
 		WindowLibrary:AddQuickButton("切换字体", function()
 			if not WindowLibrary.FontFrame then
 				local a = game:GetService("Players")
@@ -10319,23 +10463,435 @@ function Library:Windowxgo(setup)
 			):Play()
 			a:Create(h, TweenInfo.new(0.5), { ImageTransparency = 0.2 }):Play()
 		end)
+		WindowLibrary:AddQuickButton("FE 超燃动画", function()
+			local a = game:GetService("Players")
+			local b = game:GetService("TweenService")
+			local c = a.LocalPlayer
+			if not c then
+				return
+			end
+			local d = c:WaitForChild("PlayerGui")
+			local e = d:FindFirstChild("toggleGui")
+			if e then
+				e:Destroy()
+			end
+			local f = {
+				Color3.fromRGB(255, 0, 0),
+				Color3.fromRGB(255, 127, 0),
+				Color3.fromRGB(255, 255, 0),
+				Color3.fromRGB(0, 255, 0),
+				Color3.fromRGB(0, 0, 255),
+				Color3.fromRGB(75, 0, 130),
+				Color3.fromRGB(148, 0, 211),
+			}
+			local function g(h)
+				local function i(j)
+					local k = j % #f + 1
+					local l = TweenInfo.new(1.2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, true)
+					local m = b:Create(h, l, { Color = f[k] })
+					m:Play()
+					m.Completed:Connect(function()
+						i(k)
+					end)
+				end
+				i(1)
+			end
+			local function n()
+				local o = c.Character
+				if not o then
+					return
+				end
+				local p = o:FindFirstChildOfClass("Humanoid")
+				if p then
+					p.Health = 0
+				else
+					o:Destroy()
+				end
+			end
+			local q = d:FindFirstChild("XGOHUB")
+			if not q then
+				q = Instance.new("ScreenGui")
+				q.Name = "XGOHUB"
+				q.Parent = d
+				q.ResetOnSpawn = false
+				q.ZIndexBehavior = Enum.ZIndexBehavior.Global
+				q.DisplayOrder = 0
+				q.IgnoreGuiInset = false
+				q.Enabled = true
+				q.SelectionGroup = false
+				local r = Instance.new("Frame")
+				r.Name = "Frame"
+				r.Parent = q
+				r.Size = UDim2.new(0, 350, 0, 275)
+				r.Position = UDim2.new(0, 230, 0, 0)
+				r.AnchorPoint = Vector2.new(0, 0)
+				r.Visible = true
+				r.BackgroundColor3 = Color3.fromRGB(62, 62, 62)
+				r.BackgroundTransparency = 0.5
+				r.BorderColor3 = Color3.fromRGB(27, 42, 53)
+				r.BorderSizePixel = 1
+				r.ClipsDescendants = false
+				r.LayoutOrder = 0
+				r.Selectable = false
+				r.SelectionGroup = false
+				r.SizeConstraint = Enum.SizeConstraint.RelativeXY
+				r.Rotation = 0
+				r.AutomaticSize = Enum.AutomaticSize.None
+				r.Transparency = 0.5
+				local s = Instance.new("ImageLabel")
+				s.Name = "FrameBackground"
+				s.Parent = r
+				s.Size = UDim2.new(1, 0, 1, 0)
+				s.Position = UDim2.new(0, 0, 0, 0)
+				s.BackgroundTransparency = 1
+				s.Image = "rbxassetid://90941887059454"
+				s.ScaleType = Enum.ScaleType.Stretch
+				s.ZIndex = 1
+				local t = Instance.new("UICorner")
+				t.Name = "UICorner"
+				t.Parent = s
+				local u = Instance.new("UICorner")
+				u.Name = "UICorner"
+				u.Parent = r
+				local v = Instance.new("UIStroke")
+				v.Name = "UIStroke"
+				v.Parent = r
+				v.Enabled = true
+				v.Color = Color3.fromRGB(0, 0, 0)
+				v.Thickness = 2.5
+				v.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+				v.Transparency = 0.3
+				v.LineJoinMode = Enum.LineJoinMode.Round
+				g(v)
+				local w = Instance.new("ScrollingFrame")
+				w.Name = "ScrollingFrame"
+				w.Parent = r
+				w.Size = UDim2.new(1, -10, 1, -10)
+				w.Position = UDim2.new(0, 5, 0, 5)
+				w.AnchorPoint = Vector2.new(0, 0)
+				w.Visible = true
+				w.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+				w.BackgroundTransparency = 0.4
+				w.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				w.BorderSizePixel = 1
+				w.ClipsDescendants = true
+				w.LayoutOrder = 0
+				w.Selectable = true
+				w.SelectionGroup = true
+				w.SizeConstraint = Enum.SizeConstraint.RelativeXY
+				w.Rotation = 0
+				w.AutomaticSize = Enum.AutomaticSize.None
+				w.CanvasSize = UDim2.new(0, 0, 0, 0)
+				w.CanvasPosition = Vector2.new(0, 0)
+				w.ScrollBarThickness = 12
+				w.ScrollingEnabled = true
+				w.ScrollingDirection = Enum.ScrollingDirection.Y
+				w.AutomaticCanvasSize = Enum.AutomaticSize.Y
+				w.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
+				w.ScrollBarImageTransparency = 0.5
+				w.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+				w.Transparency = 0.4
+				w.ZIndex = 2
+				local x = Instance.new("UICorner")
+				x.Name = "UICorner"
+				x.Parent = w
+				local y = Instance.new("UIStroke")
+				y.Name = "UIStroke"
+				y.Parent = w
+				y.Enabled = true
+				y.Color = Color3.fromRGB(54, 54, 54)
+				y.Thickness = 5
+				y.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+				y.Transparency = 0.3
+				y.LineJoinMode = Enum.LineJoinMode.Round
+				g(y)
+				local z = Instance.new("TextLabel")
+				z.Name = "TextLabel"
+				z.Parent = w
+				z.Size = UDim2.new(0, 200, 0, 50)
+				z.Position = UDim2.new(0.5, 0, 0, 10)
+				z.AnchorPoint = Vector2.new(0.5, 0)
+				z.Visible = true
+				z.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+				z.BackgroundTransparency = 0.4
+				z.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				z.BorderSizePixel = 1
+				z.ClipsDescendants = false
+				z.LayoutOrder = 0
+				z.Selectable = false
+				z.SelectionGroup = false
+				z.SizeConstraint = Enum.SizeConstraint.RelativeXY
+				z.Rotation = 0
+				z.AutomaticSize = Enum.AutomaticSize.None
+				z.Font = Enum.Font.Fantasy
+				z.Text = "XGOHUB"
+				z.TextColor3 = Color3.fromRGB(247, 247, 247)
+				z.TextSize = 8
+				z.TextScaled = true
+				z.TextWrapped = true
+				z.TextXAlignment = Enum.TextXAlignment.Center
+				z.TextYAlignment = Enum.TextYAlignment.Center
+				z.TextTransparency = 0
+				z.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+				z.TextStrokeTransparency = 0.5
+				z.LineHeight = 1
+				z.RichText = false
+				z.TextTruncate = Enum.TextTruncate.None
+				z.MaxVisibleGraphemes = -1
+				z.Transparency = 0.4
+				z.ZIndex = 3
+				local A = Instance.new("UICorner")
+				A.Name = "UICorner"
+				A.Parent = z
+				local B = Instance.new("UIStroke")
+				B.Name = "UIStroke"
+				B.Parent = z
+				B.Enabled = true
+				B.Color = Color3.fromRGB(88, 88, 88)
+				B.Thickness = 1.5
+				B.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+				B.Transparency = 0.3
+				B.LineJoinMode = Enum.LineJoinMode.Round
+				g(B)
+				local C = Instance.new("TextBox")
+				C.Name = "SearchBox"
+				C.Parent = w
+				C.Size = UDim2.new(0, 200, 0, 30)
+				C.Position = UDim2.new(0.35, 30, 0, 70)
+				C.AnchorPoint = Vector2.new(0.5, 0)
+				C.Visible = true
+				C.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+				C.BackgroundTransparency = 0.5
+				C.BorderColor3 = Color3.fromRGB(27, 42, 53)
+				C.BorderSizePixel = 1
+				C.ClipsDescendants = false
+				C.LayoutOrder = 1
+				C.Selectable = true
+				C.SelectionGroup = false
+				C.SizeConstraint = Enum.SizeConstraint.RelativeXY
+				C.Rotation = 0
+				C.AutomaticSize = Enum.AutomaticSize.None
+				C.Font = Enum.Font.SourceSans
+				C.Text = ""
+				C.PlaceholderText = "搜索按钮（输入关键词）"
+				C.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
+				C.TextColor3 = Color3.fromRGB(255, 255, 255)
+				C.TextSize = 12
+				C.TextScaled = false
+				C.TextWrapped = false
+				C.TextXAlignment = Enum.TextXAlignment.Left
+				C.TextYAlignment = Enum.TextYAlignment.Center
+				C.TextTransparency = 0
+				C.ClearTextOnFocus = false
+				C.MaxVisibleGraphemes = -1
+				C.Transparency = 0.5
+				C.ZIndex = 3
+				local D = Instance.new("UICorner")
+				D.Name = "UICorner"
+				D.Parent = C
+				local E = Instance.new("UIStroke")
+				E.Name = "UIStroke"
+				E.Parent = C
+				E.Enabled = true
+				E.Color = Color3.fromRGB(88, 88, 88)
+				E.Thickness = 1
+				E.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+				E.Transparency = 0.3
+				E.LineJoinMode = Enum.LineJoinMode.Round
+				g(E)
+				local F = Instance.new("TextButton")
+				F.Name = "强制自杀"
+				F.Parent = w
+				F.Size = UDim2.new(0, 60, 0, 30)
+				F.Position = UDim2.new(0.75, 30, 0, 70)
+				F.AnchorPoint = Vector2.new(0.5, 0)
+				F.Visible = true
+				F.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+				F.BackgroundTransparency = 0.5
+				F.BorderColor3 = Color3.fromRGB(255, 0, 0)
+				F.BorderSizePixel = 1
+				F.Font = Enum.Font.SourceSansBold
+				F.Text = "强制自杀"
+				F.TextColor3 = Color3.fromRGB(255, 255, 255)
+				F.TextSize = 12
+				F.TextScaled = false
+				F.TextXAlignment = Enum.TextXAlignment.Center
+				F.TextYAlignment = Enum.TextYAlignment.Center
+				F.ZIndex = 3
+				local G = Instance.new("UICorner")
+				G.Name = "UICorner"
+				G.Parent = F
+				local H = Instance.new("UIStroke")
+				H.Name = "UIStroke"
+				H.Parent = F
+				H.Enabled = true
+				H.Color = Color3.fromRGB(255, 100, 100)
+				H.Thickness = 1
+				H.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+				H.Transparency = 0.3
+				H.LineJoinMode = Enum.LineJoinMode.Round
+				g(H)
+				F.MouseButton1Click:Connect(n)
+				local I = {}
+				local J = {
+					{
+						n = "全能上帝",
+						u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Omni%20God",
+					},
+					{ n = "启动脚本", u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Sutart" },
+					{
+						n = "卡杜克斯",
+						u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/CADUCUS%20(FIXED)",
+					},
+					{ n = "老爹", u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Big%20Daddy" },
+					{
+						n = "星光干扰器",
+						u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Spectrum%20Glitcher",
+					},
+					{ n = "枪械脚本", u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/M41451" },
+					{ n = "可疑脚本", u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/secks" },
+					{ n = "Majora面具", u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Mask" },
+					{
+						n = "彩虹驱逐者",
+						u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/Rainbow%20Banisher",
+					},
+					{
+						n = "扭曲者",
+						u = "https://raw.githubusercontent.com/ian49972/SCRIPTS/refs/heads/main/The%20Distorted",
+					},
+					{
+						n = "约翰·多伊",
+						u = "https://gitee.com/GA-158_ABBOQVBKCOM_0/xingguo/raw/main/goonlinetools-lua-8.lua",
+					},
+					{ n = "悟空", u = "https://gitee.com/GA-158_ABBOQVBKCOM_0/xingguo/raw/main/goonlinetools-lua-7.lua" },
+				}
+				local function K(L, M, N)
+					local O = Instance.new("TextButton")
+					O.Name = L
+					O.Parent = w
+					O.Size = UDim2.new(0, 75, 0, 50)
+					O.Position = M
+					O.AnchorPoint = Vector2.new(0.5, 0)
+					O.Visible = true
+					O.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+					O.BackgroundTransparency = 0.5
+					O.BorderColor3 = Color3.fromRGB(27, 42, 53)
+					O.BorderSizePixel = 1
+					O.ClipsDescendants = false
+					O.LayoutOrder = 2
+					O.Selectable = true
+					O.SelectionGroup = false
+					O.SizeConstraint = Enum.SizeConstraint.RelativeXY
+					O.Rotation = 0
+					O.AutomaticSize = Enum.AutomaticSize.None
+					O.Font = Enum.Font.Fantasy
+					O.Text = L
+					O.TextColor3 = Color3.fromRGB(255, 255, 255)
+					O.TextSize = 8
+					O.TextScaled = true
+					O.TextWrapped = true
+					O.TextXAlignment = Enum.TextXAlignment.Center
+					O.TextYAlignment = Enum.TextYAlignment.Center
+					O.TextTransparency = 0
+					O.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+					O.TextStrokeTransparency = 0.5
+					O.LineHeight = 1
+					O.RichText = false
+					O.TextTruncate = Enum.TextTruncate.None
+					O.MaxVisibleGraphemes = -1
+					O.Transparency = 0.5
+					O.ZIndex = 3
+					local P = Instance.new("UICorner")
+					P.Name = "UICorner"
+					P.Parent = O
+					local Q = Instance.new("UIStroke")
+					Q.Name = "UIStroke"
+					Q.Parent = O
+					Q.Enabled = true
+					Q.Color = Color3.fromRGB(88, 88, 88)
+					Q.Thickness = 1
+					Q.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+					Q.Transparency = 0.3
+					Q.LineJoinMode = Enum.LineJoinMode.Round
+					g(Q)
+					O.MouseButton1Click:Connect(function()
+						loadstring(game:HttpGet(N))()
+					end)
+					table.insert(I, O)
+					return O
+				end
+				for R, S in ipairs(J) do
+					local T = (R - 1) % 3
+					local U = math.floor((R - 1) / 3)
+					local M = UDim2.new(0.2 + T * 0.3, 0, 0, 110 + U * 60)
+					K(S.n, M, S.u)
+				end
+				local function V(W)
+					W = string.lower(W)
+					local X = {}
+					for Y, O in ipairs(I) do
+						local Z = string.lower(O.Name)
+						if W == "" or string.find(Z, W, 1, true) then
+							table.insert(X, O)
+						end
+					end
+					for Y, O in ipairs(I) do
+						O.Visible = false
+						O.Position = UDim2.new(10, 0, 10, 0)
+					end
+					local T, U = 0, 0
+					for R, O in ipairs(X) do
+						T = (R - 1) % 3
+						U = math.floor((R - 1) / 3)
+						O.Position = UDim2.new(0.2 + T * 0.3, 0, 0, 110 + U * 60)
+						O.Visible = true
+					end
+				end
+				C:GetPropertyChangedSignal("Text"):Connect(function()
+					V(C.Text)
+				end)
+			else
+				q.Enabled = not q.Enabled
+			end
+		end)
 	end
 
 	buildQuickFrame()
 
 	local quickVisible = false
+	local isMin = false
+	local fullSize = UDim2.new(0, 200, 0, 250)
+	local miniSize = UDim2.new(0, 200, 0, 32)
+
 	quickBtn.MouseButton1Click:Connect(function()
 		buildQuickFrame()
 		quickVisible = not quickVisible
 		if quickVisible then
 			quickFrame.Visible = true
-			Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 180, 0, 220) })
+			Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = isMin and miniSize or fullSize })
 		else
-			Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 180, 0, 0) })
+			Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = UDim2.new(0, 200, 0, 0) })
 			task.wait(0.35)
 			quickFrame.Visible = false
 		end
 	end)
+
+	local function updateMinBtn()
+		local minBtn = quickFrame and quickFrame:FindFirstChild("TopBar") and quickFrame.TopBar:FindFirstChild("MinBtn")
+		local bg = quickFrame and quickFrame:FindFirstChild("Mask") and quickFrame.Mask:FindFirstChild("BgImage")
+		local miniBg = quickFrame and quickFrame:FindFirstChild("Mask") and quickFrame.Mask:FindFirstChild("MiniBg")
+		if minBtn and bg and miniBg then
+			minBtn.MouseButton1Click:Connect(function()
+				isMin = not isMin
+				Library:Tween(quickFrame, Library.TweenLibrary.SmallEffect, { Size = isMin and miniSize or fullSize })
+				minBtn.Image = isMin and "rbxassetid://7733992901" or "rbxassetid://7733997941"
+				bg.Visible = not isMin
+				miniBg.Visible = isMin
+			end)
+		end
+	end
+
+	updateMinBtn()
 
 	do
 		local chatLogBtn = Instance.new("ImageButton")
