@@ -7,6 +7,7 @@ local a=game.ReplicatedStorage:FindFirstChild("ExecutionCount")or Instance.new("
 • 优化拖拽手感与内存占用
 • 新增切换按钮方框切换方法/去除了原有方法
 • 优化了切换按钮的定义
+• 修复了所有语法错误
 
 <b>后续计划</b>
 - 多语言包
@@ -14,6 +15,7 @@ local a=game.ReplicatedStorage:FindFirstChild("ExecutionCount")or Instance.new("
 - 云端脚本市场
 - 后续会重新做Ui粒子特效
 - 可能会重做悬浮窗 | 添加快捷栏
+- 暂时去除 UI粒子特效 等待重做
 
 感谢各位使用，如有 BUG 请反馈至 QQ群：259461151  -- XGOHUB 作者.星果XG
 
